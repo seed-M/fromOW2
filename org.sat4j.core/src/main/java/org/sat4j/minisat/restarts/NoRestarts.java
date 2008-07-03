@@ -43,17 +43,14 @@ public class NoRestarts implements RestartStrategy {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Override
 	public void init(SearchParams params) {
 		// nothing to do
 	}
 
-	@Override
 	public long nextRestartNumberOfConflict() {
 		return Long.MAX_VALUE;
 	}
 
-	@Override
 	public void onRestart() {
 		// do nothing
 	}
