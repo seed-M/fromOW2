@@ -29,9 +29,12 @@ package org.sat4j.minisat.constraints.cnf;
 
 import java.io.Serializable;
 
+import org.sat4j.minisat.IProof;
+import org.sat4j.minisat.IProofDelegate;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.UnitPropagationListener;
+import org.sat4j.minisat.proof.NullProofDelegate;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 
@@ -49,6 +52,18 @@ public abstract class WLClause implements Constr, Serializable {
 	protected final int[] lits;
 
 	protected final ILits voc;
+	
+    /**
+     * @author Fabien Delorme
+     * ID of the current clause, used for proof logging
+     */
+    private int id = IProof.CLAUSE_ID_NULL;
+    
+    /**
+     * @author delorme
+     * Proof to propagate infos to
+     */
+    private static IProofDelegate proof = new NullProofDelegate();
 
 	/**
 	 * Creates a new basic clause
@@ -64,7 +79,48 @@ public abstract class WLClause implements Constr, Serializable {
 		assert ps.size() == 0;
 		this.voc = voc;
 		activity = 0;
-	}
+	}	
+	
+    /**
+     * @author Fabien Delorme
+     * Creates a clause with an ID
+     * @param ps
+     * @param voc
+     * @param id id of the clause
+     */
+    public WLClause(IVecInt ps, ILits voc, int id){
+    	this(ps, voc);
+    	this.id = id;
+    }
+    
+    /**
+     * @author Fabien Delorme
+     * Returns the id of the clause
+     * @return
+     */
+    public int getId(){
+    	return this.id;
+    }
+    
+    /**
+     * @author Fabien Delorme
+     * sets the ID of the clause. Should not be called more than once on a given clause...
+     * @param id
+     */
+    public void setId(int id){
+    	// id should not be changed once set...
+    	assert this.id == IProof.CLAUSE_ID_NULL;
+    	this.id = id;
+    }
+    
+    /**
+     * @author delorme
+     * sets the IProofDelegate instances will have to give informations to
+     */
+    public static void setProof(IProofDelegate proof){
+    	assert proof != null;
+    	WLClause.proof = proof;
+    }
 
 	/**
 	 * Perform some sanity check before constructing a clause a) if a literal is

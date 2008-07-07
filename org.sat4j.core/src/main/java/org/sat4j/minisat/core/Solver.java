@@ -49,6 +49,7 @@
  *******************************************************************************/
 package org.sat4j.minisat.core;
 
+
 import static org.sat4j.core.LiteralsUtils.var;
 
 import java.io.PrintStream;
@@ -64,6 +65,8 @@ import java.util.TimerTask;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
+import org.sat4j.minisat.IProofDelegate;
+import org.sat4j.minisat.proof.NullProofDelegate;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
@@ -171,6 +174,11 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 
 	private int learnedLiterals = 0;
 	
+    /** Used for proof logging
+     * @author Fabien Delorme
+     */
+    private IProofDelegate proof;
+	
 	protected IVecInt dimacs2internal(IVecInt in) {
 		// if (voc.nVars() == 0) {
 		// throw new RuntimeException(
@@ -195,21 +203,41 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * 		an asserting clause generator
 	 */
 
-	public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
-			D dsf, IOrder<L> order, RestartStrategy restarter) {
-		this(acg, learner, dsf, new SearchParams(), order, restarter);
-	}
+    public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
+            D dsf, IOrder<L> order, RestartStrategy restarter) {
+        this(acg, learner, dsf, new SearchParams(), order, restarter, new NullProofDelegate());
+    }
 
-	public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
-			D dsf, SearchParams params, IOrder<L> order,
-			RestartStrategy restarter) {
-		analyzer = acg;
-		this.learner = learner;
-		this.order = order;
-		this.params = params;
-		setDataStructureFactory(dsf);
-		this.restarter = restarter;
-	}
+    public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
+            D dsf, SearchParams params, IOrder<L> order,
+            RestartStrategy restarter) {
+    	this(acg, learner, dsf, params, order, restarter, new NullProofDelegate());
+    }
+    
+    public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
+            D dsf, IOrder<L> order, RestartStrategy restarter, IProofDelegate proof) {
+        this(acg, learner, dsf, new SearchParams(), order, restarter, proof);
+    }
+
+    public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
+            D dsf, SearchParams params, IOrder<L> order,
+            RestartStrategy restarter, IProofDelegate proof) {
+        analyzer = acg;
+        this.learner = learner;
+        this.order = order;
+        this.params = params;
+        setDataStructureFactory(dsf);
+        this.restarter = restarter;
+        this.proof = proof;
+        
+        this.proof.setSolver(this);
+    }
+    
+    
+    public void setProof (IProofDelegate proof){
+    	this.proof = proof;
+    	this.proof.setSolver(this);
+    }
 
 	/**
 	 * Change the internal representation of the contraints. Note that the
@@ -290,17 +318,24 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	public int newVar() {
 		int index = voc.nVars() + 1;
 		voc.ensurePool(index);
+		proof.newVar(1);
 		return index;
 	}
 
 	public int newVar(int howmany) {
 		voc.ensurePool(howmany);
+		proof.newVar(howmany);
 		return voc.nVars();
 	}
 
 	public IConstr addClause(IVecInt literals) throws ContradictionException {
-		IVecInt vlits = dimacs2internal(literals);
-		return addConstr(dsfactory.createClause(vlits));
+        IVecInt vlits  = dimacs2internal(literals);
+        int     id     = proof.newClause(vlits); // Proof logger must know about this clause & the literals associated
+        Constr  clause = dsfactory.createClause(vlits);
+        
+        proof.setId(clause, id);
+        
+        return addConstr(clause);
 	}
 
 	public boolean removeConstr(IConstr co) {
@@ -308,11 +343,15 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			throw new IllegalArgumentException(
 					"Reference to the constraint to remove needed!"); //$NON-NLS-1$
 		}
+		
 		Constr c = (Constr) co;
 		c.remove();
 		constrs.remove(c);
 		clearLearntClauses();
 		cancelLearntLiterals();
+		
+		proof.deleted(c);
+		
 		return true;
 	}
 
@@ -427,6 +466,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	private final IVecInt outLearnt = new VecInt();
 
 	public void analyze(Constr confl, Pair results) {
+    	boolean again = true; // analyzer.clauseNonAssertive(confl), without the side effect...
 		assert confl != null;
 		outLearnt.clear();
 
@@ -437,6 +477,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			seen[i] = false;
 		}
 
+		proof.beginChain(confl);
 		analyzer.initAnalyze();
 		int p = ILits.UNDEFINED;
 
@@ -456,13 +497,18 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 				order.updateVar(q);
 				if (!seen[q >> 1]) {
 					// order.updateVar(q); // MINISAT
-					seen[q >> 1] = true;
-					if (voc.getLevel(q) == decisionLevel()) {
-						analyzer.onCurrentDecisionLevelLiteral(q);
-					} else if (voc.getLevel(q) > 0) {
-						// ajoute les variables depuis le niveau de d?cision 0
-						outLearnt.push(q ^ 1);
-						outBtlevel = Math.max(outBtlevel, voc.getLevel(q));
+					if (voc.getLevel(q) > 0){
+						seen[q >> 1] = true;
+						if (voc.getLevel(q) == decisionLevel()) {
+							analyzer.onCurrentDecisionLevelLiteral(q);
+						} else {
+							// ajoute les variables depuis le niveau de d?cision 0
+							outLearnt.push(q ^ 1);
+							outBtlevel = Math.max(outBtlevel, voc.getLevel(q));
+						}
+					}
+					else {
+                    	proof.resolveFromId(q >> 1);
 					}
 				}
 			}
@@ -479,12 +525,20 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			} while (!seen[p >> 1]);
 			// seen[p.var] indique que p se trouve dans outLearnt ou dans
 			// le dernier niveau de d?cision
-		} while (analyzer.clauseNonAssertive(confl));
+			
+            again = analyzer.clauseNonAssertive(confl);
+            
+            if (again){
+            	proof.resolve(confl, p >> 1);
+            }
+		} while (again);
 
 		outLearnt.set(0, p ^ 1);
 		simplifier.simplify(outLearnt);
 
+		int id = proof.afterAnalyze(outLearnt, analyzetoclear);
 		Constr c = dsfactory.createUnregisteredClause(outLearnt);
+		proof.setId(c, id);
 		slistener.learn(c);
 
 		results.reason = c;
@@ -633,7 +687,8 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 		int i, j;
 		// (maintain an abstraction of levels involved in conflict)
 		analyzetoclear.clear();
-		outLearnt.copyTo(analyzetoclear);
+		// TODO FD : removed because conflicts with proof logging
+        // outLearnt.copyTo(analyzetoclear);
 		for (i = 1, j = 1; i < outLearnt.size(); i++)
 			if (voc.getReason(outLearnt.get(i)) == null
 					|| !analyzeRemovable(outLearnt.get(i)))
@@ -758,8 +813,10 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			IVec<Propagatable> constrs = dsfactory.getWatchesFor(p);
 
 			final int size = constrs.size();
+			
 			for (int i = 0; i < size; i++) {
 				stats.inspects++;
+				
 				if (!constrs.get(i).propagate(this, p)) {
 					// Constraint is conflicting: copy remaining watches to
 					// watches[p]
@@ -1344,10 +1401,6 @@ interface ConflictTimer {
 }
 
 abstract class ConflictTimerAdapter implements Serializable, ConflictTimer {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private int counter;
@@ -1375,10 +1428,6 @@ abstract class ConflictTimerAdapter implements Serializable, ConflictTimer {
 }
 
 class ConflictTimerContainer implements Serializable, ConflictTimer {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private final IVec<ConflictTimer> timers = new Vec<ConflictTimer>();
