@@ -54,24 +54,29 @@ public class OptToPBSATAdapter extends PBSolverDecorator {
         this.problem = problem;
     }
 
+    @Override
     public boolean isSatisfiable() throws TimeoutException {
         modelComputed = false;
         return problem.admitABetterSolution();
     }
 
+   @Override
    public boolean isSatisfiable(boolean global) throws TimeoutException {
-        throw new UnsupportedOperationException();
+	  return isSatisfiable();
     }
 
+    @Override
     public boolean isSatisfiable(IVecInt assumps, boolean global)
             throws TimeoutException {
-        throw new UnsupportedOperationException();
+        return isSatisfiable(assumps);
     }
 
+    @Override
     public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int[] model() {
     	if (modelComputed) 
     		return problem.model();
@@ -93,11 +98,13 @@ public class OptToPBSATAdapter extends PBSolverDecorator {
         return problem.model();
     }
 
+    @Override
     public boolean model(int var) {
     	if (!modelComputed) model();
         return problem.model(var);
     }
 
+    @Override
     public String toString(String prefix) {        
         return prefix+"Optimization to Pseudo Boolean adapter\n"+super.toString(prefix);
     }

@@ -41,7 +41,7 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 public abstract class AbstractPBClauseCardConstrDataStructurePB  extends
-        AbstractPBDataStructureFactoryPB implements IInternalPBConstraintCreator{
+		AbstractPBDataStructureFactoryPB {
 
     /**
 	 * 
@@ -92,22 +92,23 @@ public abstract class AbstractPBClauseCardConstrDataStructurePB  extends
         if (mpb == null)
             return null;
         int size = mpb.size();
-        int[] lits = new int[size];
+		int[] theLits = new int[size];
         BigInteger[] normCoefs = new BigInteger[size];
-        mpb.buildConstraintFromMapPb(lits, normCoefs);
+		mpb.buildConstraintFromMapPb(theLits, normCoefs);
         if (mpb.getDegree().equals(BigInteger.ONE)) {
-            IVecInt v = WLClause.sanityCheck(new VecInt(lits), getVocabulary(),
-                    solver);
+			IVecInt v = WLClause.sanityCheck(new VecInt(theLits),
+					getVocabulary(), solver);
             if (v == null)
                 return null;
             return constructClause(v);
         }
         if (coefficientsEqualToOne(new Vec<BigInteger>(normCoefs))) {
             assert mpb.getDegree().compareTo(MAX_INT_VALUE) < 0;
-            return constructCard(new VecInt(lits), mpb.getDegree().intValue());
+			return constructCard(new VecInt(theLits), mpb.getDegree()
+					.intValue());
         }
         //return constructPB(mpb);
-        return constructPB(lits,normCoefs,mpb.getDegree());
+		return constructPB(theLits, normCoefs, mpb.getDegree());
     }
 
     /*
@@ -154,14 +155,14 @@ public abstract class AbstractPBClauseCardConstrDataStructurePB  extends
 
     abstract protected PBConstr constructClause(IVecInt v);
 
-    abstract protected PBConstr constructCard(IVecInt lits, int degree)
+	abstract protected PBConstr constructCard(IVecInt theLits, int degree)
             throws ContradictionException;
 
     abstract protected PBConstr constructPB(IDataStructurePB mpb)
             throws ContradictionException;
 
-    abstract protected PBConstr constructPB(int[] lits, BigInteger[] coefs, BigInteger degree)
-    throws ContradictionException;
+	abstract protected PBConstr constructPB(int[] theLits, BigInteger[] coefs,
+			BigInteger degree) throws ContradictionException;
 
     abstract protected PBConstr constructLearntClause(IVecInt literals);
 

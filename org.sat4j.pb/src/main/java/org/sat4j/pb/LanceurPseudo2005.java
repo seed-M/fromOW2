@@ -69,8 +69,8 @@ public class LanceurPseudo2005 extends AbstractOptimizationLauncher {
      * @see org.sat4j.Lanceur#createReader(org.sat4j.specs.ISolver)
      */
     @Override
-    protected Reader createReader(ISolver solver, String problemname) {
-        return new OPBReader2006((IPBSolver)solver);
+    protected Reader createReader(ISolver theSolver, String problemname) {
+        return new OPBReader2006((IPBSolver)theSolver);
     }
 
     /*
@@ -80,27 +80,29 @@ public class LanceurPseudo2005 extends AbstractOptimizationLauncher {
      */
     @Override
     protected ISolver configureSolver(String[] args) {
-        IPBSolver solver;
+        IPBSolver theSolver;
         if (args.length > 1) {
-            solver = SolverFactory.instance().createSolverByName(args[0]);
+            theSolver = SolverFactory.instance().createSolverByName(args[0]);
         } else {
-            solver = SolverFactory.newDefault();
+            theSolver = SolverFactory.newDefault();
         }
-        solver = new PseudoOptDecorator(solver);
-        // solver.setTimeout(Integer.MAX_VALUE);
-        out.println(solver.toString(COMMENT_PREFIX)); //$NON-NLS-1$
-        return solver;
+        theSolver = new PseudoOptDecorator(theSolver);
+        if (args.length==3) {
+           theSolver.setTimeout(Integer.valueOf(args[1]));
+        }
+        out.println(theSolver.toString(COMMENT_PREFIX)); //$NON-NLS-1$
+        return theSolver;
     }
 
     @Override
     public void usage() {
-        out.println("java -jar sat4j-pb.jar [solvername] instancename.opb"); //$NON-NLS-1$
+        out.println("java -jar sat4j-pb.jar [solvername [timeout]] instancename.opb"); //$NON-NLS-1$
         showAvailableSolvers(SolverFactory.instance());
     }
 
     @Override
     protected String getInstanceName(String[] args) {
-        assert args.length == 1 || args.length == 2;
+        assert args.length == 1 || args.length == 2 || args.length == 3;
         return args[args.length - 1];
     }
 }

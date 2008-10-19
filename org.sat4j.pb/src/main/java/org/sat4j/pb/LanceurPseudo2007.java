@@ -46,8 +46,8 @@ public class LanceurPseudo2007 extends LanceurPseudo2005 {
 	private static final long serialVersionUID = 1L;
 	
     @Override
-    protected Reader createReader(ISolver solver, String problemname) {
-        return new OPBReader2007((IPBSolver)solver);
+    protected Reader createReader(ISolver theSolver, String problemname) {
+        return new OPBReader2007((IPBSolver)theSolver);
     }
     /**
      * Lance le prouveur sur un fichier Dimacs
@@ -58,7 +58,7 @@ public class LanceurPseudo2007 extends LanceurPseudo2005 {
      */
     public static void main(final String[] args) {
         final AbstractLauncher lanceur = new LanceurPseudo2007();
-        if (args.length==0||args.length>2) {
+        if (args.length==0||args.length>3) {
             lanceur.usage();
             return;
         }
