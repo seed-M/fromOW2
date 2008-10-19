@@ -47,20 +47,36 @@ import org.sat4j.specs.IProblem;
  */
 public abstract class Reader {
 
-    public IProblem parseInstance(final String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
-        InputStream in;
-        if (filename.startsWith("http://")) {
-            in = (new URL(filename)).openStream();
-        } else {
-            in = new FileInputStream(filename);
-        }
-        if (filename.endsWith(".gz")) {
-            in = new GZIPInputStream(in);
-        }
-        return parseInstance(in);
-    }
+	public IProblem parseInstance(final String filename)
+			throws FileNotFoundException, ParseFormatException, IOException,
+			ContradictionException {
+		InputStream in = null;
+		try {
+			if (filename.startsWith("http://")) {
+				in = (new URL(filename)).openStream();
+			} else {
+				in = new FileInputStream(filename);
+			}
+			if (filename.endsWith(".gz")) {
+				in = new GZIPInputStream(in);
+			}
+			IProblem problem;
+			problem = parseInstance(in);
+			return problem;
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (ParseFormatException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		} catch (ContradictionException e) {
+			throw e;
+		} finally {
+			if (in != null) {
+				in.close();
+			}
+		}
+	}
 
     public IProblem parseInstance(final InputStream in)
             throws ParseFormatException, ContradictionException, IOException {
