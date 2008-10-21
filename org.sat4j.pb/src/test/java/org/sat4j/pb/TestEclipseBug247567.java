@@ -21,12 +21,13 @@ import org.sat4j.specs.TimeoutException;
  *
  */
 public class TestEclipseBug247567 {
+	private static final String PREFIX = System.getProperty("test.pbprefix");
 
 	@Test
 	public void testReserveVarsButUseLess() throws ContradictionException, TimeoutException, FileNotFoundException, ParseFormatException, IOException {
 		IPBSolver solver = SolverFactory.newEclipseP2();
 		Reader reader = new OPBEclipseReader2007(solver);
-		reader.parseInstance(getClass().getResource("bug247567.opb").getFile());
+		reader.parseInstance(PREFIX+"bug247567.opb");
 		assertTrue(solver.isSatisfiable());
 		assertTrue(solver.model(1));
 		assertTrue(solver.model(2));
