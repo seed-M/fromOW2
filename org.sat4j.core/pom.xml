@@ -36,8 +36,4 @@
       <name>Dieter von Holten</name>
      </contributor>
   </contributors>
-  <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sat4j/maven/trunk/org.sat4j.core</connection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/sat4j/maven/trunk/org.sat4j.core</url>
-  </scm>
 </project>
