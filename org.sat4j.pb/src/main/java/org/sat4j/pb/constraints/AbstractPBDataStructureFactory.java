@@ -30,16 +30,16 @@ package org.sat4j.pb.constraints;
 import java.math.BigInteger;
 
 import org.sat4j.minisat.constraints.AbstractDataStructureFactory;
-import org.sat4j.minisat.constraints.cnf.LearntWLClause;
+import org.sat4j.minisat.constraints.cnf.CBClause;
+import org.sat4j.minisat.constraints.cnf.Clauses;
 import org.sat4j.minisat.constraints.cnf.Lits;
-import org.sat4j.minisat.constraints.cnf.WLClause;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.pb.constraints.pb.AtLeastPB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.IInternalPBConstraintCreator;
+import org.sat4j.pb.constraints.pb.MixableCBClausePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
-import org.sat4j.pb.constraints.pb.WLClausePB;
 import org.sat4j.pb.core.PBDataStructureFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
@@ -59,14 +59,14 @@ public abstract class AbstractPBDataStructureFactory extends
 	private static final long serialVersionUID = 1L;
 
 	public Constr createClause(IVecInt literals) throws ContradictionException {
-        IVecInt v = WLClause.sanityCheck(literals, getVocabulary(), solver);
+        IVecInt v = Clauses.sanityCheck(literals, getVocabulary(), solver);
         if (v == null)
             return null;
-        return WLClausePB.brandNewClause(solver, getVocabulary(), v);
+        return MixableCBClausePB.brandNewClause(solver, getVocabulary(), v);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
-        return new LearntWLClause(literals, getVocabulary());
+        return new CBClause(literals, getVocabulary());
     }
 
     @Override

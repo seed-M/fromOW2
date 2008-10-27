@@ -34,9 +34,9 @@ import org.sat4j.core.VecInt;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.MinWatchCardPB;
 import org.sat4j.pb.constraints.pb.MinWatchPb;
+import org.sat4j.pb.constraints.pb.MixableCBClausePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.pb.constraints.pb.PuebloMinWatchPb;
-import org.sat4j.pb.constraints.pb.WLClausePB;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -51,7 +51,7 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
 
     @Override
     protected PBConstr constructClause(IVecInt v) {
-        return WLClausePB.brandNewClause(solver, getVocabulary(), v);
+        return MixableCBClausePB.brandNewClause(solver, getVocabulary(), v);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
 
     @Override
     protected PBConstr constructLearntClause(IVecInt literals) {
-        return new WLClausePB(literals, getVocabulary());
+        return new MixableCBClausePB(literals, getVocabulary());
     }
 
     @Override
@@ -95,7 +95,7 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
         IVecInt resLits = new VecInt();
         IVec<BigInteger> resCoefs = new Vec<BigInteger>();
         dspb.buildConstraintFromConflict(resLits, resCoefs);
-        return new WLClausePB(resLits, getVocabulary());
+        return new MixableCBClausePB(resLits, getVocabulary());
     }
 
     @Override
