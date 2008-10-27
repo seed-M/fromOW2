@@ -21,20 +21,8 @@ public class AllTests {
         TestSuite suite = new TestSuite("Test for org.sat4j.minisat");
         // $JUnit-BEGIN$
         suite.addTestSuite(TestAssertion.class);
-        suite.addTestSuite(M2MiniActiveLearningTest.class);
-        suite.addTestSuite(VarOrderTest.class);
-        suite.addTestSuite(M2MiniLearning23Test.class);
-        suite.addTestSuite(M2MiniLearning2Test.class);
-        suite.addTestSuite(M2MiniSATTest.class);
         suite.addTestSuite(TestsFonctionnels.class);
-        suite.addTestSuite(M2MiniLearningTest.class);
-        suite.addTestSuite(M2RelsatTest.class);
-        suite.addTestSuite(M2CardMinYannTest.class);
-        suite.addTestSuite(M2AtLeastTest.class);
-        suite.addTestSuite(M2BackjumpingTest.class);
-        suite.addTestSuite(M2MiniLearningCBTest.class);
         suite.addTest(GenericM2Test.suite());
-        suite.addTestSuite(M2CardMaxYannTest.class);
         // $JUnit-END$
         return suite;
     }

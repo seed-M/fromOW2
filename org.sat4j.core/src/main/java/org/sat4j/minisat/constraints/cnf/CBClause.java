@@ -182,7 +182,12 @@ public class CBClause implements Constr, Undoable, Serializable {
      * @see org.sat4j.minisat.core.Constr#locked()
      */
     public boolean locked() {
-        return voc.getReason(lits[0]) == this;
+    	for (int p : lits) {
+    		if (voc.isSatisfied(p)) {
+    			return voc.getReason(p) == this;
+    		}
+    	}
+        return false;
     }
 
     /*

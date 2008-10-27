@@ -19,7 +19,7 @@ public class TestAtMost extends TestCase {
 
     @Override
     protected void setUp() {
-        solver = SolverFactory.newMiniSAT();
+        solver = SolverFactory.newDefault();
     }
 
     public void testUnEssaiSat() throws TimeoutException {

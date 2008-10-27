@@ -18,7 +18,7 @@ public class SingleSolutionTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        solver = SolverFactory.newMiniSAT();
+        solver = SolverFactory.newDefault();
         detector = new SingleSolutionDetector(solver);
         detector.newVar(3);
     }

@@ -36,7 +36,7 @@ public class ModelIteratorTest extends TestCase {
 
     public void testModelIterator() {
         try {
-            ISolver solver = new ModelIterator(SolverFactory.newMiniLearning());
+            ISolver solver = new ModelIterator(SolverFactory.newDefault());
             solver.newVar(3);
             IVecInt clause = new VecInt();
             clause.push(1);
@@ -121,7 +121,7 @@ public class ModelIteratorTest extends TestCase {
     public void testCardModel() {
         try {
             ISolver solver = new Minimal4CardinalityModel(SolverFactory
-                    .newMiniLearning());
+                    .newDefault());
             solver.newVar(3);
             IVecInt clause = new VecInt();
             clause.push(1);
@@ -149,7 +149,7 @@ public class ModelIteratorTest extends TestCase {
     public void testIncModel() {
         try {
             ISolver solver = new Minimal4InclusionModel(SolverFactory
-                    .newMiniLearning());
+                    .newDefault());
             solver.newVar(3);
             IVecInt clause = new VecInt();
             clause.push(1);
@@ -176,7 +176,7 @@ public class ModelIteratorTest extends TestCase {
 
     public void testIsSatisfiableVecInt() {
         try {
-            ISolver solver = SolverFactory.newMiniLearning();
+            ISolver solver = SolverFactory.newDefault();
             solver.newVar(3);
             IVecInt clause = new VecInt();
             clause.push(1);
