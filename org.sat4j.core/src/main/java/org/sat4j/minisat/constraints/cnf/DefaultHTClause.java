@@ -25,55 +25,70 @@
 * See www.minisat.se for the original solver in C++.
 * 
 *******************************************************************************/
-package org.sat4j.minisat.datatype;
+package org.sat4j.minisat.constraints.cnf;
 
-import junit.framework.TestCase;
+import static org.sat4j.core.LiteralsUtils.neg;
 
-import org.sat4j.minisat.core.Lbool;
+import org.sat4j.minisat.core.ILits;
+import org.sat4j.specs.IVecInt;
 
-/*
- * Created on 2 nov. 2003
- *
- */
+public class DefaultHTClause extends HTClause {
 
-/**
- * @author leberre
- * 
- */
-public class LboolTest extends TestCase {
+    private boolean learnt;
+
+    public DefaultHTClause(IVecInt ps, ILits voc) {
+        super(ps, voc);
+    }
 
     /**
-     * Constructor for LboolTest.
      * 
-     * @param arg0
      */
-    public LboolTest(String arg0) {
-        super(arg0);
-    }
+    private static final long serialVersionUID = 1L;
 
-    public void testNot() {
-        assertEquals(Lbool.FALSE, Lbool.TRUE.not());
-        assertEquals(Lbool.TRUE, Lbool.FALSE.not());
-        assertEquals(Lbool.UNDEFINED, Lbool.UNDEFINED.not());
-    }
-
-    /*
-     * Test pour boolean equals(Object)
+    /**
+     * declares this clause as learnt
+     * 
      */
-    public void testEqualsObject() {
-        assertEquals(Lbool.FALSE, Lbool.FALSE);
-        assertNotSame(Lbool.FALSE, Lbool.TRUE);
-        assertNotSame(Lbool.FALSE, Lbool.UNDEFINED);
-        assertNotSame(Lbool.TRUE, Lbool.UNDEFINED);
+    public void setLearnt() {
+        learnt = true;
     }
 
     /*
-     * Test pour String toString()
+     * (non-Javadoc)
+     * 
+     * @see org.sat4j.minisat.datatype.Constr#learnt()
      */
-    public void testToString() {
-        assertEquals("U", Lbool.UNDEFINED.toString());
-        assertEquals("T", Lbool.TRUE.toString());
-        assertEquals("F", Lbool.FALSE.toString());
+    public boolean learnt() {
+        return learnt;
+    }
+
+    /**
+     * Register this clause which means watching the necessary literals If the
+     * clause is learnt, setLearnt() must be called before a call to register()
+     * 
+     * @see #setLearnt()
+     */
+    public void register() {
+        assert lits.length > 1;
+        if (learnt) {
+            // looking for the literal to put in tail
+            int maxi = 1;
+            int maxlevel = voc.getLevel(lits[1]);
+            for (int i = 2; i < lits.length; i++) {
+                int level = voc.getLevel(lits[i]);
+                if (level > maxlevel) {
+                    maxi = i;
+                    maxlevel = level;
+                }
+            }
+            int l = lits[tail];
+            lits[tail] = lits[maxi];
+            lits[maxi] = l;
+        }
+
+        // watch both head and tail literals.
+        voc.watch(neg(lits[HEAD]), this);
+        voc.watch(neg(lits[tail]), this);
     }
 
 }

@@ -38,7 +38,9 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 
 /**
- * @author leberre Contrainte de cardinalit?
+ * Cardinality constraint.
+ *
+ * @author leberre 
  */
 public class AtLeast implements Constr, Undoable, Serializable {
 

@@ -25,24 +25,59 @@
 * See www.minisat.se for the original solver in C++.
 * 
 *******************************************************************************/
+package org.sat4j.minisat.constraints.cnf;
 
-package org.sat4j.minisat;
+import static org.sat4j.core.LiteralsUtils.neg;
+import org.sat4j.minisat.core.ILits;
+import org.sat4j.minisat.core.UnitPropagationListener;
+import org.sat4j.specs.IVecInt;
 
-import junit.framework.TestCase;
+public class OriginalHTClause extends HTClause {
 
-/**
- * @author roussel
- * 
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
-public class TestAssertion extends TestCase {
-
-    public void testAssertion() {
-        boolean assertionsEnabled = false;
-        assert assertionsEnabled = true;
-        if (!assertionsEnabled)
-            fail("assertions should be enabled !");
+    public OriginalHTClause(IVecInt ps, ILits voc) {
+        super(ps, voc);
     }
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.sat4j.minisat.constraints.cnf.WLClause#register()
+     */
+    public void register() {
+        assert lits.length > 1;
+        voc.watch(neg(lits[HEAD]), this);
+        voc.watch(neg(lits[tail]), this);
+    }
+
+    public boolean learnt() {
+        return false;
+    }
+
+    public void setLearnt() {
+        // do nothing
+    }
+
+    /**
+     * Creates a brand new clause, presumably from external data.
+     * 
+     * @param s
+     *            the object responsible for unit propagation
+     * @param voc
+     *            the vocabulary
+     * @param literals
+     *            the literals to store in the clause
+     * @return the created clause or null if the clause should be ignored
+     *         (tautology for example)
+     */
+    public static OriginalHTClause brandNewClause(UnitPropagationListener s,
+            ILits voc, IVecInt literals) {
+        OriginalHTClause c = new OriginalHTClause(literals, voc);
+        c.register();
+        return c;
+    }
 }

@@ -20,6 +20,7 @@ package org.sat4j.minisat;
 
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.minisat.constraints.ClassicDataStructureFactory;
+import org.sat4j.minisat.constraints.HTDataStructureFactory;
 import org.sat4j.minisat.core.DataStructureFactory;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.IOrder;
@@ -198,7 +199,7 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      *      instance of ASolverFactory.
      */
     public static ISolver newDefault() {
-        return newMiniLearning(new ClassicDataStructureFactory());
+        return newMiniLearning(new HTDataStructureFactory());
     }
 
     @Override
@@ -214,7 +215,7 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      *      instance of ASolverFactory.
      */
     public static ISolver newLight() {
-        return newDefault();
+        return newMiniLearning(new ClassicDataStructureFactory());
     }
 
     @Override
