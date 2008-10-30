@@ -84,9 +84,6 @@ public class VarOrderHeapObjective extends VarOrderHeap<ILits> {
 					phaseStrategy.init(var, neg(p));
 				}
 			}
-			// } else {
-			// System.err.println(
-			// "c The heuristics cannot find the objective function!!!!");
 		}
 	}
 

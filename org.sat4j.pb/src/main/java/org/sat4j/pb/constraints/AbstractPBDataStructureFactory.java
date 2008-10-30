@@ -36,9 +36,9 @@ import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.pb.constraints.pb.AtLeastPB;
+import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.IInternalPBConstraintCreator;
-import org.sat4j.pb.constraints.pb.MixableCBClausePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.pb.core.PBDataStructureFactory;
 import org.sat4j.specs.ContradictionException;
@@ -62,11 +62,11 @@ public abstract class AbstractPBDataStructureFactory extends
         IVecInt v = Clauses.sanityCheck(literals, getVocabulary(), solver);
         if (v == null)
             return null;
-        return MixableCBClausePB.brandNewClause(solver, getVocabulary(), v);
+        return HTClausePB.brandNewClause(solver, getVocabulary(), v);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
-        return new CBClause(literals, getVocabulary());
+        return new HTClausePB(literals, getVocabulary());
     }
 
     @Override

@@ -30,7 +30,7 @@ package org.sat4j.pb.constraints;
 import java.math.BigInteger;
 
 import org.sat4j.minisat.constraints.cnf.Clauses;
-import org.sat4j.pb.constraints.pb.MixableCBClausePB;
+import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
@@ -65,12 +65,12 @@ public abstract class AbstractPBDataStructureFactoryPB extends
         if (theLits==null) {
             return null;
         }
-        return MixableCBClausePB.brandNewClause(solver, getVocabulary(),theLits);
+        return HTClausePB.brandNewClause(solver, getVocabulary(),theLits);
     }
 
     @Override
     public PBConstr createUnregisteredClause(IVecInt literals) {
-        return MixableCBClausePB.brandNewClause(solver, getVocabulary(),literals);
+        return new HTClausePB(literals,getVocabulary());
     }
 
 }
