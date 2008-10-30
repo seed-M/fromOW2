@@ -166,12 +166,12 @@ public class DimacsOutputSolver implements ISolver {
 
     }
 
-    public void printStat(PrintStream out, String prefix) {
+    public void printStat(PrintStream output, String prefix) {
         // TODO Auto-generated method stub
 
     }
 
-    public void printStat(PrintWriter out, String prefix) {
+    public void printStat(PrintWriter output, String prefix) {
         // TODO Auto-generated method stub
 
     }
@@ -236,7 +236,7 @@ public class DimacsOutputSolver implements ISolver {
         throw new TimeoutException("There is no real solver behind!");
     }
 
-    public void printInfos(PrintWriter out, String prefix) {
+    public void printInfos(PrintWriter output, String prefix) {
     }
 
     public void setTimeoutOnConflicts(int count) {        
