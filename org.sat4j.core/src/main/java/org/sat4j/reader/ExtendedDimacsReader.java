@@ -123,8 +123,7 @@ public class ExtendedDimacsReader extends DimacsReader {
         try {
             ((GateTranslator)solver).gateTrue(vars);
         } catch (ContradictionException e) {
-            assert false;
-            System.err.println("Contradiction when asserting root variable?");
+            throw new ParseFormatException("Contradiction when asserting root variable?");
         }
         disableNumberOfConstraintCheck();
     }

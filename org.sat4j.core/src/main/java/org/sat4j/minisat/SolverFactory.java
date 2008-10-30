@@ -19,18 +19,35 @@
 package org.sat4j.minisat;
 
 import org.sat4j.core.ASolverFactory;
-import org.sat4j.minisat.constraints.ClassicDataStructureFactory;
-import org.sat4j.minisat.constraints.HTDataStructureFactory;
+import org.sat4j.minisat.constraints.CardinalityDataStructure;
+import org.sat4j.minisat.constraints.ClausalDataStructureCB;
+import org.sat4j.minisat.constraints.ClausalDataStructureCBHT;
+import org.sat4j.minisat.constraints.MixedDataStructureDaniel;
+import org.sat4j.minisat.constraints.MixedDataStructureWithBinary;
+import org.sat4j.minisat.constraints.MixedDataStructureWithBinaryAndTernary;
 import org.sat4j.minisat.core.DataStructureFactory;
 import org.sat4j.minisat.core.ILits;
+import org.sat4j.minisat.core.ILits2;
+import org.sat4j.minisat.core.ILits23;
 import org.sat4j.minisat.core.IOrder;
+import org.sat4j.minisat.core.SearchParams;
 import org.sat4j.minisat.core.Solver;
+import org.sat4j.minisat.learning.ActiveLearning;
+import org.sat4j.minisat.learning.FixedLengthLearning;
 import org.sat4j.minisat.learning.LimitedLearning;
 import org.sat4j.minisat.learning.MiniSATLearning;
+import org.sat4j.minisat.learning.NoLearningButHeuristics;
 import org.sat4j.minisat.learning.PercentLengthLearning;
+import org.sat4j.minisat.orders.JWOrder;
+import org.sat4j.minisat.orders.MyOrder;
+import org.sat4j.minisat.orders.PureOrder;
+import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrder;
 import org.sat4j.minisat.orders.VarOrderHeap;
+import org.sat4j.minisat.restarts.ArminRestarts;
+import org.sat4j.minisat.restarts.LubyRestarts;
 import org.sat4j.minisat.restarts.MiniSATRestarts;
+import org.sat4j.minisat.uip.DecisionUIP;
 import org.sat4j.minisat.uip.FirstUIP;
 import org.sat4j.opt.MinOneDecorator;
 import org.sat4j.specs.ISolver;
@@ -81,6 +98,65 @@ public class SolverFactory extends ASolverFactory<ISolver> {
 
 
     /**
+     * @return a "default" "minilearning" solver learning clauses of size
+     *         smaller than 10 % of the total number of variables
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearning() {
+        return newMiniLearning(10);
+    }
+
+    /**
+     * @return a "default" "minilearning" solver learning clauses of size
+     *         smaller than 10 % of the total number of variables with a heap
+     *         based var order.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeap() {
+        return newMiniLearningHeap(new MixedDataStructureDaniel());
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapEZSimp() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeap();
+        solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
+        return solver;
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapExpSimp() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeap();
+        solver.setSimplifier(solver.EXPENSIVE_SIMPLIFICATION);
+        return solver;
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapRsatExpSimp() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeapExpSimp();
+        solver.setOrder(new VarOrderHeap<ILits>(new RSATPhaseSelectionStrategy()));
+        return solver;
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapRsatExpSimpBiere() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeapRsatExpSimp();
+        solver.setRestartStrategy(new ArminRestarts());
+        solver.setSearchParams(new SearchParams(1.1, 100));
+        return solver;
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapRsatExpSimpLuby() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeapRsatExpSimp();
+        solver.setRestartStrategy(new LubyRestarts());
+        return solver;
+    }
+
+    /**
+     * @param n
+     *                the maximal size of the clauses to learn as a percentage
+     *                of the initial number of variables
+     * @return a "minilearning" solver learning clauses of size smaller than n
+     *         of the total number of variables
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearning(int n) {
+        return newMiniLearning(new MixedDataStructureDaniel(), n);
+    }
+
+    /**
      * @param dsf
      *                a specific data structure factory
      * @return a default "minilearning" solver using a specific data structure
@@ -102,6 +178,71 @@ public class SolverFactory extends ASolverFactory<ISolver> {
     public static <L extends ILits> Solver<L,DataStructureFactory<L>> newMiniLearningHeap(
             DataStructureFactory<L> dsf) {
         return newMiniLearning(dsf, new VarOrderHeap<L>());
+    }
+
+    /**
+     * @return a default minilearning solver using a specific data structure
+     *         described in Lawrence Ryan thesis to handle binary clauses.
+     * @see #newMiniLearning
+     */
+    public static Solver<ILits2,DataStructureFactory<ILits2>> newMiniLearning2() {
+        return newMiniLearning(new MixedDataStructureWithBinary());
+    }
+
+    public static Solver<ILits2,DataStructureFactory<ILits2>> newMiniLearning2Heap() {
+        return newMiniLearningHeap(new MixedDataStructureWithBinary());
+    }
+
+    /**
+     * @return a default minilearning solver using a specific data structures
+     *         described in Lawrence Ryan thesis to handle binary and ternary
+     *         clauses.
+     * @see #newMiniLearning
+     */
+    public static Solver<ILits23,DataStructureFactory<ILits23>> newMiniLearning23() {
+        return newMiniLearning(new MixedDataStructureWithBinaryAndTernary());
+    }
+
+    /**
+     * @return a default minilearning SAT solver using counter-based clause
+     *         representation (i.e. all the literals of a clause are watched)
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningCB() {
+        return newMiniLearning(new ClausalDataStructureCB());
+    }
+
+    /**
+     * @return a default minilearning SAT solver using counter-based clause
+     *         representation (i.e. all the literals of a clause are watched)
+     *         for the ORIGINAL clauses and watched-literals clause
+     *         representation for learnt clauses.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningCBWL() {
+        return newMiniLearning(new ClausalDataStructureCBHT());
+    }
+
+    public static Solver<ILits2,DataStructureFactory<ILits2>> newMiniLearning2NewOrder() {
+        return newMiniLearning(new MixedDataStructureWithBinary(),
+                new MyOrder());
+    }
+
+    /**
+     * @return a default minilearning SAT solver choosing periodically to branch
+     *         on "pure watched" literals if any. (a pure watched literal l is a
+     *         literal that is watched on at least one clause such that its
+     *         negation is not watched at all. It is not necessarily a watched
+     *         literal.)
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningPure() {
+        return newMiniLearning(new MixedDataStructureDaniel(), new PureOrder());
+    }
+
+    /**
+     * @return a default minilearning SAT solver choosing periodically to branch
+     *         on literal "pure in the original set of clauses" if any.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningCBWLPure() {
+        return newMiniLearning(new ClausalDataStructureCBHT(), new PureOrder());
     }
 
     /**
@@ -144,6 +285,10 @@ public class SolverFactory extends ASolverFactory<ISolver> {
         return solver;
     }
 
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningEZSimp() {
+        return newMiniLearningEZSimp(new MixedDataStructureDaniel());
+    }
+
     // public static ISolver newMiniLearning2EZSimp() {
     // return newMiniLearningEZSimp(new MixedDataStructureWithBinary());
     // }
@@ -156,6 +301,87 @@ public class SolverFactory extends ASolverFactory<ISolver> {
         learning.setSolver(solver);
         solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
         return solver;
+    }
+
+    /**
+     * @return a default MiniLearning without restarts.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapEZSimpNoRestarts() {
+        LimitedLearning<ILits,DataStructureFactory<ILits>> learning = new PercentLengthLearning<ILits,DataStructureFactory<ILits>>(10);
+        Solver<ILits,DataStructureFactory<ILits>> solver = new Solver<ILits,DataStructureFactory<ILits>>(new FirstUIP(), learning,
+                new MixedDataStructureDaniel(), new SearchParams(
+                        Integer.MAX_VALUE), new VarOrderHeap<ILits>(),
+                new MiniSATRestarts());
+        learning.setSolver(solver);
+        solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
+        return solver;
+    }
+
+    /**
+     * @return a default MiniLearning with restarts beginning at 1000 conflicts.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapEZSimpLongRestarts() {
+        LimitedLearning<ILits,DataStructureFactory<ILits>> learning = new PercentLengthLearning<ILits,DataStructureFactory<ILits>>(10);
+        Solver<ILits,DataStructureFactory<ILits>> solver = new Solver<ILits,DataStructureFactory<ILits>>(new FirstUIP(), learning,
+                new MixedDataStructureDaniel(), new SearchParams(1000),
+                new VarOrderHeap<ILits>(), new MiniSATRestarts());
+        learning.setSolver(solver);
+        solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
+        return solver;
+    }
+
+    /**
+     * @return a SAT solver using First UIP clause generator, watched literals,
+     *         VSIDS like heuristics learning only clauses having a great number
+     *         of active variables, i.e. variables with an activity strictly
+     *         greater than one.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newActiveLearning() {
+        ActiveLearning<ILits,DataStructureFactory<ILits>> learning = new ActiveLearning<ILits,DataStructureFactory<ILits>>();
+        Solver<ILits,DataStructureFactory<ILits>> s = new Solver<ILits,DataStructureFactory<ILits>>(new FirstUIP(), learning,
+                new MixedDataStructureDaniel(), new VarOrder<ILits>(),
+                new MiniSATRestarts());
+        learning.setOrder(s.getOrder());
+        learning.setSolver(s);
+        return s;
+    }
+
+    /**
+     * @return a SAT solver very close to the original MiniSAT sat solver.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSAT() {
+        return newMiniSAT(new MixedDataStructureDaniel());
+    }
+
+    /**
+     * @return MiniSAT without restarts.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSATNoRestarts() {
+        MiniSATLearning<ILits,DataStructureFactory<ILits>> learning = new MiniSATLearning<ILits,DataStructureFactory<ILits>>();
+        Solver<ILits,DataStructureFactory<ILits>> solver = new Solver<ILits,DataStructureFactory<ILits>>(new FirstUIP(), learning,
+                new MixedDataStructureDaniel(), new SearchParams(
+                        Integer.MAX_VALUE), new VarOrder<ILits>(),
+                new MiniSATRestarts());
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        return solver;
+
+    }
+
+    /**
+     * @return MiniSAT with a special data structure from Lawrence Ryan thesis
+     *         for managing binary clauses.
+     */
+    public static Solver<ILits2,DataStructureFactory<ILits2>> newMiniSAT2() {
+        return newMiniSAT(new MixedDataStructureWithBinary());
+    }
+
+    /**
+     * @return MiniSAT with a special data structure from Lawrence Ryan thesis
+     *         for managing binary and ternary clauses.
+     */
+    public static Solver<ILits23,DataStructureFactory<ILits23>> newMiniSAT23() {
+        return newMiniSAT(new MixedDataStructureWithBinaryAndTernary());
     }
 
     /**
@@ -173,11 +399,115 @@ public class SolverFactory extends ASolverFactory<ISolver> {
         return solver;
     }
 
+    /**
+     * @return a SAT solver very close to the original MiniSAT sat solver.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSATHeap() {
+        return newMiniSATHeap(new MixedDataStructureDaniel());
+    }
+
+    /**
+     * @return a SAT solver very close to the original MiniSAT sat solver
+     *         including easy reason simplification.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSATHeapEZSimp() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniSATHeap();
+        solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
+        return solver;
+    }
+
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSATHeapExpSimp() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniSATHeap();
+        solver.setSimplifier(solver.EXPENSIVE_SIMPLIFICATION);
+        return solver;
+    }
+
+    /**
+     * @return MiniSAT with a special data structure from Lawrence Ryan thesis
+     *         for managing binary clauses.
+     */
+    public static Solver<ILits2,DataStructureFactory<ILits2>> newMiniSAT2Heap() {
+        return newMiniSATHeap(new MixedDataStructureWithBinary());
+    }
+
+    /**
+     * @return MiniSAT with a special data structure from Lawrence Ryan thesis
+     *         for managing binary and ternary clauses.
+     */
+    public static Solver<ILits23,DataStructureFactory<ILits23>> newMiniSAT23Heap() {
+        return newMiniSATHeap(new MixedDataStructureWithBinaryAndTernary());
+    }
+
     public static <L extends ILits> Solver<L,DataStructureFactory<L>> newMiniSATHeap(
             DataStructureFactory<L> dsf) {
         MiniSATLearning<L,DataStructureFactory<L>> learning = new MiniSATLearning<L,DataStructureFactory<L>>();
         Solver<L,DataStructureFactory<L>> solver = new Solver<L,DataStructureFactory<L>>(new FirstUIP(), learning, dsf,
                 new VarOrderHeap<L>(), new MiniSATRestarts());
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        return solver;
+    }
+
+    /**
+     * @return MiniSAT with data structures to handle cardinality constraints.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniCard() {
+        return newMiniSAT(new CardinalityDataStructure());
+    }
+
+
+    /**
+     * @return MiniSAT with decision UIP clause generator.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newRelsat() {
+        MiniSATLearning<ILits,DataStructureFactory<ILits>> learning = new MiniSATLearning<ILits,DataStructureFactory<ILits>>();
+        Solver<ILits,DataStructureFactory<ILits>> solver = new Solver<ILits,DataStructureFactory<ILits>>(new DecisionUIP(), learning,
+                new MixedDataStructureDaniel(), new VarOrderHeap<ILits>(),
+                new MiniSATRestarts());
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        return solver;
+    }
+
+    /**
+     * @return MiniSAT with VSIDS heuristics, FirstUIP clause generator for
+     *         backjumping but no learning.
+     */
+    public static Solver<ILits,DataStructureFactory<ILits>> newBackjumping() {
+        NoLearningButHeuristics<ILits,DataStructureFactory<ILits>> learning = new NoLearningButHeuristics<ILits,DataStructureFactory<ILits>>();
+        Solver<ILits,DataStructureFactory<ILits>> solver = new Solver<ILits,DataStructureFactory<ILits>>(new FirstUIP(), learning,
+                new MixedDataStructureDaniel(), new VarOrderHeap<ILits>(),
+                new MiniSATRestarts());
+        learning.setVarActivityListener(solver);
+        return solver;
+    }
+
+    /**
+     * @return a SAT solver with learning limited to clauses of length smaller
+     *         or equals to 3, with a specific data structure for binary and
+     *         ternary clauses as found in Lawrence Ryan thesis, without
+     *         restarts, with a Jeroslow/Wang kind of heuristics.
+     */
+    public static Solver<ILits23,DataStructureFactory<ILits23>> newMini3SAT() {
+        LimitedLearning<ILits23,DataStructureFactory<ILits23>> learning = new FixedLengthLearning<ILits23,DataStructureFactory<ILits23>>(3);
+        Solver<ILits23,DataStructureFactory<ILits23>> solver = new Solver<ILits23,DataStructureFactory<ILits23>>(new FirstUIP(), learning,
+                new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
+                        Integer.MAX_VALUE), new JWOrder(),
+                new MiniSATRestarts());
+        learning.setSolver(solver);
+        return solver;
+    }
+
+    /**
+     * @return a Mini3SAT with full learning.
+     * @see #newMini3SAT()
+     */
+    public static Solver<ILits23,DataStructureFactory<ILits23>> newMini3SATb() {
+        MiniSATLearning<ILits23,DataStructureFactory<ILits23>> learning = new MiniSATLearning<ILits23,DataStructureFactory<ILits23>>();
+        Solver<ILits23,DataStructureFactory<ILits23>> solver = new Solver<ILits23,DataStructureFactory<ILits23>>(new FirstUIP(), learning,
+                new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
+                        Integer.MAX_VALUE), new JWOrder(),
+                new MiniSATRestarts());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -199,7 +529,7 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      *      instance of ASolverFactory.
      */
     public static ISolver newDefault() {
-        return newMiniLearning(new HTDataStructureFactory());
+        return newMiniLearningHeapRsatExpSimpBiere();
     }
 
     @Override
@@ -215,7 +545,7 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      *      instance of ASolverFactory.
      */
     public static ISolver newLight() {
-        return newMiniLearning(new ClassicDataStructureFactory());
+        return newMini3SAT();
     }
 
     @Override

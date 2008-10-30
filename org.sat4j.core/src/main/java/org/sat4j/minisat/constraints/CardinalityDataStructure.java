@@ -25,65 +25,45 @@
 * See www.minisat.se for the original solver in C++.
 * 
 *******************************************************************************/
-package org.sat4j.tools;
+package org.sat4j.minisat.constraints;
 
-import org.sat4j.core.VecInt;
+import org.sat4j.minisat.constraints.card.AtLeast;
+import org.sat4j.minisat.constraints.cnf.LearntHTClause;
+import org.sat4j.minisat.core.Constr;
 import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.TimeoutException;
 
 /**
- * Computes models with a minimal number (with respect to cardinality) of
- * negative literals. This is done be adding a constraint on the number of
- * negative literals each time a model if found (the number of negative literals
- * occuring in the model minus one).
- * 
- * @author leberre
- * @see org.sat4j.specs.ISolver#addAtMost(IVecInt, int)
+ * @author leberre To change the template for this generated type comment go to
+ *         Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class Minimal4CardinalityModel extends SolverDecorator<ISolver> {
+public class CardinalityDataStructure extends AbstractCardinalityDataStructure {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param solver
-     */
-    public Minimal4CardinalityModel(ISolver solver) {
-        super(solver);
+    public Constr createUnregisteredClause(IVecInt literals) {
+        return new LearntHTClause(literals, getVocabulary());
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.ISolver#model()
+     * @see org.sat4j.minisat.DataStructureFactory#createClause(org.sat4j.datatype.VecInt)
+     */
+    public Constr createClause(IVecInt literals) throws ContradictionException {
+        return AtLeast.atLeastNew(solver, getVocabulary(), literals, 1);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.sat4j.minisat.DataStructureFactory#createCardinalityConstraint(org.sat4j.datatype.VecInt,
+     *      int)
      */
     @Override
-    public int[] model() {
-        int[] prevmodel = null;
-        IVecInt vec = new VecInt();
-        // backUp();
-        try {
-            do {
-                prevmodel = super.model();
-                vec.clear();
-                for (int i = 1; i <= nVars(); i++) {
-                    vec.push(-i);
-                }
-                int counter = 0;
-                for (int q : prevmodel) {
-                    if (q < 0) {
-                        counter++;
-                    }
-                }
-                addAtMost(vec, counter - 1);
-            } while (isSatisfiable());
-        } catch (TimeoutException e) {
-           throw new IllegalStateException("Solver timed out"); //$NON-NLS-1$
-        } catch (ContradictionException e) {
-            // added trivial unsat clauses
-        }
-        // restore();
-        return prevmodel;
+    public Constr createCardinalityConstraint(IVecInt literals, int degree)
+            throws ContradictionException {
+        return AtLeast.atLeastNew(solver, getVocabulary(), literals, degree);
     }
+
 }

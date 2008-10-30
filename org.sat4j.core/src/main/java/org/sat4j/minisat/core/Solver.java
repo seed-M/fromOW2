@@ -471,11 +471,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			// select next reason to look at
 			do {
 				p = trail.last();
-				// System.err.print((Clause.lastid()+1)+"
-				// "+((Clause)confl).getId()+"" );
 				confl = voc.getReason(p);
-				// System.err.println(((Clause)confl).getId());
-				// assert(confl != null) || counter == 1;
 				undoOne();
 			} while (!seen[p >> 1]);
 			// seen[p.var] indique que p se trouve dans outLearnt ou dans

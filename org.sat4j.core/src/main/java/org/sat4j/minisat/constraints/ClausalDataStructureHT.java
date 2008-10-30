@@ -25,65 +25,44 @@
 * See www.minisat.se for the original solver in C++.
 * 
 *******************************************************************************/
-package org.sat4j.tools;
+package org.sat4j.minisat.constraints;
 
-import org.sat4j.core.VecInt;
+import org.sat4j.minisat.constraints.cnf.Clauses;
+import org.sat4j.minisat.constraints.cnf.LearntHTClause;
+import org.sat4j.minisat.constraints.cnf.Lits;
+import org.sat4j.minisat.constraints.cnf.OriginalHTClause;
+import org.sat4j.minisat.core.Constr;
+import org.sat4j.minisat.core.ILits;
 import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.TimeoutException;
 
 /**
- * Computes models with a minimal number (with respect to cardinality) of
- * negative literals. This is done be adding a constraint on the number of
- * negative literals each time a model if found (the number of negative literals
- * occuring in the model minus one).
- * 
+ * Uses Head Tail data structure for both original clauses and learned clauses.
+ *
  * @author leberre
- * @see org.sat4j.specs.ISolver#addAtMost(IVecInt, int)
  */
-public class Minimal4CardinalityModel extends SolverDecorator<ISolver> {
+public class ClausalDataStructureHT extends AbstractDataStructureFactory<ILits> {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * @param solver
-     */
-    public Minimal4CardinalityModel(ISolver solver) {
-        super(solver);
-    }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.ISolver#model()
+     * @see org.sat4j.minisat.DataStructureFactory#createClause(org.sat4j.datatype.VecInt)
      */
+    public Constr createClause(IVecInt literals) throws ContradictionException {
+        IVecInt v = Clauses.sanityCheck(literals, getVocabulary(), solver);
+        if (v == null)
+            return null;
+        return OriginalHTClause.brandNewClause(solver, getVocabulary(), v);
+    }
+
+    public Constr createUnregisteredClause(IVecInt literals) {
+        return new LearntHTClause(literals, getVocabulary());
+    }
+
     @Override
-    public int[] model() {
-        int[] prevmodel = null;
-        IVecInt vec = new VecInt();
-        // backUp();
-        try {
-            do {
-                prevmodel = super.model();
-                vec.clear();
-                for (int i = 1; i <= nVars(); i++) {
-                    vec.push(-i);
-                }
-                int counter = 0;
-                for (int q : prevmodel) {
-                    if (q < 0) {
-                        counter++;
-                    }
-                }
-                addAtMost(vec, counter - 1);
-            } while (isSatisfiable());
-        } catch (TimeoutException e) {
-           throw new IllegalStateException("Solver timed out"); //$NON-NLS-1$
-        } catch (ContradictionException e) {
-            // added trivial unsat clauses
-        }
-        // restore();
-        return prevmodel;
+    protected ILits createLits() {
+        return new Lits();
     }
 }
