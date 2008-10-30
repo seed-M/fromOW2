@@ -30,7 +30,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.sat4j.core.ASolverFactory;
-import org.sat4j.minisat.constraints.MixedDataStructureDaniel;
+import org.sat4j.minisat.constraints.HTDataStructureFactory;
 import org.sat4j.minisat.core.DataStructureFactory;
 import org.sat4j.minisat.core.DotSearchListener;
 import org.sat4j.minisat.core.IOrder;
@@ -231,8 +231,8 @@ public class Lanceur extends AbstractLauncher {
     }
 
     @Override
-    protected Reader createReader(ISolver solver, String problemname) {
-        return new InstanceReader(solver);
+    protected Reader createReader(ISolver theSolver, String problemname) {
+        return new InstanceReader(theSolver);
     }
 
     @Override
@@ -265,19 +265,19 @@ public class Lanceur extends AbstractLauncher {
             pf.setProperty(couple[0], couple[1]);
         }
         DataStructureFactory dsf = setupObject("DSF", pf,
-                new MixedDataStructureDaniel());
+                new HTDataStructureFactory());
         LearningStrategy learning = setupObject("LEARNING", pf,
                 new PercentLengthLearning());
         IOrder order = setupObject("ORDER", pf, new VarOrderHeap());
         RestartStrategy restarter = setupObject("RESTARTS", pf,
                 new MiniSATRestarts());
-        Solver solver = new Solver(new FirstUIP(), learning, dsf, order,
+        Solver theSolver = new Solver(new FirstUIP(), learning, dsf, order,
                 restarter);
-        learning.setSolver(solver);
-        solver.setSimplifier(pf.getProperty("SIMP", "NO_SIMPLIFICATION"));
+        learning.setSolver(theSolver);
+        theSolver.setSimplifier(pf.getProperty("SIMP", "NO_SIMPLIFICATION"));
         SearchParams params = setupObject("PARAMS", pf, new SearchParams());
-        solver.setSearchParams(params);
-        return solver;
+        theSolver.setSearchParams(params);
+        return theSolver;
     }
 
     @SuppressWarnings("unchecked")
