@@ -101,7 +101,7 @@ public class MinWatchPb extends WatchPb {
         for (int i = 0; i < lits.length
                 && watchCumul.subtract(coefs[0]).compareTo(degree) < 0; i++) {
             if (!voc.isFalsified(lits[i])) {
-                voc.watch(lits[i] ^ 1, this);
+                voc.attach(lits[i] ^ 1, this);
                 watching[watchingCount++] = i;
                 watched[i] = true;
                 // Mise ??? jour de la possibilit??? initiale
@@ -143,7 +143,7 @@ public class MinWatchPb extends WatchPb {
 
             if (free > 0) {
                 assert maxi >= 0;
-                voc.watch(lits[maxi] ^ 1, this);
+                voc.attach(lits[maxi] ^ 1, this);
                 watching[watchingCount++] = maxi;
                 watched[maxi] = true;
                 // Mise ??? jour de la possibilit??? initiale
@@ -349,7 +349,7 @@ public class MinWatchPb extends WatchPb {
         // Effectuer les propagations, return si l'une est impossible
         if (upWatchCumul.compareTo(degree) < 0) {
             // conflit
-            voc.watch(p, this);
+            voc.attach(p, this);
             assert watched[pIndice];
             assert !isSatisfiable();
             return false;
@@ -362,7 +362,7 @@ public class MinWatchPb extends WatchPb {
                         && i != pIndiceWatching
                         && !voc.isSatisfied(lits[watching[i]])
                         && !s.enqueue(lits[watching[i]], this)) {
-                    voc.watch(p, this);
+                    voc.attach(p, this);
                     assert !isSatisfiable();
                     return false;
                 }
@@ -387,7 +387,7 @@ public class MinWatchPb extends WatchPb {
      */
     public void remove() {
         for (int i = 0; i < watchingCount; i++) {
-            voc.watches(lits[watching[i]] ^ 1).remove(this);
+            voc.attaches(lits[watching[i]] ^ 1).remove(this);
             this.watched[this.watching[i]] = false;
         }
         watchingCount = 0;
@@ -401,7 +401,7 @@ public class MinWatchPb extends WatchPb {
      *            un litt???ral d???saffect???
      */
     public void undo(int p) {
-        voc.watch(p, this);
+        voc.attach(p, this);
         int pIndice = 0;
         while ((lits[pIndice] ^ 1) != p)
             pIndice++;
@@ -481,7 +481,7 @@ public class MinWatchPb extends WatchPb {
                     watched[ind] = true;
                     assert watchingCount < size();
                     watching[watchingCount++] = ind;
-                    voc.watch(lits[ind] ^ 1, this);
+                    voc.attach(lits[ind] ^ 1, this);
                     // Si on obtient un nouveau coefficient maximum
                     if (coefs[ind].compareTo(maxCoef) > 0) {
                         maxCoef = coefs[ind];

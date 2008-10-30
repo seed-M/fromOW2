@@ -85,11 +85,11 @@ public class MaxWatchPb extends WatchPb {
             if (voc.isFalsified(lits[i])) {
                 if (learnt){
                     voc.undos(lits[i] ^ 1).push(this);
-                    voc.watch(lits[i] ^ 1, this);
+                    voc.attach(lits[i] ^ 1, this);
                 }
             } else {
                 // Mise ? jour de la possibilit? initiale
-                voc.watch(lits[i] ^ 1, this);
+                voc.attach(lits[i] ^ 1, this);
                 watchCumul = watchCumul.add(coefs[i]);
             }
         }
@@ -191,7 +191,7 @@ public class MaxWatchPb extends WatchPb {
      * @return false ssi une inconsistance est d?tect?e
      */
     public boolean propagate(UnitPropagationListener s, int p) {
-        voc.watch(p, this);
+        voc.attach(p, this);
 
         assert watchCumul.compareTo(recalcLeftSide()) >= 0 : "" + watchCumul
                 + "/" + recalcLeftSide() + ":" + learnt;
@@ -237,7 +237,7 @@ public class MaxWatchPb extends WatchPb {
     public void remove() {
         for (int i = 0; i < lits.length; i++) {
             if (!voc.isFalsified(lits[i]))
-                voc.watches(lits[i] ^ 1).remove(this);
+                voc.attaches(lits[i] ^ 1).remove(this);
         }
     }
 

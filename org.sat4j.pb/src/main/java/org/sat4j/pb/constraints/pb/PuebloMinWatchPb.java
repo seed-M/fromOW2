@@ -178,7 +178,7 @@ public class PuebloMinWatchPb extends MinWatchPb {
                     watched[ind] = true;
                     assert watchingCount < size();
                     watching[watchingCount++] = ind;
-                    voc.watch(lits[ind] ^ 1, this);
+                    voc.attach(lits[ind] ^ 1, this);
                 }
             }
             watchCumul = upWatchCumul.add(coefs[pIndice]);
