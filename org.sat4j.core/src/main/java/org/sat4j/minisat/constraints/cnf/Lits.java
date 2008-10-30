@@ -222,11 +222,11 @@ public class Lits implements Serializable, ILits {
 		return undos[lit >> 1];
 	}
 
-	public void watch(int lit, Propagatable c) {
+	public void attach(int lit, Propagatable c) {
 		watches[lit].push(c);
 	}
 
-	public IVec<Propagatable> watches(int lit) {
+	public IVec<Propagatable> attaches(int lit) {
 		return watches[lit];
 	}
 

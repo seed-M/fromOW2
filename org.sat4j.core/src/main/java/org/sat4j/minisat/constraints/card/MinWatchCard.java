@@ -329,7 +329,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
         // Si la contrainte est responsable de propagation unitaire
         if (watchCumul == degree) {
-            voc.watch(p, this);
+            voc.attach(p, this);
             return false;
         }
 
@@ -347,7 +347,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         // Mise ? jour de la contrainte
         if (indSwap == lits.length) {
             // Si aucun litt?ral n'a ?t? trouv?
-            voc.watch(p, this);
+            voc.attach(p, this);
             // La limite est atteinte
             watchCumul--;
             assert watchCumul == degree;
@@ -366,7 +366,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         lits[indFalsified] = tmpInt;
 
         // On observe le nouveau litt?ral
-        voc.watch(tmpInt ^ 1, this);
+        voc.attach(tmpInt ^ 1, this);
 
         return true;
     }
@@ -376,7 +376,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
      */
     public void remove() {
         for (int i = 0; i <= degree; i++) {
-            voc.watches(lits[i] ^ 1).remove(this);
+            voc.attaches(lits[i] ^ 1).remove(this);
         }
     }
 
@@ -485,7 +485,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
             // Si le litteral est observable
             if (!voc.isFalsified(lits[i])) {
                 watchCumul++;
-                voc.watch(lits[i] ^ 1, this);
+                voc.attach(lits[i] ^ 1, this);
             }
         }
         if (learnt()) {
@@ -508,7 +508,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
                 }
                 if (free > 0) {
                     assert maxi >= 0;
-                    voc.watch(lits[maxi] ^ 1, this);
+                    voc.attach(lits[maxi] ^ 1, this);
                     tmpInt = lits[maxi];
                     lits[maxi] = lits[watchCumul];
                     lits[watchCumul] = tmpInt;

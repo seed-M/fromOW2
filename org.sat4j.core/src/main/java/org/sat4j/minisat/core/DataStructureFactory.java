@@ -71,12 +71,12 @@ public interface DataStructureFactory<L extends ILits> {
      * @return a vector containing all the objects to be notified of the
      *         satisfaction of that literal.
      */
-    IVec<Propagatable> getWatchesFor(int p);
+    IVec<Propagatable> getAttachesFor(int p);
 
     /**
      * @param p
      * @param i
      *            the index of the conflicting constraint
      */
-    void conflictDetectedInWatchesFor(int p, int i);
+    void conflictDetectedInAttachesFor(int p, int i);
 }

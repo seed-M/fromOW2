@@ -114,8 +114,8 @@ public abstract class HTClause implements Constr, Serializable {
 	 * @see Constr#remove(Solver)
 	 */
 	public void remove() {
-		voc.watches(neg(lits[HEAD])).remove(this);
-		voc.watches(neg(lits[tail])).remove(this);
+		voc.attaches(neg(lits[HEAD])).remove(this);
+		voc.attaches(neg(lits[tail])).remove(this);
 	}
 
 	/*
@@ -142,12 +142,12 @@ public abstract class HTClause implements Constr, Serializable {
 			}
 			assert temphead <= tail;
 			if (temphead == tail) {
-				voc.watch(p, this);
+				voc.attach(p, this);
 				return s.enqueue(mylits[tail], this);
 			}
 			mylits[HEAD] = mylits[temphead];
 			mylits[temphead] = neg(p);
-			voc.watch(neg(mylits[HEAD]), this);
+			voc.attach(neg(mylits[HEAD]), this);
 			return true;
 		}
 		assert mylits[tail] == neg(p);
@@ -158,12 +158,12 @@ public abstract class HTClause implements Constr, Serializable {
 		}
 		assert HEAD <= temptail;
 		if (HEAD == temptail) {
-			voc.watch(p, this);
+			voc.attach(p, this);
 			return s.enqueue(mylits[HEAD], this);
 		}
 		mylits[tail] = mylits[temptail];
 		mylits[temptail] = neg(p);
-		voc.watch(neg(mylits[tail]), this);
+		voc.attach(neg(mylits[tail]), this);
 		return true;
 	}
 

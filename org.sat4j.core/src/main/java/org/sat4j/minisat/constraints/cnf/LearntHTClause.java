@@ -64,8 +64,8 @@ public class LearntHTClause extends HTClause {
 		lits[maxi] = l;
 
 		// watch both head and tail literals.
-		voc.watch(neg(lits[HEAD]), this);
-		voc.watch(neg(lits[tail]), this);
+		voc.attach(neg(lits[HEAD]), this);
+		voc.attach(neg(lits[tail]), this);
 
 	}
 

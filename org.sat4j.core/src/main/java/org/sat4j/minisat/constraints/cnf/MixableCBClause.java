@@ -60,7 +60,7 @@ public class MixableCBClause extends CBClause {
      */
     @Override
     public boolean propagate(UnitPropagationListener s, int p) {
-        voc.watch(p, this);
+        voc.attach(p, this);
         return super.propagate(s, p);
     }
 

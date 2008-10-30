@@ -54,7 +54,7 @@ public class ClausalDataStructureCB extends AbstractDataStructureFactory<ILits> 
 	 * (int, int)
 	 */
 	@Override
-	public void conflictDetectedInWatchesFor(int p, int i) {
+	public void conflictDetectedInAttachesFor(int p, int i) {
 		// to nothing
 	}
 
@@ -64,8 +64,8 @@ public class ClausalDataStructureCB extends AbstractDataStructureFactory<ILits> 
 	 * @see org.sat4j.minisat.core.DataStructureFactory#getWatchesFor(int)
 	 */
 	@Override
-	public IVec<Propagatable> getWatchesFor(int p) {
-		return getVocabulary().watches(p);
+	public IVec<Propagatable> getAttachesFor(int p) {
+		return getVocabulary().attaches(p);
 	}
 
 	/*

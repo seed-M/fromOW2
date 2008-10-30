@@ -80,7 +80,7 @@ public class CBClause implements Constr, Undoable, Serializable {
      */
     public void remove() {
         for (int i = 0; i < lits.length; i++) {
-            voc.watches(lits[i] ^ 1).remove(this);
+            voc.attaches(lits[i] ^ 1).remove(this);
         }
     }
 
@@ -206,7 +206,7 @@ public class CBClause implements Constr, Undoable, Serializable {
      */
     public void register() {
         for (int p : lits) {
-            voc.watch(p ^ 1, this);
+            voc.attach(p ^ 1, this);
         }
         if (learnt) {
             for (int p : lits) {

@@ -50,8 +50,8 @@ public class OriginalHTClause extends HTClause {
      */
     public void register() {
         assert lits.length > 1;
-        voc.watch(neg(lits[HEAD]), this);
-        voc.watch(neg(lits[tail]), this);
+        voc.attach(neg(lits[HEAD]), this);
+        voc.attach(neg(lits[tail]), this);
     }
 
     public boolean learnt() {

@@ -55,8 +55,8 @@ public class JWOrder extends VarOrder<ILits23> {
                 + pos3 + neg3;
         assert weight <= Integer.MAX_VALUE;
         if (weight == 0) {
-            int pos = lits.watches(p).size();
-            int neg = lits.watches(neg(p)).size();
+            int pos = lits.attaches(p).size();
+            int neg = lits.attaches(neg(p)).size();
             weight = pos + neg;
         }
         return (int) weight;

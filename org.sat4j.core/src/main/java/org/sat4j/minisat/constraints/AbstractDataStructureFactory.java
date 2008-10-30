@@ -57,9 +57,9 @@ public abstract class AbstractDataStructureFactory<L extends ILits> implements
      * 
      * @see org.sat4j.minisat.core.DataStructureFactory#conflictDetectedInWatchesFor(int)
      */
-    public void conflictDetectedInWatchesFor(int p, int i) {
+    public void conflictDetectedInAttachesFor(int p, int i) {
         for (int j = i + 1; j < tmp.size(); j++) {
-            lits.watch(p, tmp.get(j));
+            lits.attach(p, tmp.get(j));
         }
     }
 
@@ -68,9 +68,9 @@ public abstract class AbstractDataStructureFactory<L extends ILits> implements
      * 
      * @see org.sat4j.minisat.core.DataStructureFactory#getWatchesFor(int)
      */
-    public IVec<Propagatable> getWatchesFor(int p) {
+    public IVec<Propagatable> getAttachesFor(int p) {
         tmp.clear();
-        lits.watches(p).moveTo(tmp);
+        lits.attaches(p).moveTo(tmp);
         return tmp;
     }
 

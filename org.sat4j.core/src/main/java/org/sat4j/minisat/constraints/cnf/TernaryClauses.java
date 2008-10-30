@@ -77,7 +77,7 @@ public class TernaryClauses implements Constr, Serializable {
     public boolean propagate(UnitPropagationListener s, int p) {
         assert voc.isSatisfied(p);
         assert voc.isFalsified(phead);
-        voc.watch(p, this);
+        voc.attach(p, this);
         for (int i = 0; i < stubs.size(); i += 2) {
             int a = stubs.get(i);
             int b = stubs.get(i + 1);

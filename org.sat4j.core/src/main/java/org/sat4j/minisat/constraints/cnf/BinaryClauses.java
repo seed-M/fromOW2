@@ -80,7 +80,7 @@ public class BinaryClauses implements Constr, Serializable {
      */
     public boolean propagate(UnitPropagationListener s, int p) {
         // assert voc.isFalsified(this.reason);
-        voc.watch(p, this);
+        voc.attach(p, this);
         for (int i = 0; i < clauses.size(); i++) {
             int q = clauses.get(i);
             if (!s.enqueue(q, this)) {

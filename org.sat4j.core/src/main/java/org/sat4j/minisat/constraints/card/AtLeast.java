@@ -72,7 +72,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
         lits = new int[ps.size()];
         ps.moveTo(lits);
         for (int q : lits) {
-            voc.watch(q ^ 1, this);
+            voc.attach(q ^ 1, this);
         }
     }
 
@@ -135,7 +135,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
      */
     public void remove() {
         for (int q : lits) {
-            voc.watches(q ^ 1).remove(this);
+            voc.attaches(q ^ 1).remove(this);
         }
     }
 
@@ -146,7 +146,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
      */
     public boolean propagate(UnitPropagationListener s, int p) {
         // remet la clause dans la liste des clauses regardees
-        voc.watch(p, this);
+        voc.attach(p, this);
 
         if (counter == maxUnsatisfied)
             return false;

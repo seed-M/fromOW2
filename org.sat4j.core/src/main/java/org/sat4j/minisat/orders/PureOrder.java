@@ -76,8 +76,8 @@ public class PureOrder extends VarOrder<ILits> {
             cpt = 0;
             int nblits = 2 * lits.nVars();
             for (int i = 2; i <= nblits; i++) {
-                if (lits.isUnassigned(i) && lits.watches(i).size() > 0
-                        && lits.watches(i ^ 1).size() == 0) {
+                if (lits.isUnassigned(i) && lits.attaches(i).size() > 0
+                        && lits.attaches(i ^ 1).size() == 0) {
                     return i;
                 }
             }

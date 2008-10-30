@@ -119,14 +119,14 @@ public interface ILits {
 
     public abstract IVec<Undoable> undos(int lit);
 
-    public abstract void watch(int lit, Propagatable c);
+    public abstract void attach(int lit, Propagatable c);
 
     /**
      * @param lit
      *            a literal
      * @return the list of all the constraints that watch the negation of lit
      */
-    public abstract IVec<Propagatable> watches(int lit);
+    public abstract IVec<Propagatable> attaches(int lit);
 
     public abstract String valueToString(int lit);
 }

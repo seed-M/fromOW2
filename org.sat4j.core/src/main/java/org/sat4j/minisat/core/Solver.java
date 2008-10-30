@@ -741,7 +741,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 			// Moved original MiniSAT code to dsfactory to avoid
 			// watches manipulation in counter Based clauses for instance.
 			assert p > 1;
-			IVec<Propagatable> watched = dsfactory.getWatchesFor(p);
+			IVec<Propagatable> watched = dsfactory.getAttachesFor(p);
 
 			final int size = watched.size();
 			for (int i = 0; i < size; i++) {
@@ -750,7 +750,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 					// Constraint is conflicting: copy remaining watches to
 					// watches[p]
 					// and return constraint
-					dsfactory.conflictDetectedInWatchesFor(p, i);
+					dsfactory.conflictDetectedInAttachesFor(p, i);
 					qhead = trail.size(); // propQ.clear();
 					// FIXME enlever le transtypage
 					return (Constr) watched.get(i);
