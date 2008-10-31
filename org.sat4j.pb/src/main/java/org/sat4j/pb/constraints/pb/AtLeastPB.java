@@ -30,6 +30,7 @@ package org.sat4j.pb.constraints.pb;
 import java.math.BigInteger;
 
 import org.sat4j.minisat.constraints.card.AtLeast;
+import org.sat4j.minisat.constraints.card.Cards;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.UnitPropagationListener;
 import org.sat4j.specs.ContradictionException;
@@ -51,7 +52,7 @@ public class AtLeastPB extends AtLeast implements PBConstr {
 
     public static AtLeastPB atLeastNew(UnitPropagationListener s, ILits voc,
             IVecInt ps, int n) throws ContradictionException {
-        int degree = niceParameters(s, voc, ps, n);
+        int degree = Cards.niceParameters(s, voc, ps, n);
         if (degree == 0)
             return null;
         return new AtLeastPB(voc, ps, degree);

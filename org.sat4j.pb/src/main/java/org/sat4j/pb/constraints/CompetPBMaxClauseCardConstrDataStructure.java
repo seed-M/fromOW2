@@ -33,7 +33,7 @@ import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.Clauses;
 import org.sat4j.pb.constraints.pb.PBConstr;
-import org.sat4j.pb.constraints.pb.WatchPb;
+import org.sat4j.pb.constraints.pb.Pseudos;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -65,7 +65,7 @@ public class CompetPBMaxClauseCardConstrDataStructure
         BigInteger[] normCoefs = new BigInteger[coefs.size()];
         coefs.copyTo(normCoefs);
 
-        BigInteger bigDegree = WatchPb.niceParametersForCompetition(theLits, normCoefs,
+        BigInteger bigDegree = Pseudos.niceParametersForCompetition(theLits, normCoefs,
                 moreThan, degree);
         if (bigDegree == null)
             return null;

@@ -191,8 +191,8 @@ public class MinWatchPb extends WatchPb {
     public static MinWatchPb minWatchPbNew(UnitPropagationListener s,
             ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
             throws ContradictionException {
-        return minWatchPbNew(s, voc, ps, toVecBigInt(coefs), moreThan,
-                toBigInt(degree));
+        return minWatchPbNew(s, voc, ps, Pseudos.toVecBigInt(coefs), moreThan,
+                BigInteger.valueOf(degree));
     }
 
     /**
@@ -219,7 +219,7 @@ public class MinWatchPb extends WatchPb {
         coefs.copyTo(coefsVec);
 
         // Ajouter les simplifications quand la structure sera d???finitive
-        IDataStructurePB mpb = niceParameters(litsVec, coefsVec, moreThan,
+        IDataStructurePB mpb = Pseudos.niceParameters(litsVec, coefsVec, moreThan,
                 degree, voc);
 
         if (mpb == null)
@@ -423,8 +423,8 @@ public class MinWatchPb extends WatchPb {
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits, IVecInt coefs,
             boolean moreThan, int degree) {
-        return watchPbNew(voc, lits, toVecBigInt(coefs), moreThan,
-                toBigInt(degree));
+        return watchPbNew(voc, lits, Pseudos.toVecBigInt(coefs), moreThan,
+                BigInteger.valueOf(degree));
     }
 
     /**
@@ -433,7 +433,7 @@ public class MinWatchPb extends WatchPb {
     public static WatchPb watchPbNew(ILits voc, IVecInt lits,
             IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
         IDataStructurePB mpb = null;
-        mpb = niceCheckedParameters(lits, coefs, moreThan, degree, voc);
+        mpb = Pseudos.niceCheckedParameters(lits, coefs, moreThan, degree, voc);
         return new MinWatchPb(voc, mpb);
     }
 

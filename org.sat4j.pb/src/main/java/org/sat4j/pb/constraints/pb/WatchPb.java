@@ -30,14 +30,12 @@ package org.sat4j.pb.constraints.pb;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.Undoable;
 import org.sat4j.minisat.core.UnitPropagationListener;
 import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 public abstract class WatchPb implements PBConstr, Undoable, Serializable {
@@ -200,80 +198,6 @@ public abstract class WatchPb implements PBConstr, Undoable, Serializable {
         return activity;
     }
 
-    public static IDataStructurePB niceParameters(IVecInt ps,
-            IVec<BigInteger> bigCoefs, boolean moreThan, BigInteger bigDeg,
-            ILits voc) throws ContradictionException {
-        // Ajouter les simplifications quand la structure sera d?finitive
-        if (ps.size() == 0) {
-            throw new ContradictionException("Creating Empty clause ?");
-        } else if (ps.size() != bigCoefs.size()) {
-            throw new IllegalArgumentException(
-                    "Contradiction dans la taille des tableaux ps=" + ps.size()
-                            + " coefs=" + bigCoefs.size() + ".");
-        }
-        return niceCheckedParameters(ps, bigCoefs, moreThan, bigDeg, voc);
-    }
-
-    public static IDataStructurePB niceCheckedParameters(IVecInt ps,
-            IVec<BigInteger> bigCoefs, boolean moreThan, BigInteger bigDeg,
-            ILits voc) {
-        assert ps.size() != 0 && ps.size() == bigCoefs.size();
-        int[] lits = new int[ps.size()];
-        ps.copyTo(lits);
-        BigInteger[] bc = new BigInteger[bigCoefs.size()];
-        bigCoefs.copyTo(bc);
-        BigInteger bigDegree = niceCheckedParametersForCompetition(lits,bc,moreThan,bigDeg); 
-
-        IDataStructurePB mpb = new MapPb(voc.nVars()*2+2);
-        if (bigDegree.signum() > 0)
-            bigDegree = mpb.cuttingPlane(lits, bc, bigDegree);
-        if (bigDegree.signum() > 0)
-            bigDegree = mpb.saturation();
-        if (bigDegree.signum() <= 0)
-            return null;
-        return mpb;
-    }
-
-    public static BigInteger niceParametersForCompetition(int[] ps,
-            BigInteger[] bigCoefs, boolean moreThan, BigInteger bigDeg) 
-            throws ContradictionException {
-        // Ajouter les simplifications quand la structure sera d?finitive
-        if (ps.length == 0) {
-            throw new ContradictionException("Creating Empty clause ?");
-        } else if (ps.length != bigCoefs.length) {
-            throw new IllegalArgumentException(
-                    "Contradiction dans la taille des tableaux ps=" + ps.length
-                            + " coefs=" + bigCoefs.length + ".");
-        }
-        return niceCheckedParametersForCompetition(ps, bigCoefs, moreThan, bigDeg);
-    }
-
-    public static BigInteger niceCheckedParametersForCompetition(int[] lits,
-            BigInteger[] bc, boolean moreThan, BigInteger bigDeg) {
-        BigInteger bigDegree = bigDeg;
-        if (!moreThan) {
-            for (int i = 0; i < lits.length; i++) {
-                bc[i] = bc[i].negate();
-            }
-            bigDegree = bigDegree.negate();
-        }
-
-        for (int i = 0; i < bc.length; i++)
-            if (bc[i].signum() < 0) {
-                lits[i] = lits[i] ^ 1;
-                bc[i] = bc[i].negate();
-                bigDegree = bigDegree.add(bc[i]);
-            }
-        
-        for (int i = 0; i < bc.length; i++)
-            if (bc[i].compareTo(bigDegree) > 0) 
-            	bc[i] = bigDegree;
-            
-        
-       return bigDegree;
-            
-    }
-
     /**
      * increase activity value of the constraint
      * 
@@ -367,19 +291,6 @@ public abstract class WatchPb implements PBConstr, Undoable, Serializable {
             }
         }
         return false;
-    }
-
-    /**
-     * Calcule le ppcm de deux nombres
-     * 
-     * @param a
-     *                premier nombre de l'op?ration
-     * @param b
-     *                second nombre de l'op?ration
-     * @return le ppcm en question
-     */
-    protected static BigInteger ppcm(BigInteger a, BigInteger b) {
-        return a.divide(a.gcd(b)).multiply(b);
     }
 
     /**
@@ -561,17 +472,6 @@ public abstract class WatchPb implements PBConstr, Undoable, Serializable {
             System.out.println(this);
             assert false;
         }
-    }
-
-    public static IVec<BigInteger> toVecBigInt(IVecInt vec) {
-        IVec<BigInteger> bigVec = new Vec<BigInteger>(vec.size());
-        for (int i = 0; i < vec.size(); ++i)
-            bigVec.push(BigInteger.valueOf(vec.get(i)));
-        return bigVec;
-    }
-
-    public static BigInteger toBigInt(int i) {
-        return BigInteger.valueOf(i);
     }
 
     public BigInteger[] getCoefs() {

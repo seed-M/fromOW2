@@ -136,8 +136,8 @@ public class MaxWatchPb extends WatchPb {
     public static MaxWatchPb maxWatchPbNew(UnitPropagationListener s,
             ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
             throws ContradictionException {
-        return maxWatchPbNew(s, voc, ps, toVecBigInt(coefs), moreThan,
-                toBigInt(degree));
+        return maxWatchPbNew(s, voc, ps, Pseudos.toVecBigInt(coefs), moreThan,
+                BigInteger.valueOf(degree));
     }
 
     /**
@@ -164,7 +164,7 @@ public class MaxWatchPb extends WatchPb {
         ps.copyTo(litsVec);
         coefs.copyTo(coefsVec);
 
-        IDataStructurePB mpb = niceParameters(litsVec, coefsVec, moreThan,
+        IDataStructurePB mpb = Pseudos.niceParameters(litsVec, coefsVec, moreThan,
                 degree, voc);
 
         if (mpb == null) {
@@ -262,8 +262,8 @@ public class MaxWatchPb extends WatchPb {
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits, IVecInt coefs,
             boolean moreThan, int degree) {
-        return watchPbNew(voc, lits, toVecBigInt(coefs), moreThan,
-                toBigInt(degree));
+        return watchPbNew(voc, lits, Pseudos.toVecBigInt(coefs), moreThan,
+                BigInteger.valueOf(degree));
     }
 
 
@@ -273,7 +273,7 @@ public class MaxWatchPb extends WatchPb {
     public static WatchPb watchPbNew(ILits voc, IVecInt lits,
             IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
         IDataStructurePB mpb = null;
-        mpb = niceCheckedParameters(lits, coefs, moreThan, degree, voc);
+        mpb = Pseudos.niceCheckedParameters(lits, coefs, moreThan, degree, voc);
         return new MaxWatchPb(voc, mpb);
     }
 

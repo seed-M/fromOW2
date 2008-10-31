@@ -34,6 +34,7 @@ import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.Clauses;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
+import org.sat4j.pb.constraints.pb.Pseudos;
 import org.sat4j.pb.constraints.pb.WatchPb;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
@@ -59,8 +60,8 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
     @Override
     protected PBConstr constraintFactory(IVecInt literals, IVecInt coefs,
             boolean moreThan, int degree) throws ContradictionException {
-        return constraintFactory(literals, WatchPb.toVecBigInt(coefs),
-                moreThan, WatchPb.toBigInt(degree));
+        return constraintFactory(literals, Pseudos.toVecBigInt(coefs),
+                moreThan, BigInteger.valueOf(degree));
     }
 
     /*
@@ -72,8 +73,7 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
     @Override
     protected PBConstr constraintFactory(IVecInt literals, IVecInt coefs,
             int degree) {
-        return constraintFactory(literals, WatchPb.toVecBigInt(coefs), WatchPb
-                .toBigInt(degree));
+        return constraintFactory(literals, Pseudos.toVecBigInt(coefs), BigInteger.valueOf(degree));
     }
 
     /*
@@ -86,7 +86,7 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
     protected PBConstr constraintFactory(IVecInt literals,
             IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
             throws ContradictionException {
-        IDataStructurePB mpb = WatchPb.niceParameters(literals, coefs,
+        IDataStructurePB mpb = Pseudos.niceParameters(literals, coefs,
                 moreThan, degree, getVocabulary());
         if (mpb == null)
             return null;
