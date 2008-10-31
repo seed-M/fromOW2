@@ -76,53 +76,9 @@ public class AtLeast implements Constr, Undoable, Serializable {
         }
     }
 
-    protected static int niceParameters(UnitPropagationListener s, ILits voc,
-            IVecInt ps, int deg) throws ContradictionException {
-
-        if (ps.size() < deg)
-            throw new ContradictionException();
-        int degree = deg;
-        for (int i = 0; i < ps.size();) {
-            // on verifie si le litteral est affecte
-            if (voc.isUnassigned(ps.get(i))) {
-                // go to next literal
-                i++;
-            } else {
-                // Si le litteral est satisfait,
-                // ?a revient ? baisser le degr?
-                if (voc.isSatisfied(ps.get(i))) {
-                    degree--;
-                }
-                // dans tous les cas, s'il est assign?,
-                // on enleve le ieme litteral
-                ps.delete(i);
-            }
-        }
-
-        // on trie le vecteur ps
-        ps.sortUnique();
-        // ?limine les clauses tautologiques
-        // deux litt?raux de signe oppos?s apparaissent dans la m?me
-        // clause
-
-        if (ps.size() == degree) {
-            for (int i = 0; i < ps.size(); i++) {
-                if (!s.enqueue(ps.get(i))) {
-                    throw new ContradictionException();
-                }
-            }
-            return 0;
-        }
-
-        if (ps.size() < degree)
-            throw new ContradictionException();
-        return degree;
-
-    }
-
     public static AtLeast atLeastNew(UnitPropagationListener s, ILits voc,
             IVecInt ps, int n) throws ContradictionException {
-        int degree = niceParameters(s, voc, ps, n);
+        int degree = Cards.niceParameters(s, voc, ps, n);
         if (degree == 0)
             return null;
         return new AtLeast(voc, ps, degree);
