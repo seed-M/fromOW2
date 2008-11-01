@@ -48,6 +48,9 @@
                            <include name="commons-cli.jar"/>
 		   </zipgroupfileset>
                </jar>
+               <antcall target="zip-bundle">
+		   <param name="package" value="maxsat"/>
+                </antcall>
 	</target>
 
 	<target name="csp" depends="core" description="Build a jar file suitable for the CSP competitions from  current source tree">
