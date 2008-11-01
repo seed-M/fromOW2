@@ -49,9 +49,8 @@ public class OriginalHTClause extends HTClause {
      * @see org.sat4j.minisat.constraints.cnf.WLClause#register()
      */
     public void register() {
-        assert lits.length > 1;
-        voc.attach(neg(lits[HEAD]), this);
-        voc.attach(neg(lits[tail]), this);
+        voc.attach(neg(head), this);
+        voc.attach(neg(tail), this);
     }
 
     public boolean learnt() {

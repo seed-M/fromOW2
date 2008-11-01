@@ -32,6 +32,7 @@ import org.sat4j.minisat.constraints.cnf.Clauses;
 import org.sat4j.minisat.constraints.cnf.LearntHTClause;
 import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.constraints.cnf.OriginalHTClause;
+import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.specs.ContradictionException;
@@ -71,6 +72,9 @@ public class MixedDataStructureDaniel extends AbstractDataStructureFactory<ILits
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
+    	if (literals.size()==1) {
+    		return new UnitClause(literals.last());
+    	}
         return new LearntHTClause(literals, getVocabulary());
     }
 

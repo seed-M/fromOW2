@@ -38,7 +38,7 @@ import org.sat4j.specs.IVecInt;
 
 /**
  * Lazy data structure for clause using the Head Tail data structure from SATO,
- * The original scheme is improved by avoiding moving pointers to literals but 
+ * The original scheme is improved by avoiding moving pointers to literals but
  * moving the literals themselves.
  * 
  * @author leberre
@@ -49,13 +49,15 @@ public abstract class HTClause implements Constr, Serializable {
 
 	private double activity;
 
-	protected final int[] lits;
+	protected final int[] middleLits;
 
 	protected final ILits voc;
 
-	protected static final int HEAD = 0;
+	protected int head;
 
-	protected final int tail;
+	protected int tail;
+
+	private static final int[] NO_MIDDLE_LITS = new int[0];
 
 	/**
 	 * Creates a new basic clause
@@ -66,12 +68,20 @@ public abstract class HTClause implements Constr, Serializable {
 	 *            A VecInt that WILL BE EMPTY after calling that method.
 	 */
 	public HTClause(IVecInt ps, ILits voc) {
-		lits = new int[ps.size()];
-		ps.moveTo(lits);
+		assert ps.size() > 1;
+		head = ps.get(0);
+		ps.delete(0);
+		tail = ps.last();
+		ps.pop();
+		if (ps.size() > 0) {
+			middleLits = new int[ps.size()];
+		} else {
+			middleLits = NO_MIDDLE_LITS;
+		}
+		ps.moveTo(middleLits);
 		assert ps.size() == 0;
 		this.voc = voc;
 		activity = 0;
-		tail = lits.length - 1;
 	}
 
 	/**
@@ -100,7 +110,13 @@ public abstract class HTClause implements Constr, Serializable {
 	 * @see Constr#calcReason(Solver, Lit, Vec)
 	 */
 	public void calcReason(int p, IVecInt outReason) {
-		final int[] mylits = lits;
+		if (voc.isFalsified(head))  {
+			outReason.push(head);
+		}
+		if (voc.isFalsified(tail))  {
+			outReason.push(tail);
+		}
+		final int[] mylits = middleLits;
 		for (int i = 0; i < mylits.length; i++) {
 			if (voc.isFalsified(mylits[i])) {
 				outReason.push(neg(mylits[i]));
@@ -114,8 +130,8 @@ public abstract class HTClause implements Constr, Serializable {
 	 * @see Constr#remove(Solver)
 	 */
 	public void remove() {
-		voc.attaches(neg(lits[HEAD])).remove(this);
-		voc.attaches(neg(lits[tail])).remove(this);
+		voc.attaches(neg(head)).remove(this);
+		voc.attaches(neg(tail)).remove(this);
 	}
 
 	/*
@@ -124,8 +140,11 @@ public abstract class HTClause implements Constr, Serializable {
 	 * @see Constr#simplify(Solver)
 	 */
 	public boolean simplify() {
-		for (int i = 0; i < lits.length; i++) {
-			if (voc.isSatisfied(lits[i])) {
+		if (voc.isSatisfied(head)||voc.isSatisfied(tail))  {
+			return true;
+		}
+		for (int i = 0; i < middleLits.length; i++) {
+			if (voc.isSatisfied(middleLits[i])) {
 				return true;
 			}
 		}
@@ -133,37 +152,47 @@ public abstract class HTClause implements Constr, Serializable {
 	}
 
 	public boolean propagate(UnitPropagationListener s, int p) {
-		final int[] mylits = lits;
-		if (mylits[HEAD] == neg(p)) {
-			int temphead = HEAD + 1;
+		
+		if (head == neg(p)) {
+			if (voc.isSatisfied(tail)) {
+				voc.attach(p, this);
+				return true;
+			}
+			final int[] mylits = middleLits;
+			int temphead = 0;
 			// moving head on the right
-			while (temphead < tail && voc.isFalsified(mylits[temphead])) {
+			while (temphead < mylits.length && voc.isFalsified(mylits[temphead])) {
 				temphead++;
 			}
-			assert temphead <= tail;
-			if (temphead == tail) {
+			assert temphead <= mylits.length;
+			if (temphead == mylits.length) {
 				voc.attach(p, this);
-				return s.enqueue(mylits[tail], this);
+				return s.enqueue(tail, this);
 			}
-			mylits[HEAD] = mylits[temphead];
+			head = mylits[temphead];
 			mylits[temphead] = neg(p);
-			voc.attach(neg(mylits[HEAD]), this);
+			voc.attach(neg(head), this);
 			return true;
 		}
-		assert mylits[tail] == neg(p);
-		int temptail = tail - 1;
+		assert tail == neg(p);
+		if (voc.isSatisfied(head)) {
+			voc.attach(p, this);
+			return true;
+		}
+		final int[] mylits = middleLits;
+		int temptail = mylits.length - 1;
 		// moving tail on the left
-		while ( HEAD < temptail && voc.isFalsified(mylits[temptail])) {
+		while (temptail>=0 && voc.isFalsified(mylits[temptail])) {
 			temptail--;
 		}
-		assert HEAD <= temptail;
-		if (HEAD == temptail) {
+		assert -1 <= temptail;
+		if (-1 == temptail) {
 			voc.attach(p, this);
-			return s.enqueue(mylits[HEAD], this);
+			return s.enqueue(head, this);
 		}
-		mylits[tail] = mylits[temptail];
+		tail = mylits[temptail];
 		mylits[temptail] = neg(p);
-		voc.attach(neg(mylits[tail]), this);
+		voc.attach(neg(tail), this);
 		return true;
 	}
 
@@ -171,7 +200,8 @@ public abstract class HTClause implements Constr, Serializable {
 	 * For learnt clauses only @author leberre
 	 */
 	public boolean locked() {
-		return voc.getReason(lits[HEAD]) == this || voc.getReason(lits[tail]) == this;
+		return voc.getReason(head) == this
+				|| voc.getReason(tail) == this;
 	}
 
 	/**
@@ -184,13 +214,22 @@ public abstract class HTClause implements Constr, Serializable {
 	@Override
 	public String toString() {
 		StringBuffer stb = new StringBuffer();
-		for (int i = 0; i < lits.length; i++) {
-			stb.append(Lits.toString(lits[i]));
+		stb.append(Lits.toString(head));
+		stb.append("["); //$NON-NLS-1$
+		stb.append(voc.valueToString(head));
+		stb.append("]"); //$NON-NLS-1$
+		stb.append(" "); //$NON-NLS-1$
+		for (int i = 0; i < middleLits.length; i++) {
+			stb.append(Lits.toString(middleLits[i]));
 			stb.append("["); //$NON-NLS-1$
-			stb.append(voc.valueToString(lits[i]));
+			stb.append(voc.valueToString(middleLits[i]));
 			stb.append("]"); //$NON-NLS-1$
 			stb.append(" "); //$NON-NLS-1$
 		}
+		stb.append(Lits.toString(tail));
+		stb.append("["); //$NON-NLS-1$
+		stb.append(voc.valueToString(tail));
+		stb.append("]"); //$NON-NLS-1$
 		return stb.toString();
 	}
 
@@ -203,7 +242,9 @@ public abstract class HTClause implements Constr, Serializable {
 	 * @return the literal
 	 */
 	public int get(int i) {
-		return lits[i];
+		if (i==0) return head;
+		if (i==middleLits.length+1) return tail;
+		return middleLits[i-1];
 	}
 
 	/**
@@ -221,17 +262,16 @@ public abstract class HTClause implements Constr, Serializable {
 	}
 
 	public int size() {
-		return lits.length;
+		return middleLits.length+2;
 	}
 
 	public void assertConstraint(UnitPropagationListener s) {
-		final int[] mylits = lits;
-		boolean ret;	
-		if (voc.isUnassigned(mylits[HEAD])) {
-		 ret = s.enqueue(mylits[HEAD], this);
+		boolean ret;
+		if (voc.isUnassigned(head)) {
+			ret = s.enqueue(head, this);
 		} else {
-			assert voc.isUnassigned(mylits[tail]);
-			ret = s.enqueue(mylits[tail], this);
+			assert voc.isUnassigned(tail);
+			ret = s.enqueue(tail, this);
 		}
 		assert ret;
 	}
@@ -242,7 +282,9 @@ public abstract class HTClause implements Constr, Serializable {
 
 	public int[] getLits() {
 		int[] tmp = new int[size()];
-		System.arraycopy(lits, 0, tmp, 0, size());
+		System.arraycopy(middleLits, 0, tmp, 1, middleLits.length);
+		tmp[0]=head;
+		tmp[tmp.length-1] = tail;
 		return tmp;
 	}
 
@@ -252,12 +294,15 @@ public abstract class HTClause implements Constr, Serializable {
 			return false;
 		try {
 			HTClause wcl = (HTClause) obj;
-			if (lits.length != wcl.lits.length)
+			if (wcl.head!= head || wcl.tail!=tail) {
+				return false;
+			}
+			if (middleLits.length != wcl.middleLits.length)
 				return false;
 			boolean ok;
-			for (int lit : lits) {
+			for (int lit : middleLits) {
 				ok = false;
-				for (int lit2 : wcl.lits)
+				for (int lit2 : wcl.middleLits)
 					if (lit == lit2) {
 						ok = true;
 						break;
@@ -273,10 +318,10 @@ public abstract class HTClause implements Constr, Serializable {
 
 	@Override
 	public int hashCode() {
-		long sum = 0;
-		for (int p : lits) {
+		long sum = head+tail;;
+		for (int p : middleLits) {
 			sum += p;
 		}
-		return (int) sum / lits.length;
+		return (int) sum / middleLits.length;
 	}
 }

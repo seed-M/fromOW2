@@ -48,24 +48,26 @@ public class LearntHTClause extends HTClause {
 	 * @see org.sat4j.minisat.constraints.cnf.WLClause#register()
 	 */
 	public void register() {
-		assert lits.length > 1;
 		// looking for the literal to put in tail
-		int maxi = 1;
-		int maxlevel = voc.getLevel(lits[1]);
-		for (int i = 2; i < lits.length; i++) {
-			int level = voc.getLevel(lits[i]);
-			if (level > maxlevel) {
-				maxi = i;
-				maxlevel = level;
+		if (middleLits.length > 0) {
+			int maxi = 0;
+			int maxlevel = voc.getLevel(middleLits[0]);
+			for (int i = 1; i < middleLits.length; i++) {
+				int level = voc.getLevel(middleLits[i]);
+				if (level > maxlevel) {
+					maxi = i;
+					maxlevel = level;
+				}
+			}
+			if (maxlevel > voc.getLevel(tail)) {
+				int l = tail;
+				tail = middleLits[maxi];
+				middleLits[maxi] = l;
 			}
 		}
-		int l = lits[tail];
-		lits[tail] = lits[maxi];
-		lits[maxi] = l;
-
 		// watch both head and tail literals.
-		voc.attach(neg(lits[HEAD]), this);
-		voc.attach(neg(lits[tail]), this);
+		voc.attach(neg(head), this);
+		voc.attach(neg(tail), this);
 
 	}
 
