@@ -29,8 +29,10 @@ package org.sat4j.minisat.constraints;
 
 import org.sat4j.minisat.constraints.card.AtLeast;
 import org.sat4j.minisat.constraints.cnf.Clauses;
+import org.sat4j.minisat.constraints.cnf.LearntBinaryClause;
 import org.sat4j.minisat.constraints.cnf.LearntHTClause;
 import org.sat4j.minisat.constraints.cnf.Lits;
+import org.sat4j.minisat.constraints.cnf.OriginalBinaryClause;
 import org.sat4j.minisat.constraints.cnf.OriginalHTClause;
 import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.minisat.core.Constr;
@@ -68,12 +70,18 @@ public class MixedDataStructureDaniel extends AbstractDataStructureFactory<ILits
         IVecInt v = Clauses.sanityCheck(literals, getVocabulary(), solver);
         if (v == null)
             return null;
+    	if (v.size()==2) {
+    		return OriginalBinaryClause.brandNewClause(solver, getVocabulary(), v);
+    	}
         return OriginalHTClause.brandNewClause(solver, getVocabulary(), v);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
     	if (literals.size()==1) {
     		return new UnitClause(literals.last());
+    	}
+    	if (literals.size()==2) {
+    		return new LearntBinaryClause(literals,getVocabulary());
     	}
         return new LearntHTClause(literals, getVocabulary());
     }
