@@ -288,7 +288,37 @@
 			<param name="module" value="csp"/>
 			<param name="lib" value="csp/lib"/>
 		</antcall>
-	  </target>
+	</target>
+        <target name="tests" 
+          description="Launch JUnit tests and generate a report">
+		<echo>Compiling test files</echo>
+		<javac srcdir="${test}" destdir="${build}" source="1.5" debug="true">
+			<classpath refid="somePath"/>
+		</javac>
+		<echo>Running JUNIT tests</echo>
+		<junit printsummary="yes" haltonfailure="no" fork="yes">
+			<classpath refid="somePath"/>
+			<formatter type="plain"/>
+			<jvmarg value="-ea"/>
+			<jvmarg value="-Xms500M"/>
+			<jvmarg value="-Xmx500M"/>
+			<jvmarg value="-Dtest.prefix=${basedir}/org.sat4j.core/src/test/testfiles/"/>
+			<jvmarg value="-Dtest.pbprefix=${basedir}/org.sat4j.pb/src/test/testfiles/"/>
+
+			<batchtest fork="yes" todir="${testreport.dir}">
+				<fileset dir="${build}">
+					<exclude name="**/AllTests.class" />
+					<exclude name="**/Abstract*Test.class" />
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	<target name="p2-tests" description="Runs tests for packages that ship with Eclipse">
+		<antcall target="tests">
+		   <param name="test" value="org.sat4j.core/src/test/java:org.sat4j.pb/src/test/java" />
+		</antcall>
+	</target>
 	<target name="default"
 				depends="sat" description="Build the SAT4J library and the associated Javadoc from CVS"
 			>
