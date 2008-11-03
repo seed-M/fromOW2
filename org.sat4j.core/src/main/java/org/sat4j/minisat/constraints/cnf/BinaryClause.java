@@ -76,10 +76,10 @@ public abstract class BinaryClause implements Constr, Serializable {
 	 */
 	public void calcReason(int p, IVecInt outReason) {
 		if (voc.isFalsified(head)) {
-			outReason.push(head);
+			outReason.push(neg(head));
 		}
 		if (voc.isFalsified(tail)) {
-			outReason.push(tail);
+			outReason.push(neg(tail));
 		}
 	}
 
@@ -108,15 +108,9 @@ public abstract class BinaryClause implements Constr, Serializable {
 	public boolean propagate(UnitPropagationListener s, int p) {
 		voc.attach(p, this);
 		if (head == neg(p)) {
-			if (voc.isSatisfied(tail)) {
-				return true;
-			}
 			return s.enqueue(tail, this);
 		}
 		assert tail == neg(p);
-		if (voc.isSatisfied(head)) {
-			return true;
-		}
 		return s.enqueue(head, this);
 	}
 
@@ -160,6 +154,7 @@ public abstract class BinaryClause implements Constr, Serializable {
 	public int get(int i) {
 		if (i == 0)
 			return head;
+		assert i == 1;
 		return tail;
 	}
 
