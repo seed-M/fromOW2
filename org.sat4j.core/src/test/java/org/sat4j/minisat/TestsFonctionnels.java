@@ -284,7 +284,7 @@ public class TestsFonctionnels extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        solver = (Solver<ILits,DataStructureFactory<ILits>>)SolverFactory.newDefault();
+        solver = SolverFactory.newMiniLearningHeapRsatExpSimpBiere();
         reader = new InstanceReader(solver);
     }
 
