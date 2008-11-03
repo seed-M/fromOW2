@@ -139,6 +139,14 @@ public class SolverFactory extends ASolverFactory<ISolver> {
         return solver;
     }
 
+    public static Solver<ILits,DataStructureFactory<ILits>> newMiniSatHeapRsatExpSimpBiere() {
+        Solver<ILits,DataStructureFactory<ILits>> solver = newMiniSATHeapExpSimp();
+        solver.setOrder(new VarOrderHeap<ILits>(new RSATPhaseSelectionStrategy()));
+        solver.setRestartStrategy(new ArminRestarts());
+        solver.setSearchParams(new SearchParams(1.1, 100));
+        return solver;
+    }
+    
     public static Solver<ILits,DataStructureFactory<ILits>> newMiniLearningHeapRsatExpSimpLuby() {
         Solver<ILits,DataStructureFactory<ILits>> solver = newMiniLearningHeapRsatExpSimp();
         solver.setRestartStrategy(new LubyRestarts());
