@@ -139,6 +139,10 @@ public abstract class SolverDecorator<T extends ISolver> implements ISolver, Ser
         return solver.getTimeout();
     }
 
+    public long getTimeoutMs() {
+        return solver.getTimeoutMs();
+    }
+    
     /*
      * (non-Javadoc)
      * 

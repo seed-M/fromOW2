@@ -1272,6 +1272,13 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 		return (int) (timeBasedTimeout ? timeout / 1000 : timeout);
 	}
 
+	public long getTimeoutMs() {
+		if (!timeBasedTimeout) {
+			throw new UnsupportedOperationException("The timeout is given in number of conflicts!");
+		}
+		return timeout;
+	}
+	
 	public void setExpectedNumberOfClauses(int nb) {
 		constrs.ensure(nb);
 	}

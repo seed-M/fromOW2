@@ -156,10 +156,13 @@ public class DimacsOutputSolver implements ISolver {
     }
 
     public int getTimeout() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    public long getTimeoutMs() {
+        return 0L;
+    }
+    
     public void reset() {
         fixedNbClauses = false;
         firstConstr  = true;
