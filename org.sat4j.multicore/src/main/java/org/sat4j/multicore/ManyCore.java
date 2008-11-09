@@ -98,6 +98,10 @@ public class ManyCore implements ISolver, OutcomeListener {
 		return solvers[0].getTimeout();
 	}
 
+	public long getTimeoutMs() {
+		return solvers[0].getTimeoutMs();
+	}
+	
 	public int newVar() {
 		throw new UnsupportedOperationException();
 	}
