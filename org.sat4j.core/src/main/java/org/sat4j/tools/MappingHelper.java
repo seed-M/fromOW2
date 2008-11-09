@@ -82,17 +82,17 @@ public class MappingHelper<T> {
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
-	 * @param x a thing such that x -> y[1] \/ y[2] ... \/ y[n]
-	 * @param y an array of alternatives for x.
+	 * @param x a thing such that x -> y[i]  for all i
+	 * @param y an array of things implied by y.
 	 * @throws ContradictionException
 	 */
 	public void addImplies(T x, T [] y) throws ContradictionException {
 		IVecInt clause = new VecInt();
-		clause.push(-getIntValue(x));
 		for (T t : y) {
+			clause.push(-getIntValue(x));
 			clause.push(getIntValue(t));
+			solver.addClause(clause);
 			clause.clear();
-		}		
-		solver.addClause(clause);
+		}
 	}
 }
