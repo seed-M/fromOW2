@@ -1,5 +1,6 @@
 package org.sat4j.tools;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class MappingHelper<T> {
 	final IVec<IConstr> constrs = new Vec<IConstr>();
 	final ISolver solver;
 	
-	public MappingHelper(ISolver solver, int maxvarid) {
+	public MappingHelper(ISolver solver) {
 		this.solver = solver;
 		mapToDomain = new Vec<T>();
 		mapToDomain.push(null);
@@ -82,9 +83,26 @@ public class MappingHelper<T> {
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
+	 * @param x a collection of things such that x[i] -> y for all i.
+	 * @param y a thing implied by all the x[i].
+	 * @throws ContradictionException
+	 */
+	public void addImplies(Collection<T> x, T y) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		for (T t : x) {
+			clause.push(-getIntValue(t));
+			clause.push(getIntValue(y));
+			solver.addClause(clause);
+			clause.clear();
+		}
+	}
+	
+	/**
+	 * Easy way to feed the solver with implications.
+	 * 
 	 * @param x a thing such that x -> y[i]  for all i
 	 * @param y an array of things implied by y.
-	 * @throws ContradictionException
+	 * @throws ContradictionException if a trivial inconsistency is detected.
 	 */
 	public void addImplies(T x, T [] y) throws ContradictionException {
 		IVecInt clause = new VecInt();
@@ -94,5 +112,86 @@ public class MappingHelper<T> {
 			solver.addClause(clause);
 			clause.clear();
 		}
+	}
+	
+	/**
+	 * Easy way to feed the solver with implications.
+	 * 
+	 * @param x a thing such that x -> y[i]  for all i
+	 * @param y a collection of things implied by y.
+	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 */
+	public void addImplies(T x, Collection<T> y) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		for (T t : y) {
+			clause.push(-getIntValue(x));
+			clause.push(getIntValue(t));
+			solver.addClause(clause);
+			clause.clear();
+		}
+	}
+	
+	/**
+	 * Easy way to enter in the solver that at least 
+	 * degree x[i] must be satisfied.
+	 * 
+	 * @param x an array of things.
+	 * @param degree the minimal number of elements in x that must be satisfied.
+	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 */
+	public void addAtLeast(T [] x, int degree) throws ContradictionException {
+		IVecInt literals = new VecInt(x.length);
+		for (T t : x) {
+			literals.push(getIntValue(t));
+		}
+		solver.addAtLeast(literals, degree);
+	}
+	
+	/**
+	 * Easy way to enter in the solver that at least 
+	 * degree x[i] must be satisfied.
+	 * 
+	 * @param x an array of things.
+	 * @param degree the minimal number of elements in x that must be satisfied.
+	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 */
+	public void addAtLeast(Collection<T> x, int degree) throws ContradictionException {
+		IVecInt literals = new VecInt(x.size());
+		for (T t : x) {
+			literals.push(getIntValue(t));
+		}
+		solver.addAtLeast(literals, degree);
+	}
+	
+	/**
+	 * Easy way to enter in the solver that at most 
+	 * degree x[i] must be satisfied.
+	 * 
+	 * @param x an array of things.
+	 * @param degree the maximal number of elements in x that must be satisfied.
+	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 */
+	public void addAtMost(T [] x, int degree) throws ContradictionException {
+		IVecInt literals = new VecInt(x.length);
+		for (T t : x) {
+			literals.push(getIntValue(t));
+		}
+		solver.addAtMost(literals, degree);
+	}
+	
+	/**
+	 * Easy way to enter in the solver that at most 
+	 * degree x[i] must be satisfied.
+	 * 
+	 * @param x an array of things.
+	 * @param degree the maximal number of elements in x that must be satisfied.
+	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 */
+	public void addAtMost(Collection<T> x, int degree) throws ContradictionException {
+		IVecInt literals = new VecInt(x.size());
+		for (T t : x) {
+			literals.push(getIntValue(t));
+		}
+		solver.addAtMost(literals, degree);
 	}
 }
