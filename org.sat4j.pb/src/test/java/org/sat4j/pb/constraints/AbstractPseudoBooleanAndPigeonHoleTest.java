@@ -174,17 +174,17 @@ public abstract class AbstractPseudoBooleanAndPigeonHoleTest extends
 				+ "normalized-opb/submitted/aloul/FPGA_SAT05/normalized-chnl50_60_pb.cnf.cr.opb"));
 	}
 
-	public void testncirc103() throws FileNotFoundException, IOException,
-			ParseFormatException {
-		assertTrue(solveInstance(PREFIX
-				+ "normalized-opb/submitted/manquinho/ttp/normalized-circ10_3.opb"));
-	}
-
-	public void testndata103() throws FileNotFoundException, IOException,
-			ParseFormatException {
-		assertTrue(solveInstance(PREFIX
-				+ "normalized-opb/submitted/manquinho/ttp/normalized-data10_3.opb"));
-	}
+//	public void testncirc103() throws FileNotFoundException, IOException,
+//			ParseFormatException {
+//		assertTrue(solveInstance(PREFIX
+//				+ "normalized-opb/submitted/manquinho/ttp/normalized-circ10_3.opb"));
+//	}
+//
+//	public void testndata103() throws FileNotFoundException, IOException,
+//			ParseFormatException {
+//		assertTrue(solveInstance(PREFIX
+//				+ "normalized-opb/submitted/manquinho/ttp/normalized-data10_3.opb"));
+//	}
 
 	public void testPN10() throws FileNotFoundException, IOException,
 			ParseFormatException {
