@@ -105,6 +105,8 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
         IVecInt resLits = new VecInt();
         IVec<BigInteger> resCoefs = new Vec<BigInteger>();
         dspb.buildConstraintFromConflict(resLits, resCoefs);
+        if (resLits.size()==1)
+    		return new UnitClausePB(resLits.last());
         if (resLits.size()==2)
     		return new BinaryClausePB(resLits,getVocabulary());
         return new HTClausePB(resLits, getVocabulary());
