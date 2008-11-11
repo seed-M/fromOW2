@@ -31,6 +31,7 @@ import java.math.BigInteger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
+import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.pb.constraints.pb.BinaryClausePB;
 import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
@@ -38,6 +39,7 @@ import org.sat4j.pb.constraints.pb.MinWatchCardPB;
 import org.sat4j.pb.constraints.pb.MinWatchPb;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.pb.constraints.pb.PuebloMinWatchPb;
+import org.sat4j.pb.constraints.pb.UnitClausePB;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -79,6 +81,8 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
 
     @Override
     protected PBConstr constructLearntClause(IVecInt literals) {
+    	if (literals.size()==1)
+    		return new UnitClausePB(literals.last());
     	if (literals.size()==2)
     		return new BinaryClausePB(literals,getVocabulary());
         return new HTClausePB(literals, getVocabulary());

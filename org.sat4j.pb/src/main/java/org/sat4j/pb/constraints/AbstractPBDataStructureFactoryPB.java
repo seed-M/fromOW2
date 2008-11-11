@@ -33,6 +33,7 @@ import org.sat4j.minisat.constraints.cnf.Clauses;
 import org.sat4j.pb.constraints.pb.BinaryClausePB;
 import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.PBConstr;
+import org.sat4j.pb.constraints.pb.UnitClausePB;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -74,6 +75,8 @@ public abstract class AbstractPBDataStructureFactoryPB extends
 
     @Override
     public PBConstr createUnregisteredClause(IVecInt literals) {
+    	if (literals.size()==1)
+    		return new UnitClausePB(literals.last());
     	if (literals.size()==2)
     		return new BinaryClausePB(literals,getVocabulary());
         return new HTClausePB(literals,getVocabulary());

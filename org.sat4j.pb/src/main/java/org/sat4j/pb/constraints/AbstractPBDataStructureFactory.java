@@ -30,9 +30,11 @@ package org.sat4j.pb.constraints;
 import java.math.BigInteger;
 
 import org.sat4j.minisat.constraints.AbstractDataStructureFactory;
-import org.sat4j.minisat.constraints.cnf.CBClause;
 import org.sat4j.minisat.constraints.cnf.Clauses;
+import org.sat4j.minisat.constraints.cnf.LearntBinaryClause;
+import org.sat4j.minisat.constraints.cnf.LearntHTClause;
 import org.sat4j.minisat.constraints.cnf.Lits;
+import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.pb.constraints.pb.AtLeastPB;
@@ -69,9 +71,11 @@ public abstract class AbstractPBDataStructureFactory extends
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
+    	if (literals.size()==1)
+    		return new UnitClause(literals.last());
     	if (literals.size()==2)
-    		return new BinaryClausePB(literals,getVocabulary());
-        return new HTClausePB(literals, getVocabulary());
+    		return new LearntBinaryClause(literals,getVocabulary());
+        return new LearntHTClause(literals, getVocabulary());
     }
 
     @Override
