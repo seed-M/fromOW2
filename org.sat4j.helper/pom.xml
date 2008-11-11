@@ -6,7 +6,7 @@
     <version>2.0.5</version>
   </parent>
   <artifactId>org.sat4j.helper</artifactId>
-  <name>SAT4J Helper</name>
+  <name>SAT4J helper</name>
   <description>
   The core library contains a flexible implementation in Java of the initial Minisat specification.
   The library is regularly updated with latest SAT technologies. It is a mature software that target
