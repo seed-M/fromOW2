@@ -33,7 +33,7 @@ import org.sat4j.specs.IVecInt;
 
 public class UnitClause implements Constr {
 
-	private final int literal;
+	protected final int literal;
 	
 	public UnitClause(int value) {
 		literal = value;
