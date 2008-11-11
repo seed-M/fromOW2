@@ -27,19 +27,23 @@
 *******************************************************************************/
 package org.sat4j.pb.constraints.pb;
 
+import static org.sat4j.core.LiteralsUtils.neg;
+
 import java.math.BigInteger;
 
-import org.sat4j.minisat.constraints.cnf.DefaultHTClause;
+import org.sat4j.minisat.constraints.cnf.HTClause;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.UnitPropagationListener;
 import org.sat4j.specs.IVecInt;
 
-public class HTClausePB extends DefaultHTClause implements PBConstr {
+public class HTClausePB extends HTClause implements PBConstr {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+
+	private boolean learnt;
 
     public HTClausePB(IVecInt ps, ILits voc) {
         super(ps, voc);
@@ -104,5 +108,55 @@ public class HTClausePB extends DefaultHTClause implements PBConstr {
     public IVecInt computeAnImpliedClause() {
         return null;
     }
+    
+	/**
+	 * declares this clause as learnt
+	 * 
+	 */
+	public void setLearnt() {
+		learnt = true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.sat4j.minisat.datatype.Constr#learnt()
+	 */
+	public boolean learnt() {
+		return learnt;
+	}
+
+	/**
+	 * Register this clause which means watching the necessary literals If the
+	 * clause is learnt, setLearnt() must be called before a call to register()
+	 * 
+	 * @see #setLearnt()
+	 */
+	public void register() {
+		if (learnt) {
+			if (middleLits.length > 0) {
+				// looking for the literal to put in tail
+				int maxi = 0;
+				int maxlevel = voc.getLevel(middleLits[0]);
+				for (int i = 1; i < middleLits.length; i++) {
+					int level = voc.getLevel(middleLits[i]);
+					if (level > maxlevel) {
+						maxi = i;
+						maxlevel = level;
+					}
+				}
+				if (maxlevel > voc.getLevel(tail)) {
+					int l = tail;
+					tail = middleLits[maxi];
+					middleLits[maxi] = l;
+				}
+			}
+		}
+
+		// watch both head and tail literals.
+		voc.attach(neg(head), this);
+		voc.attach(neg(tail), this);
+	}
+
 
 }

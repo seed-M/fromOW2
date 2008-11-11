@@ -31,6 +31,7 @@ import java.math.BigInteger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
+import org.sat4j.pb.constraints.pb.BinaryClausePB;
 import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.MinWatchCardPB;
@@ -51,6 +52,9 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
 
     @Override
     protected PBConstr constructClause(IVecInt v) {
+    	if (v.size()==2) {
+        	BinaryClausePB.brandNewClause(solver, getVocabulary(), v);
+        }
         return HTClausePB.brandNewClause(solver, getVocabulary(), v);
     }
 
@@ -75,6 +79,8 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
 
     @Override
     protected PBConstr constructLearntClause(IVecInt literals) {
+    	if (literals.size()==2)
+    		return new BinaryClausePB(literals,getVocabulary());
         return new HTClausePB(literals, getVocabulary());
     }
 
@@ -95,6 +101,8 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
         IVecInt resLits = new VecInt();
         IVec<BigInteger> resCoefs = new Vec<BigInteger>();
         dspb.buildConstraintFromConflict(resLits, resCoefs);
+        if (resLits.size()==2)
+    		return new BinaryClausePB(resLits,getVocabulary());
         return new HTClausePB(resLits, getVocabulary());
     }
 

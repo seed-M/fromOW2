@@ -36,6 +36,7 @@ import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.pb.constraints.pb.AtLeastPB;
+import org.sat4j.pb.constraints.pb.BinaryClausePB;
 import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
 import org.sat4j.pb.constraints.pb.IInternalPBConstraintCreator;
@@ -62,10 +63,14 @@ public abstract class AbstractPBDataStructureFactory extends
         IVecInt v = Clauses.sanityCheck(literals, getVocabulary(), solver);
         if (v == null)
             return null;
+        if (v.size()==2)
+        	return BinaryClausePB.brandNewClause(solver, getVocabulary(), v);
         return HTClausePB.brandNewClause(solver, getVocabulary(), v);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
+    	if (literals.size()==2)
+    		return new BinaryClausePB(literals,getVocabulary());
         return new HTClausePB(literals, getVocabulary());
     }
 
