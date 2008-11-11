@@ -84,26 +84,6 @@ public abstract class HTClause implements Constr, Serializable {
 		activity = 0;
 	}
 
-	/**
-	 * Creates a brand new clause, presumably from external data. Performs all
-	 * sanity checks.
-	 * 
-	 * @param s
-	 *            the object responsible for unit propagation
-	 * @param voc
-	 *            the vocabulary
-	 * @param literals
-	 *            the literals to store in the clause
-	 * @return the created clause or null if the clause should be ignored
-	 *         (tautology for example)
-	 */
-	public static HTClause brandNewClause(UnitPropagationListener s, ILits voc,
-			IVecInt literals) {
-		HTClause c = new DefaultHTClause(literals, voc);
-		c.register();
-		return c;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
