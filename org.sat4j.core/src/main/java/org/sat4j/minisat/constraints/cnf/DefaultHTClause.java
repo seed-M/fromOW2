@@ -69,7 +69,6 @@ public class DefaultHTClause extends HTClause {
 	 * @see #setLearnt()
 	 */
 	public void register() {
-		assert middleLits.length > 1;
 		if (learnt) {
 			if (middleLits.length > 0) {
 				// looking for the literal to put in tail
