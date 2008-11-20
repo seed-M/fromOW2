@@ -135,10 +135,6 @@ public abstract class HTClause implements Constr, Serializable {
 	public boolean propagate(UnitPropagationListener s, int p) {
 		
 		if (head == neg(p)) {
-			if (voc.isSatisfied(tail)) {
-				voc.attach(p, this);
-				return true;
-			}
 			final int[] mylits = middleLits;
 			int temphead = 0;
 			// moving head on the right
@@ -156,10 +152,6 @@ public abstract class HTClause implements Constr, Serializable {
 			return true;
 		}
 		assert tail == neg(p);
-		if (voc.isSatisfied(head)) {
-			voc.attach(p, this);
-			return true;
-		}
 		final int[] mylits = middleLits;
 		int temptail = mylits.length - 1;
 		// moving tail on the left
@@ -215,8 +207,8 @@ public abstract class HTClause implements Constr, Serializable {
 	}
 
 	/**
-	 * Retourne le ieme literal de la clause. Attention, cet ordre change durant
-	 * la recherche.
+	 * Return the ith literal of the clause.
+	 * Note that the order of the literals does change during the search...
 	 * 
 	 * @param i
 	 *            the index of the literal
