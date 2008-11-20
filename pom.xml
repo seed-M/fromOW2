@@ -336,7 +336,15 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
           <comparisonVersion>2.0.3</comparisonVersion>
         </configuration>
       </plugin>
-
+      <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>scmchangelog-maven-plugin</artifactId>
+                  <version>1.0</version>
+                  <configuration>
+                  <grammar>REMY</grammar>
+                  <trackerUrlPattern>http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid={0]&amp;group_id=228&amp;atid=350289</trackerUrlPattern>
+                  </configuration>
+                </plugin>
 		</plugins>
 	</reporting>
   
