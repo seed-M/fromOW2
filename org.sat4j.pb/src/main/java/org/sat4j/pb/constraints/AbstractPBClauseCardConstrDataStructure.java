@@ -153,7 +153,7 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
         return true;
     }
 
-    abstract protected PBConstr constructClause(IVecInt v);
+    abstract protected PBConstr constructClause(IVecInt v) throws ContradictionException;
 
     abstract protected PBConstr constructCard(IVecInt theLits, int degree)
             throws ContradictionException;

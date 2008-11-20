@@ -31,7 +31,6 @@ import java.math.BigInteger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
-import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.pb.constraints.pb.BinaryClausePB;
 import org.sat4j.pb.constraints.pb.HTClausePB;
 import org.sat4j.pb.constraints.pb.IDataStructurePB;
@@ -53,9 +52,9 @@ public class PuebloPBMinClauseCardConstrDataStructure extends
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected PBConstr constructClause(IVecInt v) {
+    protected PBConstr constructClause(IVecInt v) throws ContradictionException {
     	if (v.size()==2) {
-        	BinaryClausePB.brandNewClause(solver, getVocabulary(), v);
+        	return BinaryClausePB.brandNewClause(solver, getVocabulary(), v);
         }
         return HTClausePB.brandNewClause(solver, getVocabulary(), v);
     }
