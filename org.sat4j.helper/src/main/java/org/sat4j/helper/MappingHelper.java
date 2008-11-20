@@ -1,32 +1,31 @@
 /*******************************************************************************
-* SAT4J: a SATisfiability library for Java Copyright (C) 2004-2008 Daniel Le Berre
-*
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* which accompanies this distribution, and is available at
-* http://www.eclipse.org/legal/epl-v10.html
-*
-* Alternatively, the contents of this file may be used under the terms of
-* either the GNU Lesser General Public License Version 2.1 or later (the
-* "LGPL"), in which case the provisions of the LGPL are applicable instead
-* of those above. If you wish to allow use of your version of this file only
-* under the terms of the LGPL, and not to allow others to use your version of
-* this file under the terms of the EPL, indicate your decision by deleting
-* the provisions above and replace them with the notice and other provisions
-* required by the LGPL. If you do not delete the provisions above, a recipient
-* may use your version of this file under the terms of the EPL or the LGPL.
-* 
-* Based on the original MiniSat specification from:
-* 
-* An extensible SAT solver. Niklas Een and Niklas Sorensson. Proceedings of the
-* Sixth International Conference on Theory and Applications of Satisfiability
-* Testing, LNCS 2919, pp 502-518, 2003.
-*
-* See www.minisat.se for the original solver in C++.
-* 
-*******************************************************************************/
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2008 Daniel Le Berre
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU Lesser General Public License Version 2.1 or later (the
+ * "LGPL"), in which case the provisions of the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of the LGPL, and not to allow others to use your version of
+ * this file under the terms of the EPL, indicate your decision by deleting
+ * the provisions above and replace them with the notice and other provisions
+ * required by the LGPL. If you do not delete the provisions above, a recipient
+ * may use your version of this file under the terms of the EPL or the LGPL.
+ * 
+ * Based on the original MiniSat specification from:
+ * 
+ * An extensible SAT solver. Niklas Een and Niklas Sorensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ *
+ * See www.minisat.se for the original solver in C++.
+ * 
+ *******************************************************************************/
 package org.sat4j.helper;
-
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,13 +39,15 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
+
 /**
- * Helper class intended to make life easier to people to feed a 
- * sat solver programmatically.
+ * Helper class intended to make life easier to people to feed a sat solver
+ * programmatically.
  * 
  * @author daniel
- *
- * @param <T> The class of the objects to map into boolean variables.
+ * 
+ * @param <T>
+ *            The class of the objects to map into boolean variables.
  */
 public class MappingHelper<T> {
 
@@ -59,7 +60,7 @@ public class MappingHelper<T> {
 	private final IVec<T> mapToDomain;
 	final IVec<IConstr> constrs = new Vec<IConstr>();
 	final ISolver solver;
-	
+
 	public MappingHelper(ISolver solver) {
 		this.solver = solver;
 		mapToDomain = new Vec<T>();
@@ -86,19 +87,41 @@ public class MappingHelper<T> {
 		}
 		return toInstall;
 	}
+	
+	public boolean getBooleanValueFor(T t) {
+		return solver.model(getIntValue(t));
+	}
 
 	public boolean hasASolution() throws TimeoutException {
 		return solver.isSatisfiable();
 	}
-	
+
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
-	 * @param x an array of things such that x[i] -> y for all i.
-	 * @param y a thing implied by all the x[i].
+	 * @param x
+	 *            a thing.
+	 * @param y
+	 *            a thing implied by x.
 	 * @throws ContradictionException
 	 */
-	public void addImplies(T [] x, T y) throws ContradictionException {
+	public void addImplies(T x, T y) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		clause.push(-getIntValue(x));
+		clause.push(getIntValue(y));
+		solver.addClause(clause);
+	}
+
+	/**
+	 * Easy way to feed the solver with implications.
+	 * 
+	 * @param x
+	 *            an array of things such that x[i] -> y for all i.
+	 * @param y
+	 *            a thing implied by all the x[i].
+	 * @throws ContradictionException
+	 */
+	public void addImplies(T[] x, T y) throws ContradictionException {
 		IVecInt clause = new VecInt();
 		for (T t : x) {
 			clause.push(-getIntValue(t));
@@ -107,12 +130,14 @@ public class MappingHelper<T> {
 			clause.clear();
 		}
 	}
-	
+
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
-	 * @param x a collection of things such that x[i] -> y for all i.
-	 * @param y a thing implied by all the x[i].
+	 * @param x
+	 *            a collection of things such that x[i] -> y for all i.
+	 * @param y
+	 *            a thing implied by all the x[i].
 	 * @throws ContradictionException
 	 */
 	public void addImplies(Collection<T> x, T y) throws ContradictionException {
@@ -124,15 +149,18 @@ public class MappingHelper<T> {
 			clause.clear();
 		}
 	}
-	
+
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
-	 * @param x a thing such that x -> y[i]  for all i
-	 * @param y an array of things implied by y.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            a thing such that x -> y[i] for all i
+	 * @param y
+	 *            an array of things implied by x.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
-	public void addImplies(T x, T [] y) throws ContradictionException {
+	public void addImplies(T x, T[] y) throws ContradictionException {
 		IVecInt clause = new VecInt();
 		for (T t : y) {
 			clause.push(-getIntValue(x));
@@ -141,13 +169,16 @@ public class MappingHelper<T> {
 			clause.clear();
 		}
 	}
-	
+
 	/**
 	 * Easy way to feed the solver with implications.
 	 * 
-	 * @param x a thing such that x -> y[i]  for all i
-	 * @param y a collection of things implied by y.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            a thing such that x -> y[i] for all i
+	 * @param y
+	 *            a collection of things implied by x.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
 	public void addImplies(T x, Collection<T> y) throws ContradictionException {
 		IVecInt clause = new VecInt();
@@ -159,67 +190,158 @@ public class MappingHelper<T> {
 		}
 	}
 	
+	
 	/**
-	 * Easy way to enter in the solver that at least 
-	 * degree x[i] must be satisfied.
+	 * Easy way to feed the solver with a clause.
 	 * 
-	 * @param x an array of things.
-	 * @param degree the minimal number of elements in x that must be satisfied.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            a thing such that x -> y[1] ... y[n] 
+	 * @param y
+	 *            an array of things whose disjunction is implied by x.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
-	public void addAtLeast(T [] x, int degree) throws ContradictionException {
+	public void addImplication(T x, T[] y) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		clause.push(-getIntValue(x));
+		for (T t : y) {
+			clause.push(getIntValue(t));
+		}
+		solver.addClause(clause);
+	}
+
+	/**
+	 * Easy way to feed the solver with implications.
+	 * 
+	 * @param x
+	 *            a thing such that x -> y[1] ... y[n] 
+	 * @param y
+	 *            a collection of things whose disjunction is implied by x.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
+	 */
+	public void addImplication(T x, Collection<T> y) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		clause.push(-getIntValue(x));
+		for (T t : y) {
+			clause.push(getIntValue(t));
+		}
+		solver.addClause(clause);
+	}
+	
+	/**
+	 * Easy way to enter in the solver that at least degree x[i] must be
+	 * satisfied.
+	 * 
+	 * @param x
+	 *            an array of things.
+	 * @param degree
+	 *            the minimal number of elements in x that must be satisfied.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
+	 */
+	public void addAtLeast(T[] x, int degree) throws ContradictionException {
 		IVecInt literals = new VecInt(x.length);
 		for (T t : x) {
 			literals.push(getIntValue(t));
 		}
 		solver.addAtLeast(literals, degree);
 	}
-	
+
 	/**
-	 * Easy way to enter in the solver that at least 
-	 * degree x[i] must be satisfied.
+	 * Easy way to enter in the solver that at least degree x[i] must be
+	 * satisfied.
 	 * 
-	 * @param x an array of things.
-	 * @param degree the minimal number of elements in x that must be satisfied.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            an array of things.
+	 * @param degree
+	 *            the minimal number of elements in x that must be satisfied.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
-	public void addAtLeast(Collection<T> x, int degree) throws ContradictionException {
+	public void addAtLeast(Collection<T> x, int degree)
+			throws ContradictionException {
 		IVecInt literals = new VecInt(x.size());
 		for (T t : x) {
 			literals.push(getIntValue(t));
 		}
 		solver.addAtLeast(literals, degree);
 	}
-	
+
 	/**
-	 * Easy way to enter in the solver that at most 
-	 * degree x[i] must be satisfied.
+	 * Easy way to enter in the solver that at most degree x[i] must be
+	 * satisfied.
 	 * 
-	 * @param x an array of things.
-	 * @param degree the maximal number of elements in x that must be satisfied.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            an array of things.
+	 * @param degree
+	 *            the maximal number of elements in x that must be satisfied.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
-	public void addAtMost(T [] x, int degree) throws ContradictionException {
+	public void addAtMost(T[] x, int degree) throws ContradictionException {
 		IVecInt literals = new VecInt(x.length);
 		for (T t : x) {
 			literals.push(getIntValue(t));
 		}
 		solver.addAtMost(literals, degree);
 	}
-	
+
 	/**
-	 * Easy way to enter in the solver that at most 
-	 * degree x[i] must be satisfied.
+	 * Easy way to enter in the solver that at most degree x[i] must be
+	 * satisfied.
 	 * 
-	 * @param x an array of things.
-	 * @param degree the maximal number of elements in x that must be satisfied.
-	 * @throws ContradictionException if a trivial inconsistency is detected.
+	 * @param x
+	 *            an array of things.
+	 * @param degree
+	 *            the maximal number of elements in x that must be satisfied.
+	 * @throws ContradictionException
+	 *             if a trivial inconsistency is detected.
 	 */
-	public void addAtMost(Collection<T> x, int degree) throws ContradictionException {
+	public void addAtMost(Collection<T> x, int degree)
+			throws ContradictionException {
 		IVecInt literals = new VecInt(x.size());
 		for (T t : x) {
 			literals.push(getIntValue(t));
 		}
 		solver.addAtMost(literals, degree);
+	}
+
+	/**
+	 * Easy way to mean that a set of things are incompatible, i.e. they cannot
+	 * altogether be satisfied.
+	 * 
+	 */
+	public void addConflict(Collection<T> things) throws ContradictionException {
+		IVecInt literals = new VecInt(things.size());
+		for (T t : things) {
+			literals.push(-getIntValue(t));
+		}
+		solver.addClause(literals);
+	}
+
+	/**
+	 * Easy way to mean that a set of things are incompatible, i.e. they cannot
+	 * altogether be satisfied.
+	 * 
+	 */
+	public void addConflict(T... things) throws ContradictionException {
+		IVecInt literals = new VecInt(things.length);
+		for (T t : things) {
+			literals.push(-getIntValue(t));
+		}
+		solver.addClause(literals);
+	}
+
+	public void setTrue(T thing) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		clause.push(getIntValue(thing));
+		constrs.push(solver.addClause(clause));
+	}
+
+	public void setFalse(T thing) throws ContradictionException {
+		IVecInt clause = new VecInt();
+		clause.push(-getIntValue(thing));
+		constrs.push(solver.addClause(clause));
 	}
 }
