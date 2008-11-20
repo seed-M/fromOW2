@@ -28,6 +28,7 @@
 package org.sat4j.minisat.constraints;
 
 import org.sat4j.minisat.constraints.cnf.Clauses;
+import org.sat4j.minisat.constraints.cnf.LearntBinaryClause;
 import org.sat4j.minisat.constraints.cnf.LearntHTClause;
 import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.constraints.cnf.MixableCBClause;
@@ -63,6 +64,9 @@ public class ClausalDataStructureCBHT extends AbstractDataStructureFactory<ILits
     	if (literals.size()==1) {
     		return new UnitClause(literals.last());
     	}
+    	if (literals.size() == 2) {
+            return new LearntBinaryClause(literals,getVocabulary());
+        }
         return new LearntHTClause(literals, getVocabulary());
     }
 

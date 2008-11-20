@@ -171,4 +171,13 @@ public interface IVecInt extends Serializable {
     boolean isEmpty();
     
     IteratorInt iterator();
+    
+    /**
+     * Allow to access the internal representation of the vector as an array.
+     * Note that only the content of index 0 to size() should be taken into
+     * account. USE WITH CAUTION
+     * 
+     * @return the internal representation of the Vector as an array.
+     */
+    int [] toArray();
 }

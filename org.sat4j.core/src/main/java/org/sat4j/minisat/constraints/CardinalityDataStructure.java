@@ -28,6 +28,7 @@
 package org.sat4j.minisat.constraints;
 
 import org.sat4j.minisat.constraints.card.AtLeast;
+import org.sat4j.minisat.constraints.cnf.LearntBinaryClause;
 import org.sat4j.minisat.constraints.cnf.LearntHTClause;
 import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.minisat.core.Constr;
@@ -46,6 +47,9 @@ public class CardinalityDataStructure extends AbstractCardinalityDataStructure {
     	if (literals.size()==1) {
     		return new UnitClause(literals.last());
     	}
+    	if (literals.size() == 2) {
+            return new LearntBinaryClause(literals,getVocabulary());
+        }
         return new LearntHTClause(literals, getVocabulary());
     }
 

@@ -41,7 +41,13 @@ import org.sat4j.specs.IVecInt;
  * The original scheme is improved by avoiding moving pointers to literals but
  * moving the literals themselves.
  * 
+ * We suppose here that the clause contains at least 3 literals. 
+ * Use the BinaryClause or UnaryClause clause data structures to deal with
+ * binary and unit clauses.
+ * 
  * @author leberre
+ * @see BinaryClause
+ * @see UnitClause
  */
 public abstract class HTClause implements Constr, Serializable {
 
@@ -57,8 +63,6 @@ public abstract class HTClause implements Constr, Serializable {
 
 	protected int tail;
 
-	private static final int[] NO_MIDDLE_LITS = new int[0];
-
 	/**
 	 * Creates a new basic clause
 	 * 
@@ -70,15 +74,12 @@ public abstract class HTClause implements Constr, Serializable {
 	public HTClause(IVecInt ps, ILits voc) {
 		assert ps.size() > 1;
 		head = ps.get(0);
-		ps.delete(0);
 		tail = ps.last();
-		ps.pop();
-		if (ps.size() > 0) {
-			middleLits = new int[ps.size()];
-		} else {
-			middleLits = NO_MIDDLE_LITS;
-		}
-		ps.moveTo(middleLits);
+		final int size = ps.size()-2;
+		assert size>0;
+		middleLits = new int[size];
+		System.arraycopy(ps.toArray(), 1, middleLits, 0, size);
+		ps.clear();
 		assert ps.size() == 0;
 		this.voc = voc;
 		activity = 0;
