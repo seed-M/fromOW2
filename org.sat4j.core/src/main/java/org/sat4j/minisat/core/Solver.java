@@ -166,12 +166,12 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 
 	private RestartStrategy restarter;
 
-	private final Map<String, Integer> constrTypes = new HashMap<String, Integer>();
+	private final Map<String, Counter> constrTypes = new HashMap<String, Counter>();
 
 	private boolean isDBSimplificationAllowed = false;
 
 	private int learnedLiterals = 0;
-	
+
 	protected IVecInt dimacs2internal(IVecInt in) {
 		// if (voc.nVars() == 0) {
 		// throw new RuntimeException(
@@ -193,7 +193,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * must be provided, else it won't work either.
 	 * 
 	 * @param acg
-	 * 		an asserting clause generator
+	 *            an asserting clause generator
 	 */
 
 	public Solver(AssertingClauseGenerator acg, LearningStrategy<L, D> learner,
@@ -217,7 +217,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * heuristics must be changed prior to calling that method.
 	 * 
 	 * @param dsf
-	 * 		the internal factory
+	 *            the internal factory
 	 */
 	public final void setDataStructureFactory(D dsf) {
 		dsfactory = dsf;
@@ -263,7 +263,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	}
 
 	public int nConstraints() {
-		return constrs.size()+trail.size()-learnedLiterals;
+		return constrs.size() + trail.size() - learnedLiterals;
 	}
 
 	public void learn(Constr c) {
@@ -386,7 +386,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * Satisfait un litt?ral
 	 * 
 	 * @param p
-	 * 		le litt?ral
+	 *            le litt?ral
 	 * @return true si tout se passe bien, false si un conflit appara?t.
 	 */
 	public boolean enqueue(int p) {
@@ -397,11 +397,11 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * Put the literal on the queue of assignments to be done.
 	 * 
 	 * @param p
-	 * 		the literal.
+	 *            the literal.
 	 * @param from
-	 * 		the reason to propagate that literal, else null
+	 *            the reason to propagate that literal, else null
 	 * @return true if the asignment can be made, false if a conflict is
-	 * 	detected.
+	 *         detected.
 	 */
 	public boolean enqueue(int p, Constr from) {
 		assert p > 1;
@@ -546,12 +546,12 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 
 	/**
 	 * Setup the reason simplification strategy. By default, there is no reason
-	 * simplification. NOTE THAT REASON SIMPLIFICATION DOES NOT WORK WITH 
-	 * SPECIFIC DATA STRUCTURE FOR HANDLING BOTH BINARY AND TERNARY CLAUSES. 
+	 * simplification. NOTE THAT REASON SIMPLIFICATION DOES NOT WORK WITH
+	 * SPECIFIC DATA STRUCTURE FOR HANDLING BOTH BINARY AND TERNARY CLAUSES.
 	 * 
 	 * @param simp
-	 * 		the name of the simplifier (one of NO_SIMPLIFICATION,
-	 * 		SIMPLE_SIMPLIFICATION, EXPENSIVE_SIMPLIFICATION).
+	 *            the name of the simplifier (one of NO_SIMPLIFICATION,
+	 *            SIMPLE_SIMPLIFICATION, EXPENSIVE_SIMPLIFICATION).
 	 */
 	public void setSimplifier(String simp) {
 		Field f;
@@ -706,7 +706,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * Propagate activity to a constraint
 	 * 
 	 * @param confl
-	 * 		a constraint
+	 *            a constraint
 	 */
 	public void claBumpActivity(Constr confl) {
 		confl.incActivity(claInc);
@@ -1130,7 +1130,25 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	public void printInfos(PrintWriter out, String prefix) {
 		out.print(prefix);
 		out.println("constraints type ");
-		for (Map.Entry<String, Integer> entry : constrTypes.entrySet()) {
+		for (Map.Entry<String, Counter> entry : constrTypes.entrySet()) {
+			out.println(prefix + entry.getKey() + " => " + entry.getValue());
+		}
+	}
+
+	public void printLearntClausesInfos(PrintWriter out, String prefix) {
+		Map<String,Counter> learntTypes = new HashMap<String,Counter>();
+		for (Iterator<Constr> it = learnts.iterator(); it.hasNext();) {
+			String type = it.next().getClass().getName();
+			Counter count = learntTypes.get(type);
+			if (count == null) {
+				learntTypes.put(type, new Counter());
+			} else {
+				count.inc();
+			}
+		}
+		out.print(prefix);
+		out.println("learnt constraints type ");
+		for (Map.Entry<String, Counter> entry : learntTypes.entrySet()) {
 			out.println(prefix + entry.getKey() + " => " + entry.getValue());
 		}
 	}
@@ -1168,18 +1186,18 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 
 	/**
 	 * @param constr
-	 * 		a constraint implementing the Constr interface.
+	 *            a constraint implementing the Constr interface.
 	 * @return a reference to the constraint for external use.
 	 */
 	protected IConstr addConstr(Constr constr) {
 		if (constr != null) {
 			constrs.push(constr);
 			String type = constr.getClass().getName();
-			Integer count = constrTypes.get(type);
+			Counter count = constrTypes.get(type);
 			if (count == null) {
-				constrTypes.put(type, 1);
+				constrTypes.put(type, new Counter());
 			} else {
-				constrTypes.put(type, count + 1);
+				count.inc();
 			}
 		}
 		return constr;
@@ -1197,7 +1215,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 	 * returns the ith constraint in the solver.
 	 * 
 	 * @param i
-	 * 		the constraint number (begins at 0)
+	 *            the constraint number (begins at 0)
 	 * @return the ith constraint
 	 */
 	public IConstr getIthConstr(int i) {
@@ -1221,6 +1239,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 				+ "speed (assignments/second)\t: " + stats.propagations //$NON-NLS-1$
 				/ cputime);
 		order.printStat(out, prefix);
+		printLearntClausesInfos(out, prefix);
 	}
 
 	/*
@@ -1252,7 +1271,7 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 		stb.append(prefix);
 		stb.append("DB Simplification allowed=");
 		stb.append(isDBSimplificationAllowed);
-		stb.append("\n"); 
+		stb.append("\n");
 		stb.append(prefix);
 		stb.append("--- End Solver configuration ---"); //$NON-NLS-1$
 		return stb.toString();
@@ -1274,11 +1293,12 @@ public class Solver<L extends ILits, D extends DataStructureFactory<L>>
 
 	public long getTimeoutMs() {
 		if (!timeBasedTimeout) {
-			throw new UnsupportedOperationException("The timeout is given in number of conflicts!");
+			throw new UnsupportedOperationException(
+					"The timeout is given in number of conflicts!");
 		}
 		return timeout;
 	}
-	
+
 	public void setExpectedNumberOfClauses(int nb) {
 		constrs.ensure(nb);
 	}
