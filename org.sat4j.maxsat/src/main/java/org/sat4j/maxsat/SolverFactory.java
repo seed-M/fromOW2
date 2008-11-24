@@ -27,8 +27,10 @@ import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.learning.MiniSATLearning;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.minisat.restarts.MiniSATRestarts;
+import org.sat4j.minisat.restarts.NoRestarts;
 import org.sat4j.minisat.uip.FirstUIP;
 import org.sat4j.pb.IPBSolver;
+import org.sat4j.pb.core.PBSolverResolution;
 
 public class SolverFactory extends ASolverFactory<IPBSolver> {
 
@@ -66,6 +68,8 @@ public class SolverFactory extends ASolverFactory<IPBSolver> {
     }
  
     public static IPBSolver newLight() {
-        return org.sat4j.pb.SolverFactory.newLight();
+        PBSolverResolution solver = org.sat4j.pb.SolverFactory.newCompetPBResMixedConstraintsObjectiveExpSimp();
+        solver.setRestartStrategy(new NoRestarts());
+        return solver;
     }
 }
