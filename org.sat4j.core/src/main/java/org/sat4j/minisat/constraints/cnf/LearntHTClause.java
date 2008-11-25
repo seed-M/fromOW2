@@ -65,7 +65,7 @@ public class LearntHTClause extends HTClause {
 				middleLits[maxi] = l;
 			}
 		}
-		// watch both head and tail literals.
+		// attach both head and tail literals.
 		voc.attach(neg(head), this);
 		voc.attach(neg(tail), this);
 

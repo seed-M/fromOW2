@@ -94,14 +94,14 @@ public abstract class HTClause implements Constr, Serializable {
 		if (voc.isFalsified(head))  {
 			outReason.push(neg(head));
 		}
-		if (voc.isFalsified(tail))  {
-			outReason.push(neg(tail));
-		}
 		final int[] mylits = middleLits;
 		for (int i = 0; i < mylits.length; i++) {
 			if (voc.isFalsified(mylits[i])) {
 				outReason.push(neg(mylits[i]));
 			}
+		}
+		if (voc.isFalsified(tail))  {
+			outReason.push(neg(tail));
 		}
 	}
 
