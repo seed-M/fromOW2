@@ -57,22 +57,23 @@ public abstract class AbstractSelectorVariablesDecorator extends
 
     protected int[] prevfullmodel;
 
+    private int [] prevmodel;
+    private boolean [] prevboolmodel;
+    
     public AbstractSelectorVariablesDecorator(ISolver solver) {
         super(solver);
     }
     
     @Override
     public int[] model() {
-        int end = nborigvars - 1;
-        while (Math.abs(prevfullmodel[end]) > nborigvars)
-            end--;
-        int[] shortmodel = new int[end + 1];
-        for (int i = 0; i <= end; i++) {
-            shortmodel[i] = prevfullmodel[i];
-        }
-        return shortmodel;
+        return prevmodel;
     }
 
+    @Override 
+    public boolean model(int var) {
+    	return prevboolmodel[var-1];
+    }
+    
     @Override
     public int newVar(int howmany) {
         nborigvars = super.newVar(howmany);
@@ -98,8 +99,20 @@ public abstract class AbstractSelectorVariablesDecorator extends
 
     public boolean admitABetterSolution() throws TimeoutException {
         boolean result = super.isSatisfiable(true);
-        if (result)
+        if (result) {
             prevfullmodel = super.model();
+            prevboolmodel = new boolean[nVars()];
+        	for (int i=0;i<nVars();i++) {
+            	prevboolmodel[i]=decorated().model(i+1);
+            }
+            int end = nborigvars - 1;
+            while (Math.abs(prevfullmodel[end]) > nborigvars)
+                end--;
+            prevmodel = new int[end + 1];
+            for (int i = 0; i <= end; i++) {
+                prevmodel[i] = prevfullmodel[i];
+            }
+        }
         return result;
     }
 
