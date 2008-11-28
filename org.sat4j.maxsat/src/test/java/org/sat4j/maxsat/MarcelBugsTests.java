@@ -61,8 +61,7 @@ public class MarcelBugsTests {
 			int [] model = satproblem.model();
 			assertNotNull(model);
 			assertArrayEquals(expectation, model);
-			assertEquals(expectedValue,problem.calculateObjective());
-			
+			assertEquals(expectedValue,problem.calculateObjective());			
 		} catch (Exception e) {
 			fail(" Problem when reading instance : "+e);
 		}		

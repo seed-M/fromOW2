@@ -34,6 +34,7 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IOptimizationProblem;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.TimeoutException;
 
 /**
@@ -46,167 +47,283 @@ import org.sat4j.specs.TimeoutException;
  * 
  */
 public class WeightedMaxSatDecorator extends PBSolverDecorator implements
-        IOptimizationProblem {
+		IOptimizationProblem {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected int nborigvars;
+	protected int nborigvars;
 
-    private int nbexpectedclauses;
+	private int nbexpectedclauses;
 
-    private long falsifiedWeight;
+	private long falsifiedWeight;
 
-    protected int nbnewvar;
+	protected int nbnewvar;
 
-    protected int[] prevfullmodel;
+	protected int[] prevmodel;
+	protected boolean[] prevboolmodel;
 
-    public WeightedMaxSatDecorator(IPBSolver solver) {
-        super(solver);
-        IOrder<?> order = ((Solver<?, ? extends DataStructureFactory<?>>) solver)
-                .getOrder();
-        if (order instanceof VarOrderHeapObjective) {
-            ((VarOrderHeapObjective) order).setObjectiveFunction(obj);
-        }
-    }
+	protected int[] prevfullmodel;
 
-    @Override
-    public int newVar(int howmany) {
-        nborigvars = super.newVar(howmany);
-        return nborigvars;
-    }
+	public WeightedMaxSatDecorator(IPBSolver solver) {
+		super(solver);
+		IOrder<?> order = ((Solver<?, ? extends DataStructureFactory<?>>) solver)
+				.getOrder();
+		if (order instanceof VarOrderHeapObjective) {
+			((VarOrderHeapObjective) order).setObjectiveFunction(obj);
+		}
+	}
 
-    @Override
-    public void setExpectedNumberOfClauses(int nb) {
-        nbexpectedclauses = nb;
-        lits.ensure(nb);
-        falsifiedWeight = 0;
-        super.setExpectedNumberOfClauses(nb);
-        super.newVar(nborigvars + nbexpectedclauses);
-    }
+	@Override
+	public int newVar(int howmany) {
+		nborigvars = super.newVar(howmany);
+		return nborigvars;
+	}
 
-    @Override
-    public int[] model() {
-        int[] shortmodel = new int[nborigvars];
-        for (int i = 0; i < nborigvars; i++) {
-            shortmodel[i] = prevfullmodel[i];
-        }
-        return shortmodel;
-    }
+	@Override
+	public void setExpectedNumberOfClauses(int nb) {
+		nbexpectedclauses = nb;
+		lits.ensure(nb);
+		falsifiedWeight = 0;
+		super.setExpectedNumberOfClauses(nb);
+		super.newVar(nborigvars + nbexpectedclauses);
+	}
 
-    protected int top = Integer.MAX_VALUE;
+	@Override
+	public int[] model() {
+		return prevmodel;
+	}
 
-    public void setTopWeight(int top) {
-        this.top = top;
-    }
+	@Override
+	public boolean model(int var) {
+		return prevboolmodel[var - 1];
+	}
 
-    @Override
-    public IConstr addClause(IVecInt literals) throws ContradictionException {
-        int weight = literals.get(0);
-        if (weight < top) {
+	protected int top = Integer.MAX_VALUE;
 
-            BigInteger bigweight = BigInteger.valueOf(weight);
-            if (literals.size() == 2) {
-                // if there is only a coefficient and a literal, no need to
-                // create
-                // a new variable
-                // check first if the literal is already in the list:
-                int lit = -literals.get(1);
-                int index = lits.containsAt(lit);
-                if (index != -1) {
-                    coefs.set(index, coefs.get(index).add(bigweight));
-                } else {
-                    // check if the opposite literal is already there
-                    index = lits.containsAt(-lit);
-                    if (index != -1) {
-                    	falsifiedWeight += weight;
-                        BigInteger oldw = coefs.get(index);
-                        BigInteger diff = oldw.subtract(bigweight);
-                        if (diff.signum() > 0) {
-                            coefs.set(index, diff);
-                        } else if (diff.signum() < 0) {
-                            lits.set(index, lit);
-                            coefs.set(index, diff.abs());
-                            // remove from falsifiedWeight the
-                            // part of the weight that will remain 
-                            // in the objective function
-                            falsifiedWeight += diff.intValue();
-                        } else {
-                            assert diff.signum() == 0;                            
-                            lits.delete(index);
-                            coefs.delete(index);
-                        }
-                    } else {
-                        lits.push(lit);
-                        coefs.push(bigweight);
-                    }
-                }
-                return null;
-            }
-            coefs.push(bigweight);
-            int newvar = nborigvars + ++nbnewvar;
-            literals.set(0, newvar);
-            lits.push(newvar);
-        } else {
-            literals.delete(0);
-        }
-        return super.addClause(literals);
-    }
+	public void setTopWeight(int top) {
+		this.top = top;
+	}
 
-    public boolean admitABetterSolution() throws TimeoutException {
-        boolean result = super.isSatisfiable(true);
-        if (result) {
-            int nbtotalvars = nborigvars + nbnewvar;
-            if (prevfullmodel == null)
-                prevfullmodel = new int[nbtotalvars];
-            for (int i = 1; i <= nbtotalvars; i++) {
-                prevfullmodel[i - 1] = super.model(i) ? i : -i;
-            }
-        }
-        return result;
-    }
+	/**
+	 * Add a set of literals to the solver.
+	 * 
+	 * Here the assumption is that the first literal (literals[0]) is the weight
+	 * of the constraint as found in the MAXSAT evaluation. if the weight is
+	 * greater or equal to the top weight, then the clause is hard, else it is
+	 * soft.
+	 * 
+	 * @param literals
+	 *            a weighted clause, the weight being the first element of the
+	 *            vector.
+	 * @see #setTopWeight(int)
+	 */
+	@Override
+	public IConstr addClause(IVecInt literals) throws ContradictionException {
+		int weight = literals.get(0);
+		literals.delete(0);
+		return addSoftClause(weight, literals);
+	}
 
-    @Override
-    public void reset() {
-        coefs.clear();
-        lits.clear();
-        nbnewvar = 0;
-        super.reset();
-    }
+	/**
+	 * Add a hard clause in the solver, i.e. a clause that must be satisfied.
+	 * 
+	 * @param literals
+	 *            the clause
+	 * @return the constraint is it is not trivially satisfied.
+	 * @throws ContradictionException
+	 */
+	public IConstr addHardClause(IVecInt literals)
+			throws ContradictionException {
+		return super.addClause(literals);
+	}
 
-    public boolean hasNoObjectiveFunction() {
-        return false;
-    }
+	/**
+	 * Add a soft clause in the solver, i.e. a clause with a weight of 1.
+	 * 
+	 * @param literals
+	 *            the clause.
+	 * @return the constraint is it is not trivially satisfied.
+	 * @throws ContradictionException
+	 */
+	public IConstr addSoftClause(IVecInt literals)
+			throws ContradictionException {
+		return addSoftClause(1, literals);
+	}
 
-    public boolean nonOptimalMeansSatisfiable() {
-        return false;
-    }
+	/**
+	 * Add a soft clause to the solver.
+	 * 
+	 * if the weight of the clause is greater of equal to the top weight, the
+	 * clause will be considered as a hard clause.
+	 * 
+	 * @param weight
+	 *            the weight of the clause
+	 * @param literals
+	 *            the clause
+	 * @return the constraint is it is not trivially satisfied.
+	 * @throws ContradictionException
+	 */
+	public IConstr addSoftClause(int weight, IVecInt literals)
+			throws ContradictionException {
+		if (weight < top) {
+			BigInteger bigweight = BigInteger.valueOf(weight);
+			if (literals.size() == 2) {
+				// if there is only a coefficient and a literal, no need to
+				// create
+				// a new variable
+				// check first if the literal is already in the list:
+				int lit = -literals.get(1);
+				int index = lits.containsAt(lit);
+				if (index != -1) {
+					coefs.set(index, coefs.get(index).add(bigweight));
+				} else {
+					// check if the opposite literal is already there
+					index = lits.containsAt(-lit);
+					if (index != -1) {
+						falsifiedWeight += weight;
+						BigInteger oldw = coefs.get(index);
+						BigInteger diff = oldw.subtract(bigweight);
+						if (diff.signum() > 0) {
+							coefs.set(index, diff);
+						} else if (diff.signum() < 0) {
+							lits.set(index, lit);
+							coefs.set(index, diff.abs());
+							// remove from falsifiedWeight the
+							// part of the weight that will remain
+							// in the objective function
+							falsifiedWeight += diff.intValue();
+						} else {
+							assert diff.signum() == 0;
+							lits.delete(index);
+							coefs.delete(index);
+						}
+					} else {
+						lits.push(lit);
+						coefs.push(bigweight);
+					}
+				}
+				return null;
+			}
+			coefs.push(bigweight);
+			int newvar = nborigvars + ++nbnewvar;
+			literals.push(newvar);
+			lits.push(newvar);
+		}
+		return super.addClause(literals);
+	}
 
-    private int counter;
+	/**
+	 * Set some literals whose sum must be minimized.
+	 * 
+	 * @param literals
+	 *            the sum of those literals must be minimized.
+	 */
+	public void addLiteralsToMinimize(IVecInt literals) {
+		for (IteratorInt it = literals.iterator(); it.hasNext();) {
+			lits.push(it.next());
+			coefs.push(BigInteger.ONE);
+		}
+	}
 
-    public Number calculateObjective() {
-        counter = 0;
-        for (int q : prevfullmodel) {
-            int index = lits.containsAt(q);
-            if (index != -1) {
-                counter += coefs.get(index).intValue();
-            }
-        }
-        return falsifiedWeight + counter;
-    }
+	/**
+	 * Set some literals whose sum must be minimized.
+	 * 
+	 * @param literals
+	 *            the sum of those literals must be minimized.
+	 * @param coefficients
+	 *            the weight of the literals.
+	 */
+	public void addWeightedLiteralsToMinimize(IVecInt literals,
+			IVec<BigInteger> coefficients) {
+		if (literals.size() != coefs.size())
+			throw new IllegalArgumentException();
+		for (int i = 0; i < literals.size(); i++) {
+			lits.push(literals.get(i));
+			coefs.push(coefficients.get(i));
+		}
+	}
 
-    private final IVecInt lits = new VecInt();
+	/**
+	 * Set some literals whose sum must be minimized.
+	 * 
+	 * @param literals
+	 *            the sum of those literals must be minimized.
+	 * @param coefficients
+	 *            the weight of the literals.
+	 */
+	public void addWeightedLiteralsToMinimize(IVecInt literals,
+			IVecInt coefficients) {
+		if (literals.size() != coefficients.size())
+			throw new IllegalArgumentException();
+		for (int i = 0; i < literals.size(); i++) {
+			lits.push(literals.get(i));
+			coefs.push(BigInteger.valueOf(coefficients.get(i)));
+		}
+	}
 
-    private final IVec<BigInteger> coefs = new Vec<BigInteger>();
+	public boolean admitABetterSolution() throws TimeoutException {
+		boolean result = super.isSatisfiable(true);
+		if (result) {
+			prevboolmodel = new boolean[nVars()];
+			for (int i = 0; i < nVars(); i++) {
+				prevboolmodel[i] = decorated().model(i + 1);
+			}
+			int nbtotalvars = nborigvars + nbnewvar;
+			if (prevfullmodel == null)
+				prevfullmodel = new int[nbtotalvars];
+			for (int i = 1; i <= nbtotalvars; i++) {
+				prevfullmodel[i - 1] = super.model(i) ? i : -i;
+			}
+			prevmodel = new int[nborigvars];
+			for (int i = 0; i < nborigvars; i++) {
+				prevmodel[i] = prevfullmodel[i];
+			}
+		}
+		return result;
+	}
 
-    private final ObjectiveFunction obj = new ObjectiveFunction(lits, coefs);
+	@Override
+	public void reset() {
+		coefs.clear();
+		lits.clear();
+		nbnewvar = 0;
+		super.reset();
+	}
 
-    public void discard() throws ContradictionException {
-        assert lits.size() == coefs.size();
-        super.addPseudoBoolean(lits, coefs, false, BigInteger
-                .valueOf(counter - 1));
-    }
+	public boolean hasNoObjectiveFunction() {
+		return false;
+	}
+
+	public boolean nonOptimalMeansSatisfiable() {
+		return false;
+	}
+
+	private int counter;
+
+	public Number calculateObjective() {
+		counter = 0;
+		for (int q : prevfullmodel) {
+			int index = lits.containsAt(q);
+			if (index != -1) {
+				counter += coefs.get(index).intValue();
+			}
+		}
+		return falsifiedWeight + counter;
+	}
+
+	private final IVecInt lits = new VecInt();
+
+	private final IVec<BigInteger> coefs = new Vec<BigInteger>();
+
+	private final ObjectiveFunction obj = new ObjectiveFunction(lits, coefs);
+
+	public void discard() throws ContradictionException {
+		assert lits.size() == coefs.size();
+		super.addPseudoBoolean(lits, coefs, false, BigInteger
+				.valueOf(counter - 1));
+	}
 
 }
