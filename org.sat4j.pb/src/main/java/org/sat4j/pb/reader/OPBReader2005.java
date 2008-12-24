@@ -667,17 +667,17 @@ public class OPBReader2005 extends Reader implements Serializable {
     }
 
     @Override
-    public final IProblem parseInstance(final java.io.Reader in)
+    public final IProblem parseInstance(final java.io.Reader input)
             throws ParseFormatException, ContradictionException {
-        IProblem problem = parseInstance(new LineNumberReader(in));
+        IProblem problem = parseInstance(new LineNumberReader(input));
         solver.setObjectiveFunction(getObjectiveFunction());
         return problem;
     }
 
-    private IProblem parseInstance(LineNumberReader in)
+    private IProblem parseInstance(LineNumberReader input)
             throws ParseFormatException, ContradictionException {
         solver.reset();
-        this.in = in;
+        this.in = input;
         try {
             parse();
             return solver;

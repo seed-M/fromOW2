@@ -42,8 +42,6 @@ import org.sat4j.reader.ParseFormatException;
 public abstract class AbstractPseudoBooleanAndPigeonHoleTest extends
 		AbstractEZPseudoBooleanAndPigeonHoleTest {
 
-	protected static final String PREFIX = System.getProperty("test.pbprefix");
-
 	public AbstractPseudoBooleanAndPigeonHoleTest(String arg) {
 		super(arg);
 	}

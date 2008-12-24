@@ -45,8 +45,6 @@ import org.sat4j.reader.ParseFormatException;
 public abstract class AbstractEZPseudoBooleanAndPigeonHoleTest extends
         AbstractPigeonHoleWithCardinalityTest<IPBSolver> {
 
-    protected static final String PREFIX = System.getProperty("test.pbprefix");
-
     /**
      * Cr?ation d'un test
      * 
@@ -58,8 +56,8 @@ public abstract class AbstractEZPseudoBooleanAndPigeonHoleTest extends
     }
 
     @Override
-    protected InstanceReader createInstanceReader(IPBSolver solver){
-    	return new PBInstanceReader(solver);
+    protected InstanceReader createInstanceReader(IPBSolver theSolver1){
+    	return new PBInstanceReader(theSolver1);
     }
     
     @Override

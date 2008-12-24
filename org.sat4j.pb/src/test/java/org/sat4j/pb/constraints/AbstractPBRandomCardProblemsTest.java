@@ -34,8 +34,8 @@ public abstract class AbstractPBRandomCardProblemsTest extends
 		AbstractRandomCardProblemsTest<IPBSolver> {
 
 	@Override
-    protected PBInstanceReader createInstanceReader(final IPBSolver solver){
-    	return new PBInstanceReader(solver);
+    protected PBInstanceReader createInstanceReader(final IPBSolver theSolver1){
+    	return new PBInstanceReader(theSolver1);
     }
     
     /**

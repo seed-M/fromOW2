@@ -221,31 +221,31 @@ public abstract class WatchPb implements PBConstr, Undoable, Serializable {
      * compute the slack of a described constraint slack = poss - degree of the
      * constraint
      * 
-     * @param coefs
+     * @param theCoefs
      *                coefficients of the constraint
-     * @param degree
+     * @param theDegree
      *                degree of the constraint
      * @return slack of the constraint
      */
-    public BigInteger slackConstraint(BigInteger[] coefs, BigInteger degree) {
-        return recalcLeftSide(coefs).subtract(degree);
+    public BigInteger slackConstraint(BigInteger[] theCoefs, BigInteger theDegree) {
+        return recalcLeftSide(theCoefs).subtract(theDegree);
     }
 
     /**
      * compute the sum of the coefficients of the satisfied or non-assigned
      * literals of a described constraint (usually called poss)
      * 
-     * @param coefs
+     * @param theCoefs
      *                coefficients of the constraint
      * @return poss
      */
-    public BigInteger recalcLeftSide(BigInteger[] coefs) {
+    public BigInteger recalcLeftSide(BigInteger[] theCoefs) {
         BigInteger poss = BigInteger.ZERO;
         // Pour chaque litteral
         for (int i = 0; i < lits.length; i++)
             if (!voc.isFalsified(lits[i])) {
-                assert coefs[i].signum() >= 0;
-                poss = poss.add(coefs[i]);
+                assert theCoefs[i].signum() >= 0;
+                poss = poss.add(theCoefs[i]);
             }
         return poss;
     }
@@ -514,7 +514,8 @@ public abstract class WatchPb implements PBConstr, Undoable, Serializable {
         return false;
     }
 
-    public boolean equals(Object pb) {
+    @Override
+	public boolean equals(Object pb) {
         if (pb==null) {
             return false;
         }

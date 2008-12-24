@@ -12,32 +12,26 @@ public class UnitClausePB extends UnitClause implements PBConstr {
 		super(value);
 	}
 
-	@Override
 	public IVecInt computeAnImpliedClause() {
 		return null;
 	}
 
-	@Override
-	public BigInteger getCoef(int literal) {
+	public BigInteger getCoef(int theLiteral1) {
 		return BigInteger.ONE;
 	}
 
-	@Override
 	public BigInteger[] getCoefs() {
 		return new BigInteger[] {BigInteger.ONE};
 	}
 
-	@Override
 	public BigInteger getDegree() {
 		return BigInteger.ONE;
 	}
 
-	@Override
 	public int[] getLits() {
 		return new int[] {literal};
 	}
 
-	@Override
 	public ILits getVocabulary() {
 		return null;
 	}

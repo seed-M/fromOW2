@@ -20,32 +20,26 @@ public class BinaryClausePB extends BinaryClause implements PBConstr {
 
 	private boolean learnt = false;
 	
-	@Override
 	public IVecInt computeAnImpliedClause() {
 		return null;
 	}
 
-	@Override
 	public BigInteger getCoef(int literal) {
 		return BigInteger.ONE;
 	}
 
-	@Override
 	public BigInteger[] getCoefs() {
 		return new BigInteger [] {BigInteger.ONE,BigInteger.ONE};
 	}
 
-	@Override
 	public BigInteger getDegree() {
 		return BigInteger.ONE;
 	}
 
-	@Override
 	public void setLearnt() {
 		learnt = true;
 	}
 
-	@Override
 	public boolean learnt() {
 		return learnt;
 	}
