@@ -34,7 +34,6 @@ import java.util.Map;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -58,7 +57,6 @@ public class MappingHelper<T> {
 
 	private final Map<T, Integer> mapToDimacs = new HashMap<T, Integer>();
 	private final IVec<T> mapToDomain;
-	final IVec<IConstr> constrs = new Vec<IConstr>();
 	final ISolver solver;
 
 	public MappingHelper(ISolver solver) {
@@ -87,7 +85,7 @@ public class MappingHelper<T> {
 		}
 		return toInstall;
 	}
-	
+
 	public boolean getBooleanValueFor(T t) {
 		return solver.model(getIntValue(t));
 	}
@@ -189,13 +187,12 @@ public class MappingHelper<T> {
 			clause.clear();
 		}
 	}
-	
-	
+
 	/**
 	 * Easy way to feed the solver with a clause.
 	 * 
 	 * @param x
-	 *            a thing such that x -> y[1] ... y[n] 
+	 *            a thing such that x -> y[1] ... y[n]
 	 * @param y
 	 *            an array of things whose disjunction is implied by x.
 	 * @throws ContradictionException
@@ -214,13 +211,14 @@ public class MappingHelper<T> {
 	 * Easy way to feed the solver with implications.
 	 * 
 	 * @param x
-	 *            a thing such that x -> y[1] ... y[n] 
+	 *            a thing such that x -> y[1] ... y[n]
 	 * @param y
 	 *            a collection of things whose disjunction is implied by x.
 	 * @throws ContradictionException
 	 *             if a trivial inconsistency is detected.
 	 */
-	public void addImplication(T x, Collection<T> y) throws ContradictionException {
+	public void addImplication(T x, Collection<T> y)
+			throws ContradictionException {
 		IVecInt clause = new VecInt();
 		clause.push(-getIntValue(x));
 		for (T t : y) {
@@ -228,7 +226,7 @@ public class MappingHelper<T> {
 		}
 		solver.addClause(clause);
 	}
-	
+
 	/**
 	 * Easy way to enter in the solver that at least degree x[i] must be
 	 * satisfied.
@@ -307,6 +305,32 @@ public class MappingHelper<T> {
 		solver.addAtMost(literals, degree);
 	}
 
+	public void addExactlyOneOf(T... ts) throws ContradictionException {
+		IVecInt literals = new VecInt(ts.length);
+		for (T t : ts) {
+			literals.push(getIntValue(t));
+		}
+		solver.addAtMost(literals, 1);
+		solver.addClause(literals);
+	}
+	
+	/**
+	 * Add a constraint x -> (y <-> z).
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @throws ContradictionException 
+	 */
+	public void addImpliesEquivalence(T x, T y, T z) throws ContradictionException {
+		IVecInt literals = new VecInt();
+		literals.push(-getIntValue(x)).push(-getIntValue(y)).push(getIntValue(z));		
+		solver.addClause(literals);
+		literals.clear();
+		literals.push(-getIntValue(x)).push(-getIntValue(z)).push(getIntValue(y));		
+		solver.addClause(literals);
+	}
+
 	/**
 	 * Easy way to mean that a set of things are incompatible, i.e. they cannot
 	 * altogether be satisfied.
@@ -333,15 +357,21 @@ public class MappingHelper<T> {
 		solver.addClause(literals);
 	}
 
-	public void setTrue(T thing) throws ContradictionException {
+	public void setTrue(T... things) throws ContradictionException {
 		IVecInt clause = new VecInt();
-		clause.push(getIntValue(thing));
-		constrs.push(solver.addClause(clause));
+		for (T thing : things) {
+			clause.push(getIntValue(thing));
+			solver.addClause(clause);
+			clause.clear();
+		}
 	}
 
-	public void setFalse(T thing) throws ContradictionException {
+	public void setFalse(T... things) throws ContradictionException {
 		IVecInt clause = new VecInt();
-		clause.push(-getIntValue(thing));
-		constrs.push(solver.addClause(clause));
+		for (T thing : things) {
+			clause.push(-getIntValue(thing));
+			solver.addClause(clause);
+			clause.clear();
+		}
 	}
 }
