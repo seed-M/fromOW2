@@ -42,12 +42,10 @@ public class OriginalBinaryClause extends BinaryClause {
 		super(ps, voc);
 	}
 
-	@Override
 	public void setLearnt() {
 		// do nothing
 	}
 
-	@Override
 	public boolean learnt() {
 		return false;
 	}

@@ -611,7 +611,6 @@ public class VecInt implements IVecInt {
         return nbelem == 0;
     }
 
-	@Override
 	public int[] toArray() {
 		return myarray;
 	}

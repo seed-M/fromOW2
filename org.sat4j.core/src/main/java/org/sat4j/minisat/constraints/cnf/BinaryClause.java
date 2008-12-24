@@ -219,7 +219,6 @@ public abstract class BinaryClause implements Constr, Serializable {
 		return (int) sum / 2;
 	}
 
-	@Override
 	public void register() {
 		voc.attach(neg(head), this);
 		voc.attach(neg(tail), this);
