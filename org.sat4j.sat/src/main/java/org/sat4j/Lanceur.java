@@ -348,7 +348,7 @@ public class Lanceur extends AbstractLauncher {
 				literals.push(-i);
 			}
 			solver.addAtLeast(literals, k);
-			log("Limiting solutions to those having at least "+k+" falsified literals");
+			log("Limiting solutions to those having at least "+k+" variables assigned to false");
 		}
 		return solver;
 	}
