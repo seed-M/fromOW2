@@ -425,4 +425,8 @@ public abstract class SolverDecorator<T extends ISolver> implements ISolver {
 		return solver.unsatExplanation();
 	}
 
+	public void configure(String key, Object value) {
+		solver.configure(key, value);
+	}
+
 }

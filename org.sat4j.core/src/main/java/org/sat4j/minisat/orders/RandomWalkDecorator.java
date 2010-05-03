@@ -6,6 +6,7 @@ import java.util.Random;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.IOrder;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;
+import org.sat4j.specs.IVecInt;
 
 /**
  * @since 2.2
@@ -89,6 +90,10 @@ public final class RandomWalkDecorator implements IOrder {
 
 	public void varDecayActivity() {
 		decorated.varDecayActivity();
+	}
+
+	public void setFixedOrder(IVecInt order) {
+		decorated.setFixedOrder(order);
 	}
 
 }

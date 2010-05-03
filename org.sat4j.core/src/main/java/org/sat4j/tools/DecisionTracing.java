@@ -28,7 +28,8 @@ public class DecisionTracing implements SearchListener {
 
 	private void updateWriter() {
 		try {
-			out = new PrintStream(new FileOutputStream(filename + ".dat"));
+			out = new PrintStream(
+					new FileOutputStream(filename + ".dat", true), true);
 		} catch (FileNotFoundException e) {
 			out = System.out;
 		}
@@ -89,6 +90,7 @@ public class DecisionTracing implements SearchListener {
 	}
 
 	public void start() {
+		updateWriter();
 
 	}
 

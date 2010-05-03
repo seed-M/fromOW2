@@ -398,4 +398,16 @@ public interface ISolver extends IProblem, Serializable {
 	 * @since 2.2
 	 */
 	IVecInt unsatExplanation();
+
+	/**
+	 * Easy way to allow the solver to be configured by the end user without
+	 * showing the details of the solver.
+	 * 
+	 * @param key
+	 *            the property to change in the solver.
+	 * @param value
+	 *            the value of the property.
+	 * @since 2.2
+	 */
+	void configure(String key, Object value);
 }

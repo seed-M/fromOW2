@@ -28,6 +28,8 @@
 package org.sat4j;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,12 +40,16 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.sat4j.core.ASolverFactory;
+import org.sat4j.core.VecInt;
+import org.sat4j.reader.EfficientScanner;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
+import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
+import org.sat4j.tools.DecisionTracing;
 
 /**
  * That class is used by launchers used to solve decision problems, i.e.
@@ -200,6 +206,27 @@ public abstract class AbstractLauncher implements Serializable {
 			}
 			beginTime = System.currentTimeMillis();
 			IProblem problem = readProblem(instanceName);
+			String orderfilename = instanceName + ".order";
+			File orderfile = new File(orderfilename);
+			if (orderfile.exists()) {
+				try {
+					IVecInt fixedOrder = new VecInt();
+					EfficientScanner in = new EfficientScanner(
+							new FileInputStream(orderfile));
+					while (!in.eof()) {
+						fixedOrder.push(in.nextInt());
+					}
+					solver.configure("fixedorder", fixedOrder);
+					solver.setSearchListener(new DecisionTracing(instanceName
+							+ ".decisions.trace"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			try {
 				solve(problem);
 			} catch (TimeoutException e) {

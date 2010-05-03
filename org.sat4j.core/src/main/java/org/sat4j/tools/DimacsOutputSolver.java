@@ -326,4 +326,11 @@ public class DimacsOutputSolver implements ISolver {
 	public IVecInt unsatExplanation() {
 		throw new UnsupportedOperationException();
 	}
+
+	/**
+	 * @since 2.2
+	 */
+	public void configure(String key, Object value) {
+		// do nothing
+	}
 }

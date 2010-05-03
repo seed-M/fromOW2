@@ -1703,6 +1703,21 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 		return unsatExplanationInTermsOfAssumptions;
 	}
 
+	/**
+	 * supported value is <"order",IOrder>
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void configure(String key, Object value) {
+		if ("fixedorder".equalsIgnoreCase(key)) {
+			order.setFixedOrder((IVecInt) value);
+			return;
+		}
+		throw new IllegalArgumentException("key " + key
+				+ " is not a valid property");
+	}
+
 }
 
 class ActivityComparator implements Comparator<Constr>, Serializable {
