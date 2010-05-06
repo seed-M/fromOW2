@@ -161,15 +161,19 @@ public final class Vec<T> implements IVec<T> {
 
 	public void growTo(final int newsize, final T pad) {
 		// assert newsize >= size();
-		ensure(newsize);
+		ensureLocal(newsize);
 		for (int i = nbelem; i < newsize; i++) {
 			myarray[i] = pad;
 		}
 		nbelem = newsize;
 	}
 
+	public final void ensure(final int nsize) {
+		ensureLocal(nsize);
+	}
+
 	@SuppressWarnings("unchecked")
-	public void ensure(final int nsize) {
+	private final void ensureLocal(final int nsize) {
 		if (nsize >= myarray.length) {
 			T[] narray = (T[]) new Object[Math.max(nsize, nbelem * 2)];
 			System.arraycopy(myarray, 0, narray, 0, nbelem);
@@ -178,7 +182,7 @@ public final class Vec<T> implements IVec<T> {
 	}
 
 	public IVec<T> push(final T elem) {
-		ensure(nbelem + 1);
+		ensureLocal(nbelem + 1);
 		myarray[nbelem++] = elem;
 		return this;
 	}
@@ -206,7 +210,7 @@ public final class Vec<T> implements IVec<T> {
 
 	public void insertFirstWithShifting(final T elem) {
 		if (nbelem > 0) {
-			ensure(nbelem + 1);
+			ensureLocal(nbelem + 1);
 			for (int i = nbelem; i > 0; i--) {
 				myarray[i] = myarray[i - 1];
 			}
