@@ -231,6 +231,7 @@ public abstract class AbstractLauncher implements Serializable {
 				solve(problem);
 			} catch (TimeoutException e) {
 				log("timeout"); //$NON-NLS-1$
+				onTimeout();
 			}
 		} catch (FileNotFoundException e) {
 			System.err.println("FATAL " + e.getLocalizedMessage());
@@ -243,6 +244,8 @@ public abstract class AbstractLauncher implements Serializable {
 			System.err.println("FATAL " + e.getLocalizedMessage());
 		}
 	}
+
+	protected abstract void onTimeout();
 
 	protected abstract String getInstanceName(String[] args);
 

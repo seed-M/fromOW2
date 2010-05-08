@@ -36,14 +36,15 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
+import org.sat4j.minisat.core.DataStructureFactory;
+import org.sat4j.minisat.core.Solver;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.Minimal4CardinalityModel;
 import org.sat4j.tools.Minimal4InclusionModel;
-import org.sat4j.tools.ModelIterator;
-import org.sat4j.tools.SolutionCounter;
+import org.sat4j.tools.ModelCounter;
 
 /**
  * @author leberre
@@ -51,12 +52,15 @@ import org.sat4j.tools.SolutionCounter;
  *         To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class ModelIteratorTest {
+public class InternalModelIteratorTest {
 
 	@Test
 	public void testModelIterator() {
 		try {
-			ISolver solver = new ModelIterator(SolverFactory.newDefault());
+			ModelCounter mc = new ModelCounter();
+			Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+			solver.setModelAnalyzer(solver.ITERATE_OVER_ALL_MODELS);
+			solver.setModelListener(mc);
 			solver.newVar(3);
 			IVecInt clause = new VecInt();
 			clause.push(1);
@@ -68,12 +72,8 @@ public class ModelIteratorTest {
 			clause.push(-2);
 			clause.push(-3);
 			solver.addClause(clause);
-			int counter = 0;
-			while (solver.isSatisfiable()) {
-				solver.model();
-				counter++;
-			}
-			assertEquals(6, counter);
+			assertTrue(solver.isSatisfiable());
+			assertEquals(6, mc.counterValue());
 		} catch (ContradictionException e) {
 			fail();
 		} catch (TimeoutException e) {
@@ -84,7 +84,10 @@ public class ModelIteratorTest {
 	@Test
 	public void testModelIteratorLimit() {
 		try {
-			ISolver solver = new ModelIterator(SolverFactory.newDefault(), 3);
+			ModelCounter mc = new ModelCounter();
+			Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+			solver.setModelAnalyzer(solver.buildModelIterator(3));
+			solver.setModelListener(mc);
 			solver.newVar(3);
 			IVecInt clause = new VecInt();
 			clause.push(1);
@@ -137,7 +140,7 @@ public class ModelIteratorTest {
 	// fail();
 	// }
 	// }
-	//    
+	//
 	// public void testCardMinModel() {
 	// try {
 	// ISolver solver = new ModelIterator(new
@@ -169,8 +172,8 @@ public class ModelIteratorTest {
 	@Test
 	public void testCardModel() {
 		try {
-			ISolver solver = new Minimal4CardinalityModel(SolverFactory
-					.newDefault());
+			ISolver solver = new Minimal4CardinalityModel(
+					SolverFactory.newDefault());
 			solver.newVar(3);
 			IVecInt clause = new VecInt();
 			clause.push(1);
@@ -198,8 +201,8 @@ public class ModelIteratorTest {
 	@Test
 	public void testIncModel() {
 		try {
-			ISolver solver = new Minimal4InclusionModel(SolverFactory
-					.newDefault());
+			ISolver solver = new Minimal4InclusionModel(
+					SolverFactory.newDefault());
 			solver.newVar(3);
 			IVecInt clause = new VecInt();
 			clause.push(1);
@@ -270,18 +273,21 @@ public class ModelIteratorTest {
 
 	@Test(timeout = 5000)
 	public void testGlobalTimeoutCounter() {
-		SolutionCounter counter = new SolutionCounter(SolverFactory
-				.newDefault());
+		ModelCounter mc = new ModelCounter();
+		Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+		solver.setModelAnalyzer(solver.ITERATE_OVER_ALL_MODELS);
+		solver.setModelListener(mc);
 		IVecInt clause = new VecInt();
 		for (int i = 1; i < 100; i++) {
 			clause.push(i);
 		}
 		try {
-			counter.addClause(clause);
-			counter.setTimeout(3);
-			counter.countSolutions();
+			solver.addClause(clause);
+			solver.setTimeout(3);
+			solver.isSatisfiable();
 		} catch (TimeoutException e) {
-			assertTrue(counter.lowerBound() > 0);
+			assertTrue(mc.counterValue() > 0);
+			System.out.println(mc.counterValue());
 		} catch (ContradictionException e) {
 			fail();
 		}
@@ -289,19 +295,20 @@ public class ModelIteratorTest {
 
 	@Test(timeout = 5000)
 	public void testGlobalTimeoutIterator() {
-		ModelIterator iterator = new ModelIterator(SolverFactory.newDefault());
+		ModelCounter mc = new ModelCounter();
+		Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+		solver.setModelAnalyzer(solver.ITERATE_OVER_ALL_MODELS);
+		solver.setModelListener(mc);
 		IVecInt clause = new VecInt();
 		for (int i = 1; i < 100; i++) {
 			clause.push(i);
 		}
 		try {
-			iterator.addClause(clause);
-			iterator.setTimeout(3);
-			while (iterator.isSatisfiable()) {
-				iterator.model();
-			}
+			solver.addClause(clause);
+			solver.setTimeout(3);
+			solver.isSatisfiable();
 		} catch (TimeoutException e) {
-
+			System.out.println(mc.counterValue());
 		} catch (ContradictionException e) {
 			fail();
 		}
@@ -318,18 +325,24 @@ public class ModelIteratorTest {
 		assertEquals(127L, count(7));
 		assertEquals(255L, count(8));
 		assertEquals(511L, count(9));
+		assertEquals(1023L, count(10));
+		assertEquals(2047L, count(11));
+		assertEquals(4095L, count(12));
 	}
 
 	private long count(int size) throws ContradictionException,
 			TimeoutException {
-		SolutionCounter counter = new SolutionCounter(SolverFactory
-				.newDefault());
+		ModelCounter mc = new ModelCounter();
+		Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+		solver.setModelAnalyzer(solver.ITERATE_OVER_ALL_MODELS);
+		solver.setModelListener(mc);
 		IVecInt clause = new VecInt();
 		for (int i = 1; i <= size; i++) {
 			clause.push(i);
 		}
-		counter.addClause(clause);
-		counter.setTimeout(10);
-		return counter.countSolutions();
+		solver.addClause(clause);
+		solver.setTimeout(10);
+		solver.isSatisfiable();
+		return mc.counterValue();
 	}
 }

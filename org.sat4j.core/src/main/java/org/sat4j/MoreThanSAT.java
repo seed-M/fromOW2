@@ -32,16 +32,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.sat4j.minisat.SolverFactory;
+import org.sat4j.minisat.core.DataStructureFactory;
+import org.sat4j.minisat.core.Solver;
 import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
-import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
+import org.sat4j.tools.ModelCounter;
 import org.sat4j.tools.RemiUtils;
-import org.sat4j.tools.SolutionCounter;
 
 /**
  * This is an example of use of the SAT4J library for computing the backbone of
@@ -63,8 +64,10 @@ public final class MoreThanSAT {
 	}
 
 	public static void main(final String[] args) {
-		final ISolver solver = SolverFactory.newDefault();
-		final SolutionCounter sc = new SolutionCounter(solver);
+		final ModelCounter mc = new ModelCounter();
+		final Solver<DataStructureFactory> solver = SolverFactory.newBestWL();
+		solver.setModelAnalyzer(solver.buildModelIterator(3));
+		solver.setModelListener(mc);
 		solver.setTimeout(3600); // 1 hour timeout
 		Reader reader = new InstanceReader(solver);
 
@@ -79,7 +82,7 @@ public final class MoreThanSAT {
 						.println(Messages.getString("MoreThanSAT.1") + backbone); //$NON-NLS-1$
 				System.out.println(Messages.getString("MoreThanSAT.2")); //$NON-NLS-1$
 				System.out.println(Messages.getString("MoreThanSAT.3") //$NON-NLS-1$
-						+ sc.countSolutions());
+						+ mc.counterValue());
 			} else {
 				System.out.println(Messages.getString("MoreThanSAT.4")); //$NON-NLS-1$
 			}

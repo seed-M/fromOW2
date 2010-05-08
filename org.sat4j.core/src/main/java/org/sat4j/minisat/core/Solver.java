@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -72,6 +73,7 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.Lbool;
+import org.sat4j.specs.ModelListener;
 import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.TimeoutException;
 
@@ -185,6 +187,49 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 			__dimacs_out.unsafePush(voc.getFromPool(in.get(i)));
 		}
 		return __dimacs_out;
+	}
+
+	public static ModelListener DO_NOTHING_MODEL_LISTENER = new ModelListener() {
+
+		public void onModel(int[] model) {
+			// do nothing
+		}
+	};
+
+	public ModelAnalyzer<D> STOP_AT_FIRST_MODEL = new ModelAnalyzer<D>() {
+
+		public Constr analyze(IVecInt internalModel, D dsf) {
+			return null;
+		}
+	};
+
+	public ModelAnalyzer<D> ITERATE_OVER_ALL_MODELS = buildModelIterator(Long.MAX_VALUE);
+
+	/**
+	 * build and iterator that stops after a fixed number of solution found.
+	 * 
+	 * @param limit
+	 *            of the number of solutions to compute.
+	 * @return a ModelAnalyzer to be used within that solver.
+	 * @see #setModelAnalyzer(ModelAnalyzer)
+	 * @since 3.0
+	 */
+	public ModelAnalyzer<D> buildModelIterator(final long limit) {
+		return new ModelAnalyzer<D>() {
+			private long cpt = 0;
+
+			public Constr analyze(IVecInt internalModel, D dsf) {
+				if (cpt >= limit) {
+					return null;
+				}
+				cpt++;
+				IVecInt clause = new VecInt(internalModel.size());
+				for (IteratorInt it = internalModel.iterator(); it.hasNext();) {
+					clause.push(LiteralsUtils.neg(it.next()));
+				}
+				return dsf.createUnregisteredClause(clause);
+			}
+		};
 	}
 
 	/**
@@ -357,13 +402,15 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 			throw new IllegalArgumentException(
 					"Reference to the constraint to remove needed!"); //$NON-NLS-1$
 		}
-		if (constrs.last() != co) {
+		Constr c = (Constr) co;
+		if (constrs.last() != co && constrs.contains(c)) {
 			throw new IllegalArgumentException(
 					"Can only remove latest added constraint!!!"); //$NON-NLS-1$
 		}
-		Constr c = (Constr) co;
 		c.remove(this);
-		constrs.pop();
+		if (constrs.last() == co) {
+			constrs.pop();
+		}
 		String type = c.getClass().getName();
 		constrTypes.get(type).dec();
 		return true;
@@ -414,14 +461,13 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 	}
 
 	/**
-	 * Si un mod?le est trouv?, ce vecteur contient le mod?le.
 	 * 
-	 * @return un mod?le de la formule.
+	 * @return a model if one has been found, null either.
+	 * 
 	 */
 	public int[] model() {
 		if (model == null) {
-			throw new UnsupportedOperationException(
-					"Call the solve method first!!!"); //$NON-NLS-1$
+			return null;
 		}
 		int[] nmodel = new int[model.length];
 		System.arraycopy(model, 0, nmodel, 0, model.length);
@@ -942,10 +988,19 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 
 		do {
 			slistener.beginLoop();
-			// propage les clauses unitaires
+			// propagate unit clauses
 			Constr confl = propagate();
 			assert trail.size() == qhead;
-
+			// check if a model if found
+			if (confl == null) {
+				assert nAssigns() <= voc.realnVars();
+				if (nAssigns() == voc.realnVars()) {
+					slistener.solutionFound();
+					confl = modelFound();
+					if (confl == null)
+						return Lbool.TRUE;
+				}
+			}
 			if (confl == null) {
 				// No conflict found
 				// simpliFYDB() prevents a correct use of
@@ -956,14 +1011,6 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 					stats.rootSimplifications++;
 					boolean ret = simplifyDB();
 					assert ret;
-				}
-				// was learnts.size() - nAssigns() > nofLearnts
-				// if (nofLearnts.obj >= 0 && learnts.size() > nofLearnts.obj) {
-				assert nAssigns() <= voc.realnVars();
-				if (nAssigns() == voc.realnVars()) {
-					slistener.solutionFound();
-					modelFound();
-					return Lbool.TRUE;
 				}
 				if (conflictC >= nofConflicts) {
 					// Reached bound on number of conflicts
@@ -991,7 +1038,11 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 				conflictCount.newConflict();
 
 				if (decisionLevel() == rootLevel) {
-					// on est a la racine, la formule est inconsistante
+					// we iterated over several models until inconsistency
+					if (status == Lbool.TRUE) {
+						return status;
+					}
+					// root conflict, the formula is inconsistent
 					unsatExplanationInTermsOfAssumptions = analyzeFinalConflictInTermsOfAssumptions(
 							confl, assumps, ILits.UNDEFINED);
 					return Lbool.FALSE;
@@ -1025,7 +1076,8 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 	/**
      * 
      */
-	void modelFound() {
+	Constr modelFound() {
+		status = Lbool.TRUE;
 		model = new int[trail.size()];
 		fullmodel = new boolean[nVars()];
 		int index = 0;
@@ -1039,7 +1091,12 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 			}
 		}
 		assert index == model.length;
-		cancelUntil(rootLevel);
+		Constr constr = modelAnalyzer.analyze(trail, dsfactory);
+		modelListener.onModel(model);
+		if (constr == null) {
+			cancelUntil(rootLevel);
+		}
+		return constr;
 	}
 
 	public boolean model(int var) {
@@ -1294,6 +1351,12 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 
 	private LearnedConstraintsDeletionStrategy learnedConstraintsDeletionStrategy = glucose;
 
+	private ModelListener modelListener = DO_NOTHING_MODEL_LISTENER;
+
+	private ModelAnalyzer<D> modelAnalyzer = STOP_AT_FIRST_MODEL;
+
+	private Lbool status;
+
 	/**
 	 * @param lcds
 	 * @since 2.1
@@ -1305,7 +1368,7 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 
 	public boolean isSatisfiable(IVecInt assumps, boolean global)
 			throws TimeoutException {
-		Lbool status = Lbool.UNDEFINED;
+		status = Lbool.UNDEFINED;
 
 		final int howmany = voc.nVars();
 		if (mseen.length <= howmany) {
@@ -1352,8 +1415,8 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 							null, assumps, p);
 					unsatExplanationInTermsOfAssumptions.push(assump);
 				} else {
-					slistener.conflictFound(confl, decisionLevel(), trail
-							.size());
+					slistener.conflictFound(confl, decisionLevel(),
+							trail.size());
 					unsatExplanationInTermsOfAssumptions = analyzeFinalConflictInTermsOfAssumptions(
 							confl, assumps, ILits.UNDEFINED);
 				}
@@ -1718,6 +1781,19 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 				+ " is not a valid property");
 	}
 
+	public void setModelListener(ModelListener modelListener) {
+		this.modelListener = modelListener;
+	}
+
+	/**
+	 * Control the behavior of the solver when a solution (model) is found.
+	 * 
+	 * @param modelAnalyzer
+	 * @since 3.0
+	 */
+	public void setModelAnalyzer(ModelAnalyzer<D> modelAnalyzer) {
+		this.modelAnalyzer = modelAnalyzer;
+	}
 }
 
 class ActivityComparator implements Comparator<Constr>, Serializable {

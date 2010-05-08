@@ -25,13 +25,17 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.opt;
+package org.sat4j.minisat.opt;
 
+import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
+import org.sat4j.minisat.core.Constr;
+import org.sat4j.minisat.core.DataStructureFactory;
+import org.sat4j.minisat.core.Solver;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.TimeoutException;
 
 /**
@@ -47,8 +51,9 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
      */
 	private static final long serialVersionUID = 1L;
 
-	public MaxSatDecorator(ISolver solver) {
+	public MaxSatDecorator(Solver<DataStructureFactory> solver) {
 		super(solver);
+		solver.setModelAnalyzer(this);
 	}
 
 	@Override
@@ -81,11 +86,6 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
 		return false;
 	}
 
-	public Number calculateObjective() {
-		calculateObjectiveValue();
-		return counter;
-	}
-
 	private final IVecInt lits = new VecInt();
 
 	private int counter;
@@ -96,17 +96,13 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
 	 * @since 2.1
 	 */
 	public void discardCurrentSolution() throws ContradictionException {
-		if (prevConstr != null) {
-			super.removeSubsumedConstr(prevConstr);
-		}
-		prevConstr = super.addAtMost(lits, counter - 1);
+
 	}
 
 	@Override
-	public boolean admitABetterSolution(IVecInt assumps)
-			throws TimeoutException {
+	public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
 
-		boolean result = super.admitABetterSolution(assumps);
+		boolean result = super.isSatisfiable(assumps);
 		if (!result) {
 			if (prevConstr != null) {
 				super.removeConstr(prevConstr);
@@ -114,10 +110,6 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
 			}
 		}
 		return result;
-	}
-
-	public void discard() throws ContradictionException {
-		discardCurrentSolution();
 	}
 
 	/**
@@ -128,9 +120,11 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
 	}
 
 	@Override
-	void calculateObjectiveValue() {
+	void calculateObjectiveValue(IVecInt internalModel) {
 		counter = 0;
-		for (int q : prevfullmodel) {
+		int q;
+		for (IteratorInt it = internalModel.iterator(); it.hasNext();) {
+			q = LiteralsUtils.toDimacs(it.next());
 			if (q > nborigvars) {
 				counter++;
 			}
@@ -143,6 +137,25 @@ public final class MaxSatDecorator extends AbstractSelectorVariablesDecorator {
 	public void forceObjectiveValueTo(Number forcedValue)
 			throws ContradictionException {
 		super.addAtMost(lits, forcedValue.intValue());
+	}
+
+	public Constr analyze(IVecInt internalModel, DataStructureFactory dsf) {
+		calculateObjectiveValue(internalModel);
+		IVecInt clause = new VecInt(internalModel.size());
+		for (IteratorInt it = internalModel.iterator(); it.hasNext();) {
+			clause.push(LiteralsUtils.neg(it.next()));
+		}
+		if (prevConstr != null) {
+			super.removeSubsumedConstr(prevConstr);
+		}
+		try {
+			prevConstr = dsf.createCardinalityConstraint(clause,
+					internalModel.size() + 1 - counter);
+
+		} catch (ContradictionException e) {
+			return null;
+		}
+		return dsf.createUnregisteredClause(clause);
 	}
 
 }

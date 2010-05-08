@@ -15,19 +15,12 @@
     <resource path="src/main/java/org/sat4j/minisat/core/ILits.java" type="org.sat4j.minisat.core.ILits">
         <filter id="1211105284">
             <message_arguments>
-                <message_argument value="watches(int)"/>
+                <message_argument value="watch(int, Propagatable)"/>
             </message_arguments>
         </filter>
         <filter id="1211105284">
             <message_arguments>
-                <message_argument value="watch(int, Propagatable)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/test/java/org/sat4j/ModelIteratorTest.java" type="org.sat4j.ModelIteratorTest">
-        <filter id="1110441988">
-            <message_arguments>
-                <message_argument value="org.sat4j.ModelIteratorTest"/>
+                <message_argument value="watches(int)"/>
             </message_arguments>
         </filter>
     </resource>

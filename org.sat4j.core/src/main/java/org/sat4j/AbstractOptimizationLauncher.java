@@ -29,9 +29,9 @@ package org.sat4j;
 
 import java.io.PrintWriter;
 
-import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IOptimizationProblem;
 import org.sat4j.specs.IProblem;
+import org.sat4j.specs.ModelListener;
 import org.sat4j.specs.TimeoutException;
 
 /**
@@ -42,7 +42,8 @@ import org.sat4j.specs.TimeoutException;
  * @author leberre
  * 
  */
-public abstract class AbstractOptimizationLauncher extends AbstractLauncher {
+public abstract class AbstractOptimizationLauncher extends AbstractLauncher
+		implements ModelListener {
 
 	/**
 	 * 
@@ -81,40 +82,27 @@ public abstract class AbstractOptimizationLauncher extends AbstractLauncher {
 
 	@Override
 	protected void solve(IProblem problem) throws TimeoutException {
-		boolean isSatisfiable = false;
-
-		IOptimizationProblem optproblem = (IOptimizationProblem) problem;
-
-		try {
-			while (optproblem.admitABetterSolution()) {
-				if (!isSatisfiable) {
-					if (optproblem.nonOptimalMeansSatisfiable()) {
-						setExitCode(ExitCode.SATISFIABLE);
-						if (optproblem.hasNoObjectiveFunction()) {
-							return;
-						}
-						log("SATISFIABLE"); //$NON-NLS-1$
-					}
-					isSatisfiable = true;
-					log("OPTIMIZING..."); //$NON-NLS-1$
-				}
-				log("Got one! Elapsed wall clock time (in seconds):" //$NON-NLS-1$
-						+ (System.currentTimeMillis() - getBeginTime())
-						/ 1000.0);
-				getLogWriter().println(
-						CURRENT_OPTIMUM_VALUE_PREFIX
-								+ optproblem.getObjectiveValue());
-				optproblem.discardCurrentSolution();
-			}
-			if (isSatisfiable) {
-				setExitCode(ExitCode.OPTIMUM_FOUND);
-			} else {
-				setExitCode(ExitCode.UNSATISFIABLE);
-			}
-		} catch (ContradictionException ex) {
-			assert isSatisfiable;
+		solver.setModelListener(this);
+		if (problem.isSatisfiable())
 			setExitCode(ExitCode.OPTIMUM_FOUND);
+		else
+			setExitCode(ExitCode.UNSATISFIABLE);
+	}
+
+	@Override
+	protected void onTimeout() {
+		if (solver.model() != null) {
+			setExitCode(ExitCode.SATISFIABLE);
 		}
+	}
+
+	public void onModel(int[] model) {
+		log("Got one! Elapsed wall clock time (in seconds):" //$NON-NLS-1$
+				+ (System.currentTimeMillis() - getBeginTime()) / 1000.0);
+		getLogWriter().println(
+				CURRENT_OPTIMUM_VALUE_PREFIX
+						+ ((IOptimizationProblem) solver).getObjectiveValue());
+
 	}
 
 }

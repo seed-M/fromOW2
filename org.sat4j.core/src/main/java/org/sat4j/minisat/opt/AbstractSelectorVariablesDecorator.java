@@ -25,9 +25,11 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.opt;
+package org.sat4j.minisat.opt;
 
 import org.sat4j.core.VecInt;
+import org.sat4j.minisat.core.DataStructureFactory;
+import org.sat4j.minisat.core.ModelAnalyzer;
 import org.sat4j.specs.IOptimizationProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
@@ -45,7 +47,8 @@ import org.sat4j.tools.SolverDecorator;
  * 
  */
 public abstract class AbstractSelectorVariablesDecorator extends
-		SolverDecorator<ISolver> implements IOptimizationProblem {
+		SolverDecorator<ISolver> implements IOptimizationProblem,
+		ModelAnalyzer<DataStructureFactory> {
 
 	/**
 	 * 
@@ -96,15 +99,13 @@ public abstract class AbstractSelectorVariablesDecorator extends
 		nbnewvar = 0;
 	}
 
-	public boolean admitABetterSolution() throws TimeoutException {
-		return admitABetterSolution(VecInt.EMPTY);
+	@Override
+	public boolean isSatisfiable() throws TimeoutException {
+		return isSatisfiable(VecInt.EMPTY);
 	}
 
-	/**
-	 * @since 2.1
-	 */
-	public boolean admitABetterSolution(IVecInt assumps)
-			throws TimeoutException {
+	@Override
+	public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
 		boolean result = super.isSatisfiable(assumps, true);
 		if (result) {
 			prevboolmodel = new boolean[nVars()];
@@ -119,12 +120,11 @@ public abstract class AbstractSelectorVariablesDecorator extends
 			for (int i = 0; i <= end; i++) {
 				prevmodel[i] = prevfullmodel[i];
 			}
-			calculateObjectiveValue();
 		}
 		return result;
 	}
 
-	abstract void calculateObjectiveValue();
+	abstract void calculateObjectiveValue(IVecInt literals);
 
 	@Override
 	public int[] model() {

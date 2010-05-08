@@ -75,30 +75,6 @@ package org.sat4j.specs;
 public interface IOptimizationProblem extends IProblem {
 
 	/**
-	 * Look for a solution of the optimization problem.
-	 * 
-	 * @return true if a better solution than current one can be found.
-	 * @throws TimeoutException
-	 *             if the solver cannot answer in reasonable time.
-	 * @see ISolver#setTimeout(int)
-	 */
-	boolean admitABetterSolution() throws TimeoutException;
-
-	/**
-	 * Look for a solution of the optimization problem when some literals are
-	 * satisfied.
-	 * 
-	 * @param assumps
-	 *            a set of literals in Dimacs format.
-	 * @return true if a better solution than current one can be found.
-	 * @throws TimeoutException
-	 *             if the solver cannot answer in reasonable time.
-	 * @see ISolver#setTimeout(int)
-	 * @since 2.1
-	 */
-	boolean admitABetterSolution(IVecInt assumps) throws TimeoutException;
-
-	/**
 	 * If the optimization problem has no objective function, then it is a
 	 * simple decision problem.
 	 * 
@@ -121,19 +97,6 @@ public interface IOptimizationProblem extends IProblem {
 	boolean nonOptimalMeansSatisfiable();
 
 	/**
-	 * Compute the value of the objective function for the current solution. A
-	 * call to that method only makes sense if hasNoObjectiveFunction()==false.
-	 * 
-	 * DO NOT CALL THAT METHOD THAT WILL BE CALLED AUTOMATICALLY. USE
-	 * getObjectiveValue() instead!
-	 * 
-	 * @return the value of the objective function.
-	 * @see #getObjectiveValue()
-	 */
-	@Deprecated
-	Number calculateObjective();
-
-	/**
 	 * Read only access to the value of the objective function for the current
 	 * solution.
 	 * 
@@ -153,25 +116,11 @@ public interface IOptimizationProblem extends IProblem {
 	void forceObjectiveValueTo(Number forcedValue)
 			throws ContradictionException;
 
-	/**
-	 * Discard the current solution in the optimization problem.
-	 * 
-	 * THE NAME WAS NOT NICE. STILL AVAILABLE TO AVOID BREAKING THE API. PLEASE
-	 * USE THE LONGER discardCurrentSolution() instead.
-	 * 
-	 * @throws ContradictionException
-	 *             if a trivial inconsistency is detected.
-	 * @see #discardCurrentSolution()
-	 */
-	@Deprecated
-	void discard() throws ContradictionException;
-
-	/**
-	 * Discard the current solution in the optimization problem.
-	 * 
-	 * @throws ContradictionException
-	 *             if a trivial inconsistency is detected.
-	 * @since 2.1
-	 */
-	void discardCurrentSolution() throws ContradictionException;
+	// /**
+	// * Minimize an objective function made of simple literals.
+	// *
+	// * @param literals
+	// * a set of literals whose sum should be minimized.
+	// */
+	// void minimize(IVecInt literals);
 }

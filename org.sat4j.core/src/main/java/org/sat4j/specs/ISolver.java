@@ -410,4 +410,14 @@ public interface ISolver extends IProblem, Serializable {
 	 * @since 2.2
 	 */
 	void configure(String key, Object value);
+
+	/**
+	 * Set a listener to be notified each time a solution is found by the
+	 * solver.
+	 * 
+	 * @param modelListener
+	 * @since 3.0
+	 */
+	void setModelListener(ModelListener modelListener);
+
 }

@@ -97,4 +97,10 @@ public class BasicLauncher<T extends ISolver> extends AbstractLauncher {
 		}
 		return args[0];
 	}
+
+	@Override
+	protected void onTimeout() {
+		// do nothing
+
+	}
 }

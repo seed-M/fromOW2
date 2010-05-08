@@ -41,10 +41,8 @@ import org.sat4j.minisat.restarts.MiniSATRestarts;
 import org.sat4j.minisat.restarts.NoRestarts;
 import org.sat4j.minisat.uip.DecisionUIP;
 import org.sat4j.minisat.uip.FirstUIP;
-import org.sat4j.opt.MinOneDecorator;
 import org.sat4j.specs.ISolver;
 import org.sat4j.tools.DimacsOutputSolver;
-import org.sat4j.tools.OptToSatAdapter;
 
 /**
  * User friendly access to pre-constructed solvers.
@@ -334,13 +332,13 @@ public final class SolverFactory extends ASolverFactory<ISolver> {
 		return solver;
 	}
 
-	/**
-	 * @return a solver computing models with a minimum number of satisfied
-	 *         literals.
-	 */
-	public static ISolver newMinOneSolver() {
-		return new OptToSatAdapter(new MinOneDecorator(newDefault()));
-	}
+	// /**
+	// * @return a solver computing models with a minimum number of satisfied
+	// * literals.
+	// */
+	// public static ISolver newMinOneSolver() {
+	// return new OptToSatAdapter(new MinOneDecorator(newDefault()));
+	// }
 
 	/**
 	 * Default solver of the SolverFactory. This solver is meant to be used on

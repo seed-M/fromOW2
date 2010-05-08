@@ -37,6 +37,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
+import org.sat4j.specs.ModelListener;
 import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.TimeoutException;
 
@@ -375,6 +376,10 @@ public class DimacsStringSolver implements ISolver {
 	 * @since 2.2
 	 */
 	public void configure(String key, Object value) {
+		// do nothing
+	}
+
+	public void setModelListener(ModelListener modelListener) {
 		// do nothing
 	}
 }

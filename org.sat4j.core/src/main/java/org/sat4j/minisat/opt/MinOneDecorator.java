@@ -25,7 +25,7 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.opt;
+package org.sat4j.minisat.opt;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -57,15 +57,16 @@ public final class MinOneDecorator extends SolverDecorator<ISolver> implements
 		super(solver);
 	}
 
-	public boolean admitABetterSolution() throws TimeoutException {
-		return admitABetterSolution(VecInt.EMPTY);
+	@Override
+	public boolean isSatisfiable() throws TimeoutException {
+		return isSatisfiable(VecInt.EMPTY);
 	}
 
 	/**
 	 * @since 2.1
 	 */
-	public boolean admitABetterSolution(IVecInt assumps)
-			throws TimeoutException {
+	@Override
+	public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
 		boolean result = isSatisfiable(assumps, true);
 		if (result) {
 			prevmodel = super.model();
