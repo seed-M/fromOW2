@@ -99,12 +99,8 @@ public class InternalModelIteratorTest {
 			clause.push(-2);
 			clause.push(-3);
 			solver.addClause(clause);
-			int counter = 0;
-			while (solver.isSatisfiable()) {
-				solver.model();
-				counter++;
-			}
-			assertEquals(3, counter);
+			solver.isSatisfiable();
+			assertEquals(3, mc.counterValue());
 		} catch (ContradictionException e) {
 			fail();
 		} catch (TimeoutException e) {
