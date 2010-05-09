@@ -217,9 +217,10 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 	public ModelAnalyzer<D> buildModelIterator(final long limit) {
 		return new ModelAnalyzer<D>() {
 			private long cpt = 0;
+			private final long bound = limit - 1;
 
 			public Constr analyze(IVecInt internalModel, D dsf) {
-				if (cpt >= limit) {
+				if (cpt >= bound) {
 					return null;
 				}
 				cpt++;
