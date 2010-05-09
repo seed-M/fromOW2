@@ -228,7 +228,10 @@ public class Solver<D extends DataStructureFactory> implements ISolver,
 				for (IteratorInt it = internalModel.iterator(); it.hasNext();) {
 					clause.push(LiteralsUtils.neg(it.next()));
 				}
-				return dsf.createUnregisteredClause(clause);
+				Constr constr = dsf.createUnregisteredClause(clause);
+				constr.register();
+				addConstr(constr);
+				return constr;
 			}
 		};
 	}
