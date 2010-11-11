@@ -25,33 +25,49 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.orders;
+package org.sat4j.minisat.core;
 
-import static org.sat4j.core.LiteralsUtils.var;
 
 /**
- * Keeps record of the phase of a variable in the lastest recorded clause.
+ * MiniSAT learning scheme.
+ * 
+ * The Data Structure Factory is expected to be set thanks to the appropriate
+ * setter method before using it.
+ * 
+ * It was not possible to set it in the constructor.
  * 
  * @author leberre
- * 
  */
-public final class PhaseInLastLearnedClauseSelectionStrategy extends
-		AbstractPhaserecordingSelectionStrategy {
-
-	/**
-     * 
-     */
+public final class MiniSATLearning<D extends DataStructureFactory> extends
+		AbstractLearning<D> {
 	private static final long serialVersionUID = 1L;
 
-	public void updateVar(int p) {
-		phase[var(p)] = p;
+	private DataStructureFactory dsf;
+
+	public void setDataStructureFactory(DataStructureFactory dsf) {
+		this.dsf = dsf;
 	}
 
 	@Override
-	public String toString() {
-		return "phase appearing in latest learned clause";
+	public void setSolver(Solver<D> s) {
+		super.setSolver(s);
+		this.dsf = s.getDSFactory();
 	}
 
-	public void assignLiteral(int p) {
+	public void learns(Constr constr) {
+		// va contenir une nouvelle clause ou null si la clause est unitaire
+		claBumpActivity(constr);
+		dsf.learnConstraint(constr);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Learn all clauses as in MiniSAT";
+	}
+
 }

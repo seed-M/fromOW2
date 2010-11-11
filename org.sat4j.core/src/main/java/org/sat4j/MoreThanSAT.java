@@ -31,7 +31,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
@@ -63,7 +62,7 @@ public final class MoreThanSAT {
 	}
 
 	public static void main(final String[] args) {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.instance().defaultSolver();
 		final SolutionCounter sc = new SolutionCounter(solver);
 		solver.setTimeout(3600); // 1 hour timeout
 		Reader reader = new InstanceReader(solver);

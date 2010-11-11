@@ -25,24 +25,34 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.learning;
+package org.sat4j.minisat.core;
 
-import org.sat4j.minisat.core.Constr;
-import org.sat4j.minisat.core.DataStructureFactory;
+import static org.sat4j.core.LiteralsUtils.negLit;
 
-/**
- * Allows MiniSAT to do backjumping without learning. The literals appearing in
- * the reason do not see their activity increased. That solution looks the best
- * for VLIW-SAT-1.0 benchmarks (1346s vs 1785s).
- * 
- * @author leberre
- */
-public final class NoLearningNoHeuristics<D extends DataStructureFactory>
-		extends AbstractLearning<D> {
+public abstract class AbstractPhaserecordingSelectionStrategy implements
+		IPhaseSelectionStrategy {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
-	public void learns(Constr reason) {
+	protected int[] phase;
+
+	public void init(int nlength) {
+		if (phase == null || phase.length < nlength) {
+			phase = new int[nlength];
+		}
+		for (int i = 1; i < nlength; i++) {
+			phase[i] = negLit(i);
+		}
 	}
 
+	public void init(int var, int p) {
+		phase[var] = p;
+	}
+
+	public int select(int var) {
+		return phase[var];
+	}
 }

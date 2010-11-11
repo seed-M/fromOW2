@@ -25,17 +25,12 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.orders;
+package org.sat4j.minisat.core;
 
 import static org.sat4j.core.LiteralsUtils.var;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-
-import org.sat4j.minisat.core.Heap;
-import org.sat4j.minisat.core.ILits;
-import org.sat4j.minisat.core.IOrder;
-import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
 /*
  * Created on 16 oct. 2003
@@ -74,7 +69,7 @@ public class VarOrderHeap implements IOrder, Serializable {
 	protected IPhaseSelectionStrategy phaseStrategy;
 
 	public VarOrderHeap() {
-		this(new PhaseInLastLearnedClauseSelectionStrategy());
+		this(new RSATPhaseSelectionStrategy());
 	}
 
 	public VarOrderHeap(IPhaseSelectionStrategy strategy) {

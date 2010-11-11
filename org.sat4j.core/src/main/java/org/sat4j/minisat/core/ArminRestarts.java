@@ -25,56 +25,50 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.orders;
+package org.sat4j.minisat.core;
 
-import static org.sat4j.core.LiteralsUtils.negLit;
-import static org.sat4j.core.LiteralsUtils.posLit;
-
-import java.util.Random;
-
-import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
 /**
- * The variable selection strategy randomly picks one phase, either positive or
- * negative.
+ * Rapid restart strategy presented by Armin Biere during it's SAT 07 invited
+ * talk.
  * 
  * @author leberre
  * 
  */
-public final class RandomLiteralSelectionStrategy implements
-		IPhaseSelectionStrategy {
+public final class ArminRestarts implements RestartStrategy {
 
 	/**
      * 
      */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @since 2.2
-	 */
-	public static final Random RAND = new Random(123456789);
+	private double inner, outer;
+	private long conflicts;
+	private SearchParams params;
 
-	public void assignLiteral(int p) {
+	public void init(SearchParams theParams) {
+		this.params = theParams;
+		inner = theParams.getInitConflictBound();
+		outer = theParams.getInitConflictBound();
+		conflicts = Math.round(inner);
 	}
 
-	public void init(int nlength) {
+	public long nextRestartNumberOfConflict() {
+		return conflicts;
 	}
 
-	public void init(int var, int p) {
-	}
-
-	public int select(int var) {
-		if (RAND.nextBoolean()) {
-			return posLit(var);
+	public void onRestart() {
+		if (inner >= outer) {
+			outer *= params.getConflictBoundIncFactor();
+			inner = params.getInitConflictBound();
+		} else {
+			inner *= params.getConflictBoundIncFactor();
 		}
-		return negLit(var);
-	}
-
-	public void updateVar(int p) {
+		conflicts = Math.round(inner);
 	}
 
 	@Override
 	public String toString() {
-		return "random phase selection";
+		return "Armin Biere (Picosat) restarts strategy";
 	}
 }

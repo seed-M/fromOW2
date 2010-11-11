@@ -28,7 +28,6 @@
 package org.sat4j;
 
 import org.sat4j.core.ASolverFactory;
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.ISolver;
@@ -62,7 +61,7 @@ public class BasicLauncher<T extends ISolver> extends AbstractLauncher {
 	 */
 	public static void main(final String[] args) {
 		BasicLauncher<ISolver> lanceur = new BasicLauncher<ISolver>(
-				SolverFactory.instance());
+				LightFactory.instance());
 		if (args.length != 1) {
 			lanceur.usage();
 			return;

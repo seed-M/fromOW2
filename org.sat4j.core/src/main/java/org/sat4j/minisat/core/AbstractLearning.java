@@ -25,31 +25,46 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.restarts;
-
-import org.sat4j.minisat.core.RestartStrategy;
-import org.sat4j.minisat.core.SearchParams;
+package org.sat4j.minisat.core;
 
 /**
- * Disable restarts in the solver.
+ * An abstract learning strategy.
  * 
- * @author leberre
+ * The Variable Activity Listener is expected to be set thanks to the
+ * appropriate setter method before using it.
+ * 
+ * It was not possible to set it in the constructor.
+ * 
+ * @author daniel
  * 
  */
-public final class NoRestarts implements RestartStrategy {
+public abstract class AbstractLearning<D extends DataStructureFactory>
+		implements LearningStrategy<D> {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
-	public void init(SearchParams params) {
-		// nothing to do
+	private VarActivityListener val;
+
+	public void setVarActivityListener(VarActivityListener s) {
+		this.val = s;
 	}
 
-	public long nextRestartNumberOfConflict() {
-		return Long.MAX_VALUE;
+	public void setSolver(Solver<D> s) {
+		this.val = s;
 	}
 
-	public void onRestart() {
-		// do nothing
+	public final void claBumpActivity(Constr reason) {
+		for (int i = 0; i < reason.size(); i++) {
+			int q = reason.get(i);
+			assert q > 1;
+			val.varBumpActivity(q);
+		}
+	}
+
+	public void init() {
 	}
 
 }

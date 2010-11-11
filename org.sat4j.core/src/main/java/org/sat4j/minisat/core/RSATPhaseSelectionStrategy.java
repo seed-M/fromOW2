@@ -25,49 +25,32 @@
  * See www.minisat.se for the original solver in C++.
  * 
  *******************************************************************************/
-package org.sat4j.minisat.orders;
+package org.sat4j.minisat.core;
+
 
 /**
- * Utility class used to order the literals according to a specific heuristics.
+ * Keeps track of the phase of the latest assignment.
+ * 
+ * @author leberre
  * 
  */
-final class ValuedLit implements Comparable<ValuedLit> {
-	final int id;
+public final class RSATPhaseSelectionStrategy extends
+		AbstractPhaserecordingSelectionStrategy {
 
-	final int count;
+	/**
+     * 
+     */
+	private static final long serialVersionUID = 1L;
 
-	ValuedLit(int id, int count) {
-		this.id = id;
-		this.count = count;
-	}
-
-	public int compareTo(ValuedLit t) {
-		if (count == 0) {
-			return Integer.MAX_VALUE;
-		}
-		if (t.count == 0) {
-			return -1;
-		}
-		return count - t.count;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == null)
-			return false;
-		if (o instanceof ValuedLit) {
-			return ((ValuedLit) o).count == count;
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return id;
+	public void assignLiteral(int p) {
+		phase[p >> 1] = p;
 	}
 
 	@Override
 	public String toString() {
-		return "" + id + "(" + count + ")"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		return "lightweight component caching from RSAT";
+	}
+
+	public void updateVar(int p) {
 	}
 }

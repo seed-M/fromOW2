@@ -29,13 +29,13 @@ package org.sat4j;
 
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.minisat.constraints.MixedDataStructureDanielWL;
+import org.sat4j.minisat.core.ArminRestarts;
 import org.sat4j.minisat.core.DataStructureFactory;
+import org.sat4j.minisat.core.MiniSATLearning;
+import org.sat4j.minisat.core.RSATPhaseSelectionStrategy;
 import org.sat4j.minisat.core.SearchParams;
 import org.sat4j.minisat.core.Solver;
-import org.sat4j.minisat.learning.MiniSATLearning;
-import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
-import org.sat4j.minisat.orders.VarOrderHeap;
-import org.sat4j.minisat.restarts.ArminRestarts;
+import org.sat4j.minisat.core.VarOrderHeap;
 import org.sat4j.specs.ISolver;
 
 /**
