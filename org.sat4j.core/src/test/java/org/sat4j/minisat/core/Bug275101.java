@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.sat4j.LightFactory;
 import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.opt.MaxSatDecorator;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
@@ -21,7 +21,7 @@ public class Bug275101 {
 	public void testMaxSAtIteratorIfSat() throws ContradictionException,
 			TimeoutException {
 		ISolver solver = new ModelIterator(new OptToSatAdapter(
-				new MaxSatDecorator(SolverFactory.newDefault())));
+				new MaxSatDecorator(LightFactory.instance().defaultSolver())));
 		solver.newVar(3);
 		IVecInt literals = new VecInt();
 		literals.push(-1).push(-2).push(3);
@@ -56,7 +56,7 @@ public class Bug275101 {
 	public void testMaxSAtIterator() throws ContradictionException,
 			TimeoutException {
 		ISolver solver = new ModelIterator(new OptToSatAdapter(
-				new MaxSatDecorator(SolverFactory.newDefault())));
+				new MaxSatDecorator(LightFactory.instance().defaultSolver())));
 		solver.newVar(2);
 		IVecInt literals = new VecInt();
 		literals.push(-1).push(-2);

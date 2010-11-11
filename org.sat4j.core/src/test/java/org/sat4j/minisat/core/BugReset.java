@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.sat4j.LightFactory;
 import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
@@ -20,7 +20,7 @@ public class BugReset {
 
 	@Test
 	public void testBugKostya() throws TimeoutException, ContradictionException {
-		ISolver solver = SolverFactory.newDefault();
+		ISolver solver = LightFactory.newDefault();
 		solver.setTimeout(3600);
 
 		boolean res;
@@ -56,7 +56,7 @@ public class BugReset {
 
 	@Test
 	public void testWithReset() throws TimeoutException, ContradictionException {
-		ISolver solver = SolverFactory.newDefault();
+		ISolver solver = LightFactory.newDefault();
 		int[] clause;
 		boolean res;
 
@@ -114,7 +114,7 @@ public class BugReset {
 
 	@Test
 	public void problemTest() throws TimeoutException, ContradictionException {
-		ISolver solver = SolverFactory.newDefault();
+		ISolver solver = LightFactory.newDefault();
 		solver.setTimeout(3600);
 		solver.newVar(4);
 		solver.setExpectedNumberOfClauses(5);
@@ -192,7 +192,7 @@ public class BugReset {
 
 	private ISolver getSolver(ISolver solver, int vars, int clauses) {
 		if (solver == null) {
-			solver = SolverFactory.newDefault();
+			solver = LightFactory.newDefault();
 			solver.setTimeout(3600);
 			solver.newVar(vars);
 			solver.setExpectedNumberOfClauses(clauses);

@@ -6,9 +6,9 @@ import java.math.BigInteger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sat4j.LightFactory;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
@@ -21,7 +21,7 @@ public class TestGateTranslator {
 
 	@Before
 	public void startUp() {
-		solver = SolverFactory.newDefault();
+		solver = LightFactory.newDefault();
 		gator = new GateTranslator(solver);
 	}
 

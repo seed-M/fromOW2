@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.sat4j.LightFactory;
 import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
@@ -17,7 +17,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testUnitClauseInFormulaUnsat() throws ContradictionException,
 			TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		solver.newVar(1);
 		solver.addClause(new VecInt(new int[] { 1 }));
 		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -1 })));
@@ -29,7 +29,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testUnitClauseInFormulaSat() throws ContradictionException,
 			TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		solver.addClause(new VecInt(new int[] { 1 }));
 		assertTrue(solver.isSatisfiable(new VecInt(new int[] { 1 })));
 	}
@@ -37,7 +37,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testBinaryClauseInFormula() throws ContradictionException,
 			TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		solver.addClause(new VecInt(new int[] { 1, 2 }));
 		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -1, -2 })));
 		IVecInt explanation = solver.unsatExplanation();
@@ -49,7 +49,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testEasyInconsistencyInAssumption()
 			throws ContradictionException, TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		solver.newVar(1);
 		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -1, 1 })));
 		IVecInt explanation = solver.unsatExplanation();
@@ -61,7 +61,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testInconsistencyInAssumption() throws ContradictionException,
 			TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		solver.newVar(3);
 		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -1, 2, 3, 1 })));
 		IVecInt explanation = solver.unsatExplanation();
@@ -73,7 +73,7 @@ public class BugTrivialAssumption {
 	@Test
 	public void testVoidFormula() throws ContradictionException,
 			TimeoutException {
-		final ISolver solver = SolverFactory.newDefault();
+		final ISolver solver = LightFactory.newDefault();
 		assertTrue(solver.isSatisfiable(new VecInt(new int[] { -1 })));
 		assertTrue(solver.isSatisfiable(new VecInt(new int[] { 1 })));
 	}
