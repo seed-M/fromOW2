@@ -110,6 +110,8 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
         return false;
     }
 
+    private int savedindex = 2;
+
     public boolean propagatePI(MandatoryLiteralListener s, int p) {
         final int[] mylits = this.lits;
         // Lits[1] must contain a falsified literal
@@ -118,14 +120,15 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
             mylits[1] = p ^ 1;
         }
         // assert mylits[1] == (p ^ 1);
-        int previous = p ^ 1, tmp;
+        int previous = p ^ 1;
         // look for a new satisfied literal to watch: applying move to front
         // strategy
-        for (int i = 2; i < mylits.length; i++) {
+        for (int i = savedindex; i < mylits.length; i++) {
             if (this.voc.isSatisfied(mylits[i])) {
                 mylits[1] = mylits[i];
                 mylits[i] = previous;
                 this.voc.watch(mylits[1] ^ 1, this);
+                savedindex = i + 1;
                 return true;
             }
         }
