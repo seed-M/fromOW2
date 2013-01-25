@@ -142,7 +142,7 @@ public interface ILauncherMode extends SolutionFoundListener {
                         logger.log("returning a prime implicant ...");
                         long beginpi = System.currentTimeMillis();
                         if ("BRESIL".equals(primeApproach)) {
-                            model = solver.primeImplicant();
+                            model = solver.primeImplicantBresil();
                         } else {
                             model = solver.primeImplicant();
                         }

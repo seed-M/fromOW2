@@ -1493,9 +1493,12 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
             p = toInternal(it.next());
             // should call isMandatory(p) for each literal
             reduceClausesForFalsifiedLiteralPI(p);
-            assert this.prime[p >> 1] != 0;
+            assert this.prime[var(p)] != 0;
         }
 
+        for (IteratorInt it = this.decisions.iterator(); it.hasNext();) {
+            reduceClausesForFalsifiedLiteralPI(toInternal(it.next()));
+        }
         int d;
         int removed = 0;
         int propagated = 0;
@@ -1506,7 +1509,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 propagated++;
             } else {
                 // it is not a mandatory literal
-                forgetPI(Math.abs(d));
+                reduceClausesForFalsifiedLiteralPI(toInternal(-d));
                 removed++;
             }
         }
