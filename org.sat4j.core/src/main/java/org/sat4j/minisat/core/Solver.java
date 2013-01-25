@@ -1478,16 +1478,20 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         if (this.learnedLiterals.size() > 0) {
             this.qhead = trail.size();
         }
+        this.prime = new int[realNumberOfVariables() + 1];
+        int p;
+        for (int i = 0; i < this.prime.length; i++) {
+            this.prime[i] = 0;
+        }
+        // unit clauses need to be handled specifically
+        for (int i = 0; i < trail.size(); i++) {
+            isMandatory(trail.get(i));
+        }
         for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
             assume(toInternal(it.next()));
         }
         for (IteratorInt it = this.decisions.iterator(); it.hasNext();) {
             assume(toInternal(it.next()));
-        }
-        this.prime = new int[realNumberOfVariables() + 1];
-        int p;
-        for (int i = 0; i < this.prime.length; i++) {
-            this.prime[i] = 0;
         }
         for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
             p = toInternal(it.next());
