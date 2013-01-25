@@ -65,7 +65,7 @@ import org.sat4j.specs.TimeoutException;
  * @author leberre
  */
 public class Solver<D extends DataStructureFactory> implements ISolverService,
-        ICDCL<D> {
+        ICDCL<D>, MandatoryLiteralListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -1084,6 +1084,22 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         return null;
     }
 
+    private Constr reduceClausesForFalsifiedLiteralPI(int p) {
+        // p is the literal to propagate
+        // Moved original MiniSAT code to dsfactory to avoid
+        // watches manipulation in counter Based clauses for instance.
+        assert p > 1;
+        IVec<Propagatable> lwatched = this.watched;
+        lwatched.clear();
+        this.voc.watches(p).moveTo(lwatched);
+        final int size = lwatched.size();
+        for (int i = 0; i < size; i++) {
+            this.stats.inspects++;
+            lwatched.get(i).propagatePI(this, p);
+        }
+        return null;
+    }
+
     void record(Constr constr) {
         constr.assertConstraint(this);
         this.slistener.adding(toDimacs(constr.get(0)));
@@ -1353,6 +1369,18 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         return confl;
     }
 
+    private Constr forgetPI(int var) {
+        this.voc.forgets(var);
+        Constr confl = reduceClausesForFalsifiedLiteralPI(LiteralsUtils
+                .toInternal(var));
+        if (confl != null) {
+            return confl;
+        }
+        confl = reduceClausesForFalsifiedLiteralPI(LiteralsUtils
+                .toInternal(-var));
+        return confl;
+    }
+
     /**
      * Assume literal p and perform unit propagation
      * 
@@ -1437,6 +1465,66 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                     .printf("%s implied: %d, decision: %d (removed %d, tested %d, propagated %d), l2 propagation:%d%n",
                             getLogPrefix(), implied.size(), decisions.size(),
                             removed, tested, propagated, l2propagation);
+        }
+        return implicant;
+    }
+
+    public void isMandatory(int p) {
+        prime[var(p)] = toDimacs(p);
+    }
+
+    public int[] primeImplicantBresil() {
+        assert this.qhead == this.trail.size() + this.learnedLiterals.size();
+        if (this.learnedLiterals.size() > 0) {
+            this.qhead = trail.size();
+        }
+        for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
+            assume(toInternal(it.next()));
+        }
+        for (IteratorInt it = this.decisions.iterator(); it.hasNext();) {
+            assume(toInternal(it.next()));
+        }
+        this.prime = new int[realNumberOfVariables() + 1];
+        int p;
+        for (int i = 0; i < this.prime.length; i++) {
+            this.prime[i] = 0;
+        }
+        for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
+            p = toInternal(it.next());
+            // should call isMandatory(p) for each literal
+            reduceClausesForFalsifiedLiteralPI(p);
+            assert this.prime[p >> 1] != 0;
+        }
+
+        int d;
+        int removed = 0;
+        int propagated = 0;
+        for (int i = 0; i < this.decisions.size(); i++) {
+            d = this.decisions.get(i);
+            if (this.prime[Math.abs(d)] != 0) {
+                // d has been propagated
+                propagated++;
+            } else {
+                // it is not a mandatory literal
+                forgetPI(Math.abs(d));
+                removed++;
+            }
+        }
+        cancelUntil(0);
+        int[] implicant = new int[this.prime.length - removed - 1];
+        int index = 0;
+        for (int i : this.prime) {
+            if (i != 0) {
+                implicant[index++] = i;
+            }
+        }
+        if (isVerbose()) {
+            System.out.printf("%s prime implicant computation statistics%n",
+                    getLogPrefix());
+            System.out
+                    .printf("%s implied: %d, decision: %d (removed %d, propagated %d) %n",
+                            getLogPrefix(), implied.size(), decisions.size(),
+                            removed, propagated);
         }
         return implicant;
     }

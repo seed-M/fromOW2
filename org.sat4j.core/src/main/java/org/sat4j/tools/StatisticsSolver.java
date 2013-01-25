@@ -421,4 +421,8 @@ public class StatisticsSolver implements ISolver {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_YET);
     }
 
+    public int[] primeImplicantBresil() {
+        throw new UnsupportedOperationException("Not implemented yet!");
+
+    }
 }

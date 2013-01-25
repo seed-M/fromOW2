@@ -136,11 +136,16 @@ public interface ILauncherMode extends SolutionFoundListener {
                 out.println(ANSWER_PREFIX + exitCode);
                 if (exitCode != ExitCode.UNKNOWN) {
                     int[] model = solver.model();
-                    if (System.getProperty("prime") != null) {
+                    String primeApproach = System.getProperty("prime");
+                    if (primeApproach != null) {
                         int initiallength = model.length;
                         logger.log("returning a prime implicant ...");
                         long beginpi = System.currentTimeMillis();
-                        model = solver.primeImplicant();
+                        if ("BRESIL".equals(primeApproach)) {
+                            model = solver.primeImplicant();
+                        } else {
+                            model = solver.primeImplicant();
+                        }
                         long endpi = System.currentTimeMillis();
                         logger.log("removed " + (initiallength - model.length)
                                 + " literals");

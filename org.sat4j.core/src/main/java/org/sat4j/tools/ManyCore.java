@@ -532,6 +532,11 @@ public class ManyCore<S extends ISolver> implements ISolver, OutcomeListener {
         }
 
     }
+
+    public int[] primeImplicantBresil() {
+        throw new UnsupportedOperationException("Not implemented yet!");
+
+    }
 }
 
 class RunnableSolver implements Runnable {

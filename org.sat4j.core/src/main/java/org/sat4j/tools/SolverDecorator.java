@@ -510,4 +510,8 @@ public abstract class SolverDecorator<T extends ISolver> implements ISolver {
         return this.solver.getSolvingEngine();
     }
 
+    public int[] primeImplicantBresil() {
+        throw new UnsupportedOperationException("Not implemented yet!");
+
+    }
 }

@@ -30,6 +30,7 @@
 package org.sat4j.minisat.constraints.cnf;
 
 import org.sat4j.minisat.core.ILits;
+import org.sat4j.minisat.core.MandatoryLiteralListener;
 import org.sat4j.specs.IVecInt;
 
 /**
@@ -69,5 +70,10 @@ public class LearntBinaryClause extends BinaryClause {
 
     public void setActivity(double d) {
         this.activity = d;
+    }
+
+    public boolean propagatePI(MandatoryLiteralListener l, int p) {
+        throw new UnsupportedOperationException("Not implemented yet!");
+
     }
 }
