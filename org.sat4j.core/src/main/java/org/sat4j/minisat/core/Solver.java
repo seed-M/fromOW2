@@ -1481,13 +1481,6 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         for (int d : fullmodel) {
             reduceClausesContainingTheNegationOfPI(toInternal(d));
         }
-        for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
-            int d = it.next();
-            // should have called isMandatory(toInternal(d)) for each literal
-            if (this.prime[Math.abs(d)] == 0) {
-                System.err.println("Problem pour " + d);
-            }
-        }
 
         int removed = 0;
         int propagated = 0;
