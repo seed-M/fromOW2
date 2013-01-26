@@ -1042,7 +1042,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
             int p = ltrail.get(this.qhead++);
             lslistener.propagating(toDimacs(p), null);
             lorder.assignLiteral(p);
-            Constr confl = reduceClausesForFalsifiedLiteral(p);
+            Constr confl = reduceClausesContainingTheNegationOf(p);
             if (confl != null) {
                 return confl;
             }
@@ -1050,7 +1050,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         return null;
     }
 
-    private Constr reduceClausesForFalsifiedLiteral(int p) {
+    private Constr reduceClausesContainingTheNegationOf(int p) {
         // p is the literal to propagate
         // Moved original MiniSAT code to dsfactory to avoid
         // watches manipulation in counter Based clauses for instance.
@@ -1084,10 +1084,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         return null;
     }
 
-    private Constr reduceClausesForFalsifiedLiteralPI(int p) {
-        // p is the literal to propagate
-        // Moved original MiniSAT code to dsfactory to avoid
-        // watches manipulation in counter Based clauses for instance.
+    private Constr reduceClausesContainingTheNegationOfPI(int p) {
         assert p > 1;
         IVec<Propagatable> lwatched = this.watched;
         lwatched.clear();
@@ -1115,8 +1112,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      */
     public boolean assume(int p) {
         // Precondition: assume propagation queue is empty
-        assert this.trail.size() == this.qhead;
-        assert !this.trailLim.contains(this.trail.size());
+        // assert this.trail.size() == this.qhead;
+        // assert !this.trailLim.contains(this.trail.size());
         this.trailLim.push(this.trail.size());
         return enqueue(p);
     }
@@ -1319,7 +1316,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 if (!this.voc.isUnassigned(p)) {
                     tempmodel.push(this.voc.isSatisfied(p) ? i : -i);
                     this.userbooleanmodel[i - 1] = this.voc.isSatisfied(p);
-                    if (this.voc.getReason(p) == null) {
+                    if (this.voc.getReason(p) == null
+                            && this.voc.getLevel(p) > 0) {
                         this.decisions.push(tempmodel.last());
                     } else {
                         this.implied.push(tempmodel.last());
@@ -1346,6 +1344,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
             }
             this.fullmodel = new int[tempmodel.size()];
             tempmodel.moveTo(this.fullmodel);
+        } else {
+            this.fullmodel = this.model;
         }
     }
 
@@ -1360,24 +1360,12 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      */
     private Constr forget(int var) {
         this.voc.forgets(var);
-        Constr confl = reduceClausesForFalsifiedLiteral(LiteralsUtils
+        Constr confl = reduceClausesContainingTheNegationOf(LiteralsUtils
                 .toInternal(var));
         if (confl != null) {
             return confl;
         }
-        confl = reduceClausesForFalsifiedLiteral(LiteralsUtils.toInternal(-var));
-        return confl;
-    }
-
-    private Constr forgetPI(int var) {
-        this.voc.forgets(var);
-        Constr confl = reduceClausesForFalsifiedLiteralPI(LiteralsUtils
-                .toInternal(var));
-        if (confl != null) {
-            return confl;
-        }
-        confl = reduceClausesForFalsifiedLiteralPI(LiteralsUtils
-                .toInternal(-var));
+        confl = reduceClausesContainingTheNegationOf(toInternal(-var));
         return confl;
     }
 
@@ -1487,33 +1475,29 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         for (int i = 0; i < trail.size(); i++) {
             isMandatory(trail.get(i));
         }
-        for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
-            assume(toInternal(it.next()));
+        for (int d : fullmodel) {
+            assume(toInternal(d));
         }
-        for (IteratorInt it = this.decisions.iterator(); it.hasNext();) {
-            assume(toInternal(it.next()));
+        for (int d : fullmodel) {
+            reduceClausesContainingTheNegationOfPI(toInternal(d));
         }
         for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
-            p = toInternal(it.next());
-            // should call isMandatory(p) for each literal
-            reduceClausesForFalsifiedLiteralPI(p);
-            assert this.prime[var(p)] != 0;
+            int d = it.next();
+            // should have called isMandatory(toInternal(d)) for each literal
+            if (this.prime[Math.abs(d)] == 0) {
+                System.err.println("Problem pour " + d);
+            }
         }
 
-        for (IteratorInt it = this.decisions.iterator(); it.hasNext();) {
-            reduceClausesForFalsifiedLiteralPI(toInternal(it.next()));
-        }
-        int d;
         int removed = 0;
         int propagated = 0;
-        for (int i = 0; i < this.decisions.size(); i++) {
-            d = this.decisions.get(i);
+        for (int d : fullmodel) {
             if (this.prime[Math.abs(d)] != 0) {
                 // d has been propagated
                 propagated++;
             } else {
                 // it is not a mandatory literal
-                reduceClausesForFalsifiedLiteralPI(toInternal(-d));
+                reduceClausesContainingTheNegationOfPI(toInternal(-d));
                 removed++;
             }
         }
