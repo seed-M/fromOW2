@@ -121,8 +121,7 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
         }
         // assert mylits[1] == (p ^ 1);
         int previous = p ^ 1;
-        // look for a new satisfied literal to watch: applying move to front
-        // strategy
+        // look for a new satisfied literal to watch
         for (int i = savedindex; i < mylits.length; i++) {
             if (this.voc.isSatisfied(mylits[i])) {
                 mylits[1] = mylits[i];
