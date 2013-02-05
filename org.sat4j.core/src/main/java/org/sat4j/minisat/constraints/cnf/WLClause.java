@@ -33,7 +33,6 @@ import java.io.Serializable;
 
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
-import org.sat4j.minisat.core.MandatoryLiteralListener;
 import org.sat4j.minisat.core.Propagatable;
 import org.sat4j.minisat.core.UnitPropagationListener;
 import org.sat4j.specs.IVecInt;
@@ -108,34 +107,6 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
             }
         }
         return false;
-    }
-
-    private int savedindex = 2;
-
-    public boolean propagatePI(MandatoryLiteralListener s, int p) {
-        final int[] mylits = this.lits;
-        // Lits[1] must contain a falsified literal
-        if (mylits[0] == (p ^ 1)) {
-            mylits[0] = mylits[1];
-            mylits[1] = p ^ 1;
-        }
-        // assert mylits[1] == (p ^ 1);
-        int previous = p ^ 1;
-        // look for a new satisfied literal to watch
-        for (int i = savedindex; i < mylits.length; i++) {
-            if (this.voc.isSatisfied(mylits[i])) {
-                mylits[1] = mylits[i];
-                mylits[i] = previous;
-                this.voc.watch(mylits[1] ^ 1, this);
-                savedindex = i + 1;
-                return true;
-            }
-        }
-        // the clause is now either unit
-        this.voc.watch(p, this);
-        // first literal is mandatory
-        s.isMandatory(mylits[0]);
-        return true;
     }
 
     public boolean propagate(UnitPropagationListener s, int p) {
