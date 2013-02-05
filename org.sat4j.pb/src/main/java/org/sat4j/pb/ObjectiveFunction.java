@@ -65,7 +65,14 @@ public class ObjectiveFunction implements Serializable {
         this.coeffs = new ReadOnlyVec<BigInteger>(coeffs);
     }
 
-    // calculate the degree of the objective function
+    /**
+     * Compute the degree of the objective function using a full model.
+     * 
+     * @param solver
+     *            a solver that recently answered true to isSatisfiable()
+     * @return the value of the objective function for the last model found be
+     *         the solver.
+     */
     public BigInteger calculateDegree(ISolver solver) {
         BigInteger tempDegree = BigInteger.ZERO;
         for (int i = 0; i < this.vars.size(); i++) {
@@ -82,10 +89,19 @@ public class ObjectiveFunction implements Serializable {
         return tempDegree;
     }
 
-    // calculate the degree of the objective function
+    /**
+     * Compute the degree of the objective function using a prime implicant. It
+     * is expected that the method IProblem.primeImplicant() has been called
+     * before calling that method.
+     * 
+     * @param solver
+     *            a solver which recently answered true to isSatisfiable and on
+     *            which the method primeImplicant() has been called.
+     * @return
+     * @see org.sat4j.specs.IProblem#primeImplicant()
+     */
     public BigInteger calculateDegreeImplicant(ISolver solver) {
         BigInteger tempDegree = BigInteger.ZERO;
-        solver.primeImplicant();
         for (int i = 0; i < this.vars.size(); i++) {
             BigInteger coeff = this.coeffs.get(i);
             if (solver.primeImplicant(this.vars.get(i))) {

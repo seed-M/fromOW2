@@ -176,7 +176,12 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 			this.isSolutionOptimal = false;
 			boolean result = super.isSatisfiable(assumps, true);
 			if (result) {
-				this.prevmodel = super.model();
+				if (this.useAnImplicantForEvaluation) {
+					this.prevmodel = modelWithAdaptedNonPrimeLiterals();
+
+				} else {
+					this.prevmodel = super.model();
+				}
 				this.prevmodelwithadditionalvars = super
 						.modelWithInternalVariables();
 				this.prevfullmodel = new boolean[nVars()];
@@ -205,6 +210,32 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 			}
 			throw te;
 		}
+	}
+
+	private int[] modelWithAdaptedNonPrimeLiterals() {
+		int[] completed = super.model();
+		String primeApproach = System.getProperty("prime");
+		if ("BRESIL".equals(primeApproach)) {
+			primeImplicantBresil();
+		} else {
+			primeImplicant();
+		}
+		ObjectiveFunction obj = getObjectiveFunction();
+		for (int i = 0; i < obj.getVars().size(); i++) {
+			int d = obj.getVars().get(i);
+			BigInteger coeff = obj.getCoeffs().get(i);
+			if (d <= nVars() && !primeImplicant(d) && !primeImplicant(-d)) {
+				// the variable does not appear in the model: it can be assigned
+				// either way
+				assert Math.abs(completed[Math.abs(d) - 1]) == d;
+				if (coeff.signum() < 0) {
+					completed[Math.abs(d) - 1] = Math.abs(d);
+				} else {
+					completed[Math.abs(d) - 1] = -Math.abs(d);
+				}
+			}
+		}
+		return completed;
 	}
 
 	public boolean hasNoObjectiveFunction() {
