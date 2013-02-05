@@ -94,6 +94,7 @@ public final class LearntWLClause extends WLClause {
     }
 
     public boolean propagatePI(MandatoryLiteralListener s, int p) {
+        this.voc.watch(p, this);
         return true;
     }
 }

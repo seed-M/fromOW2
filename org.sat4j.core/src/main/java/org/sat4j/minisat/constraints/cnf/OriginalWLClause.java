@@ -97,7 +97,7 @@ public final class OriginalWLClause extends WLClause {
 
     }
 
-    private int savedindex = 2;
+    private final int savedindex = 2;
 
     public boolean propagatePI(MandatoryLiteralListener s, int p) {
         final int[] mylits = this.lits;
@@ -114,7 +114,7 @@ public final class OriginalWLClause extends WLClause {
                 mylits[1] = mylits[i];
                 mylits[i] = previous;
                 this.voc.watch(mylits[1] ^ 1, this);
-                savedindex = i + 1;
+                // savedindex = i + 1;
                 return true;
             }
         }
