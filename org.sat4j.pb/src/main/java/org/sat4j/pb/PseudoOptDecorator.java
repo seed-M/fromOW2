@@ -213,7 +213,11 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 	}
 
 	private int[] modelWithAdaptedNonPrimeLiterals() {
-		int[] completed = super.model();
+		int[] modelWithPotentialHoles = super.model();
+		int[] completed = new int[nVars()];
+		for (int v : modelWithPotentialHoles) {
+			completed[Math.abs(v) - 1] = v;
+		}
 		String primeApproach = System.getProperty("prime");
 		if ("BRESIL".equals(primeApproach)) {
 			primeImplicantBresil();
@@ -233,6 +237,12 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 				} else {
 					completed[Math.abs(d) - 1] = -Math.abs(d);
 				}
+			}
+		}
+		// completing the model with negative literals
+		for (int i = 0; i < completed.length; i++) {
+			if (completed[i] == 0) {
+				completed[i] = -(i + 1);
 			}
 		}
 		return completed;
