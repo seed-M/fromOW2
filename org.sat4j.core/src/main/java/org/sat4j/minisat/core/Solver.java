@@ -1384,6 +1384,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
 
     public int[] primeImplicant() {
         assert this.qhead == this.trail.size() + this.learnedLiterals.size();
+        long begin = System.currentTimeMillis();
         if (this.learnedLiterals.size() > 0) {
             this.qhead = trail.size();
         }
@@ -1446,13 +1447,15 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 implicant[index++] = i;
             }
         }
+        long end = System.currentTimeMillis();
         if (isVerbose()) {
             System.out.printf("%s prime implicant computation statistics%n",
                     getLogPrefix());
             System.out
-                    .printf("%s implied: %d, decision: %d (removed %d, tested %d, propagated %d), l2 propagation:%d%n",
+                    .printf("%s implied: %d, decision: %d (removed %d, tested %d, propagated %d), l2 propagation:%d, time(ms):%d %n",
                             getLogPrefix(), implied.size(), decisions.size(),
-                            removed, tested, propagated, l2propagation);
+                            removed, tested, propagated, l2propagation, end
+                                    - begin);
         }
         return implicant;
     }
@@ -1463,6 +1466,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
 
     public int[] primeImplicantBresil() {
         assert this.qhead == this.trail.size() + this.learnedLiterals.size();
+        long begin = System.currentTimeMillis();
         if (this.learnedLiterals.size() > 0) {
             this.qhead = trail.size();
         }
@@ -1502,13 +1506,14 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 implicant[index++] = i;
             }
         }
+        long end = System.currentTimeMillis();
         if (isVerbose()) {
             System.out.printf("%s prime implicant computation statistics%n",
                     getLogPrefix());
             System.out
-                    .printf("%s implied: %d, decision: %d (removed %d, propagated %d) %n",
+                    .printf("%s implied: %d, decision: %d (removed %d, propagated %d), time(ms):%d %n",
                             getLogPrefix(), implied.size(), decisions.size(),
-                            removed, propagated);
+                            removed, propagated, end - begin);
         }
         return implicant;
     }
