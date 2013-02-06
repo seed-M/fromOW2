@@ -1426,6 +1426,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 if (canBeRemoved) {
                     // it is not a necessary literal
                     forget(Math.abs(d));
+                    IConstr confl = propagate();
+                    assert confl == null;
                     removed++;
                 } else {
                     this.prime[Math.abs(d)] = d;
