@@ -332,7 +332,7 @@ public class MinWatchCard implements Propagatable, Constr, Undoable,
      * @return false if an inconistency is detected, else true
      */
     public boolean propagate(UnitPropagationListener s, int p) {
-
+        this.savedindex = this.degree + 1;
         // Si la contrainte est responsable de propagation unitaire
         if (this.watchCumul == this.degree) {
             this.voc.watch(p, this);
@@ -628,6 +628,8 @@ public class MinWatchCard implements Propagatable, Constr, Undoable,
         throw new UnsupportedOperationException("Not implemented yet!");
     }
 
+    private int savedindex = this.degree + 1;
+
     public boolean propagatePI(MandatoryLiteralListener l, int p) {
         // Recherche du litt?ral falsifi?
         int indFalsified = 0;
@@ -637,7 +639,7 @@ public class MinWatchCard implements Propagatable, Constr, Undoable,
         assert this.watchCumul > this.degree;
 
         // Recherche du litt?ral swap
-        int indSwap = this.degree + 1;
+        int indSwap = this.savedindex;
         while (indSwap < this.lits.length
                 && this.voc.isFalsified(this.lits[indSwap])) {
             indSwap++;
@@ -656,6 +658,7 @@ public class MinWatchCard implements Propagatable, Constr, Undoable,
             }
             return true;
         }
+        this.savedindex = indSwap + 1;
         // Si un litt?ral a ?t? trouv? on les ?change
         int tmpInt = this.lits[indSwap];
         this.lits[indSwap] = this.lits[indFalsified];
