@@ -97,7 +97,7 @@ public final class OriginalWLClause extends WLClause {
 
     }
 
-    private final int savedindex = 2;
+    private int savedindex = 2;
 
     public boolean propagatePI(MandatoryLiteralListener s, int p) {
         final int[] mylits = this.lits;
@@ -114,7 +114,7 @@ public final class OriginalWLClause extends WLClause {
                 mylits[1] = mylits[i];
                 mylits[i] = previous;
                 this.voc.watch(mylits[1] ^ 1, this);
-                // savedindex = i + 1;
+                savedindex = i + 1;
                 return true;
             }
         }
@@ -124,4 +124,11 @@ public final class OriginalWLClause extends WLClause {
         s.isMandatory(mylits[0]);
         return true;
     }
+
+    @Override
+    public boolean propagate(UnitPropagationListener s, int p) {
+        this.savedindex = 2;
+        return super.propagate(s, p);
+    }
+
 }
