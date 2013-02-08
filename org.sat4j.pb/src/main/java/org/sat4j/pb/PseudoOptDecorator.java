@@ -213,17 +213,14 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 	}
 
 	private int[] modelWithAdaptedNonPrimeLiterals() {
-		int[] modelWithPotentialHoles = super.model();
-		int[] completed = new int[nVars()];
-		for (int v : modelWithPotentialHoles) {
-			completed[Math.abs(v) - 1] = v;
+        // do not use model() because it might contain holes.
+        int[] completeModel = new int[nVars()];
+        int var;
+        for (int i = 0; i < nVars(); i++) {
+            var = i + 1;
+            completeModel[i] = super.model(var) ? var : -var;
 		}
-		String primeApproach = System.getProperty("prime");
-		if ("BRESIL".equals(primeApproach)) {
-			primeImplicantBresil();
-		} else {
 			primeImplicant();
-		}
 		ObjectiveFunction obj = getObjectiveFunction();
 		for (int i = 0; i < obj.getVars().size(); i++) {
 			int d = obj.getVars().get(i);
@@ -231,21 +228,15 @@ public class PseudoOptDecorator extends PBSolverDecorator implements
 			if (d <= nVars() && !primeImplicant(d) && !primeImplicant(-d)) {
 				// the variable does not appear in the model: it can be assigned
 				// either way
-				assert Math.abs(completed[Math.abs(d) - 1]) == d;
-				if (coeff.signum() < 0) {
-					completed[Math.abs(d) - 1] = Math.abs(d);
+                assert Math.abs(completeModel[Math.abs(d) - 1]) == d;
+                if (coeff.signum() * d < 0) {
+                    completeModel[Math.abs(d) - 1] = Math.abs(d);
 				} else {
-					completed[Math.abs(d) - 1] = -Math.abs(d);
+                    completeModel[Math.abs(d) - 1] = -Math.abs(d);
 				}
 			}
 		}
-		// completing the model with negative literals
-		for (int i = 0; i < completed.length; i++) {
-			if (completed[i] == 0) {
-				completed[i] = -(i + 1);
-			}
-		}
-		return completed;
+        return completeModel;
 	}
 
 	public boolean hasNoObjectiveFunction() {

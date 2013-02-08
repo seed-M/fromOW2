@@ -415,11 +415,4 @@ public class ObjectiveReducerPBSolverDecorator implements IPBSolver {
 	public ISolver getSolvingEngine() {
 		return decorated.getSolvingEngine();
 	}
-
-	@Override
-	public int[] primeImplicantBresil() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
