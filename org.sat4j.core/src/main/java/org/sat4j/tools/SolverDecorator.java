@@ -509,9 +509,4 @@ public abstract class SolverDecorator<T extends ISolver> implements ISolver {
     public ISolver getSolvingEngine() {
         return this.solver.getSolvingEngine();
     }
-
-    public int[] primeImplicantBresil() {
-        return this.solver.primeImplicantBresil();
-
-    }
 }

@@ -118,6 +118,12 @@ public interface ILauncherMode extends SolutionFoundListener {
     ExitCode getCurrentExitCode();
 
     /**
+     * Allow to set a specific exit code to the launcher (in case of trivial
+     * unsatisfiability for instance).
+     */
+    void setExitCode(ExitCode exitCode);
+
+    /**
      * The launcher is in decision mode: the answer is either SAT, UNSAT or
      * UNKNOWN
      */
@@ -134,20 +140,14 @@ public interface ILauncherMode extends SolutionFoundListener {
                 solver.printStat(out);
                 solver.printInfos(out);
                 out.println(ANSWER_PREFIX + exitCode);
-                if (exitCode != ExitCode.UNKNOWN) {
+                if (exitCode != ExitCode.UNKNOWN
+                        && exitCode != ExitCode.UNSATISFIABLE) {
                     int[] model = solver.model();
-                    String primeApproach = System.getProperty("prime");
-                    if (primeApproach != null) {
+                    if (System.getProperty("prime") != null) {
                         int initiallength = model.length;
-
+                        logger.log("returning a prime implicant ...");
                         long beginpi = System.currentTimeMillis();
-                        if ("BRESIL".equals(primeApproach)) {
-                            logger.log("returning a prime implicant from bresil ...");
-                            model = solver.primeImplicantBresil();
-                        } else {
-                            logger.log("returning a prime implicant ...");
-                            model = solver.primeImplicant();
-                        }
+                        model = solver.primeImplicant();
                         long endpi = System.currentTimeMillis();
                         logger.log("removed " + (initiallength - model.length)
                                 + " literals");
@@ -185,16 +185,12 @@ public interface ILauncherMode extends SolutionFoundListener {
         private int nbSolutionFound;
 
         private PrintWriter out;
-        private ISolver aSolver;
-        private Reader reader;
         private long beginTime;
 
         public void solve(IProblem problem, Reader reader, ILogAble logger,
                 PrintWriter out, long beginTime) {
             this.exitCode = ExitCode.UNKNOWN;
             this.out = out;
-            this.aSolver = (ISolver) problem;
-            this.reader = reader;
             this.nbSolutionFound = 0;
             this.beginTime = beginTime;
             try {
@@ -223,7 +219,7 @@ public interface ILauncherMode extends SolutionFoundListener {
         public void onSolutionFound(int[] solution) {
             this.nbSolutionFound++;
             this.exitCode = ExitCode.SATISFIABLE;
-            this.out.printf("c Found solution #%d  (%.2f)s%n", nbSolutionFound,
+            this.out.printf("\rc Found solution #%d  (%.2f)s", nbSolutionFound,
                     (System.currentTimeMillis() - beginTime) / 1000.0);
         }
 
@@ -235,6 +231,10 @@ public interface ILauncherMode extends SolutionFoundListener {
             if (this.exitCode == ExitCode.SATISFIABLE) {
                 this.exitCode = ExitCode.OPTIMUM_FOUND;
             }
+        }
+
+        public void setExitCode(ExitCode exitCode) {
+            this.exitCode = exitCode;
         }
     };
 
@@ -350,6 +350,10 @@ public interface ILauncherMode extends SolutionFoundListener {
 
         public void onUnsatTermination() {
             // do nothing
+        }
+
+        public void setExitCode(ExitCode exitCode) {
+            this.exitCode = exitCode;
         }
     };
 

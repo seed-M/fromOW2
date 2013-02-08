@@ -252,9 +252,4 @@ public abstract class AbstractOutputSolver implements ISolver {
     public ISolver getSolvingEngine() {
         throw new UnsupportedOperationException();
     }
-
-    public int[] primeImplicantBresil() {
-        throw new UnsupportedOperationException("Not implemented yet!");
-
-    }
 }

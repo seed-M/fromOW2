@@ -39,6 +39,7 @@ import java.util.Map;
 import org.sat4j.core.Vec;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
+import org.sat4j.specs.RandomAccessModel;
 import org.sat4j.specs.Lbool;
 
 /**
@@ -183,7 +184,7 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService> {
     }
 
     @Override
-    public final void solutionFound(int[] model) {
+    public final void solutionFound(int[] model, RandomAccessModel lazyModel) {
         saveLine(lineTab("\"" + this.currentNodeName
                 + "\" [label=\"\", shape=box, color=\"green\", style=filled]"));
     }
@@ -205,11 +206,11 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService> {
         saveLine("}");
     }
 
-    private final String lineTab(final String line) {
+    private String lineTab(final String line) {
         return "\t" + line;
     }
 
-    private final void saveLine(final String line) {
+    private void saveLine(final String line) {
         try {
             this.out.write(line + '\n');
             if ("}".equals(line)) {

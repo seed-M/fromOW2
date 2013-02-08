@@ -27,69 +27,61 @@
  * Contributors:
  *   CRIL - initial API and implementation
  *******************************************************************************/
-package org.sat4j.minisat.core;
+package org.sat4j.tools;
 
-import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolverService;
-import org.sat4j.specs.RandomAccessModel;
-import org.sat4j.specs.Lbool;
-import org.sat4j.specs.SearchListener;
+import org.sat4j.specs.ISolver;
+import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.TimeoutException;
 
 /**
- * Do-nothing search listener. Used by default by the solver when no
- * SearchListener is provided to the solver.
+ * This class allow to use the ModelIterator class as a solver.
  * 
- * @author leberre
- * 
+ * @author lonca
  */
-final class VoidTracing implements SearchListener<ISolverService> {
+public class ModelIteratorToSATAdapter extends ModelIterator {
+
+    /**
+     * 
+     */
     private static final long serialVersionUID = 1L;
+    private int[] lastModel = null;
+    private final SolutionFoundListener sfl;
 
-    public void assuming(int p) {
+    public ModelIteratorToSATAdapter(ISolver solver, SolutionFoundListener sfl) {
+        this(solver, Long.MAX_VALUE, sfl);
     }
 
-    public void propagating(int p, IConstr reason) {
+    public ModelIteratorToSATAdapter(ISolver solver, long bound,
+            SolutionFoundListener sfl) {
+        super(solver, bound);
+        this.sfl = sfl;
     }
 
-    public void backtracking(int p) {
+    @Override
+    public boolean isSatisfiable() throws TimeoutException {
+        boolean isSat = false;
+        while (super.isSatisfiable()) {
+            isSat = true;
+            lastModel = super.model();
+            this.sfl.onSolutionFound(lastModel);
+        }
+        return isSat;
     }
 
-    public void adding(int p) {
+    @Override
+    public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
+        boolean isSat = false;
+        while (super.isSatisfiable(assumps)) {
+            isSat = true;
+            lastModel = super.model();
+            this.sfl.onSolutionFound(lastModel);
+        }
+        return isSat;
     }
 
-    public void learn(IConstr clause) {
+    @Override
+    public int[] model() {
+        return this.lastModel;
     }
 
-    public void delete(int[] clause) {
-    }
-
-    public void conflictFound(IConstr confl, int dlevel, int trailLevel) {
-    }
-
-    public void conflictFound(int p) {
-    }
-
-    public void solutionFound(int[] model, RandomAccessModel lazyModel) {
-    }
-
-    public void beginLoop() {
-    }
-
-    public void start() {
-    }
-
-    public void end(Lbool result) {
-    }
-
-    public void restarting() {
-    }
-
-    public void backjump(int backjumpLevel) {
-    }
-
-    public void init(ISolverService solverService) {
-    }
-
-    public void cleaning() {
-    }
 }

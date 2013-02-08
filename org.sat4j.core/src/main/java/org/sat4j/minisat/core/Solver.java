@@ -29,6 +29,7 @@
  *******************************************************************************/
 package org.sat4j.minisat.core;
 
+import static org.sat4j.core.LiteralsUtils.neg;
 import static org.sat4j.core.LiteralsUtils.toDimacs;
 import static org.sat4j.core.LiteralsUtils.toInternal;
 import static org.sat4j.core.LiteralsUtils.var;
@@ -1112,8 +1113,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      */
     public boolean assume(int p) {
         // Precondition: assume propagation queue is empty
-        // assert this.trail.size() == this.qhead;
-        // assert !this.trailLim.contains(this.trail.size());
+        assert this.trail.size() == this.qhead;
+        assert !this.trailLim.contains(this.trail.size());
         this.trailLim.push(this.trail.size());
         return enqueue(p);
     }
@@ -1194,9 +1195,9 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 assert nAssigns() <= this.voc.realnVars();
                 if (nAssigns() == this.voc.realnVars()) {
                     modelFound();
-                    this.slistener
-                            .solutionFound((this.fullmodel != null) ? this.fullmodel
-                                    : this.model);
+                    this.slistener.solutionFound(
+                            (this.fullmodel != null) ? this.fullmodel
+                                    : this.model, this);
                     if (this.sharedConflict == null) {
                         cancelUntil(this.rootLevel);
                         return Lbool.TRUE;
@@ -1359,13 +1360,16 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      *         literals.
      */
     private Constr forget(int var) {
+        boolean satisfied = this.voc.isSatisfied(toInternal(var));
         this.voc.forgets(var);
-        Constr confl = reduceClausesContainingTheNegationOf(LiteralsUtils
-                .toInternal(var));
-        if (confl != null) {
-            return confl;
+        Constr confl;
+        if (satisfied) {
+            confl = reduceClausesContainingTheNegationOf(LiteralsUtils
+                    .toInternal(-var));
+        } else {
+            confl = reduceClausesContainingTheNegationOf(LiteralsUtils
+                    .toInternal(var));
         }
-        confl = reduceClausesContainingTheNegationOf(toInternal(-var));
         return confl;
     }
 
@@ -1377,7 +1381,12 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      * @return true if no conflict is reached, false if a conflict is found.
      */
     private boolean setAndPropagate(int p) {
-        return assume(p) && propagate() == null;
+        if (voc.isUnassigned(p)) {
+            assert !trail.contains(p);
+            assert !trail.contains(neg(p));
+            return assume(p) && propagate() == null;
+        }
+        return voc.isSatisfied(p);
     }
 
     private int[] prime;
@@ -1388,25 +1397,31 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         if (this.learnedLiterals.size() > 0) {
             this.qhead = trail.size();
         }
+        System.out.printf("%s implied: %d, decision: %d %n", getLogPrefix(),
+                implied.size(), decisions.size());
         this.prime = new int[realNumberOfVariables() + 1];
-        int p;
+        int p, d;
         for (int i = 0; i < this.prime.length; i++) {
             this.prime[i] = 0;
         }
+        boolean noproblem;
         for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
-            p = it.next();
-            this.prime[Math.abs(p)] = p;
-            setAndPropagate(toInternal(p));
+            d = it.next();
+            p = toInternal(d);
+            this.prime[Math.abs(d)] = d;
+            noproblem = setAndPropagate(p);
+            assert noproblem;
         }
-        int d;
         boolean canBeRemoved;
         int rightlevel;
         int removed = 0;
         int propagated = 0;
         int tested = 0;
         int l2propagation = 0;
+
         for (int i = 0; i < this.decisions.size(); i++) {
             d = this.decisions.get(i);
+            assert !this.voc.isFalsified(toInternal(d));
             if (this.voc.isSatisfied(toInternal(d))) {
                 // d has been propagated
                 this.prime[Math.abs(d)] = d;
@@ -1432,13 +1447,16 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 } else {
                     this.prime[Math.abs(d)] = d;
                     cancel();
-                    setAndPropagate(toInternal(d));
+                    assert voc.isUnassigned(toInternal(d));
+                    noproblem = setAndPropagate(toInternal(d));
+                    assert noproblem;
                 }
             } else {
                 // conflict, literal is necessary
                 this.prime[Math.abs(d)] = d;
                 cancel();
-                setAndPropagate(toInternal(d));
+                noproblem = setAndPropagate(toInternal(d));
+                assert noproblem;
             }
         }
         cancelUntil(0);
@@ -2568,17 +2586,17 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      */
     public void setLearnedConstraintsDeletionStrategy(
             LearnedConstraintsEvaluationType evaluation) {
-        ConflictTimer timer = this.learnedConstraintsDeletionStrategy
+        ConflictTimer aTimer = this.learnedConstraintsDeletionStrategy
                 .getTimer();
         switch (evaluation) {
         case ACTIVITY:
-            this.learnedConstraintsDeletionStrategy = activityBased(timer);
+            this.learnedConstraintsDeletionStrategy = activityBased(aTimer);
             break;
         case LBD:
-            this.learnedConstraintsDeletionStrategy = new GlucoseLCDS(timer);
+            this.learnedConstraintsDeletionStrategy = new GlucoseLCDS(aTimer);
             break;
         case LBD2:
-            this.learnedConstraintsDeletionStrategy = new Glucose2LCDS(timer);
+            this.learnedConstraintsDeletionStrategy = new Glucose2LCDS(aTimer);
             break;
         }
         if (this.conflictCount != null) {
