@@ -103,6 +103,7 @@ import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.Lbool;
+import org.sat4j.specs.RandomAccessModel;
 import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ClausalCardinalitiesDecorator;
@@ -127,7 +128,7 @@ import org.sat4j.tools.encoding.Policy;
  * 
  */
 public class DetailedCommandPanel extends JPanel implements SolverController,
-        SearchListener, ILogAble {
+        SearchListener<ISolverService>, ILogAble {
 
     private static final String EXACTLY_1 = "Exactly 1:";
     private static final String EXACTLY_K = "Exactly K:";
@@ -759,6 +760,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
             getThis().paintAll(getThis().getGraphics());
             DetailedCommandPanel.this.frame
                     .setActivateTracingEditableUnderCondition(false);
+            frame.setActivateRadioTracing(false);
         } else {
 
             ((ISolver) DetailedCommandPanel.this.problem).expireTimeout();
@@ -769,6 +771,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
             DetailedCommandPanel.this.startStopButton.setText(START);
             getThis().paintAll(getThis().getGraphics());
             DetailedCommandPanel.this.frame.setActivateTracingEditable(true);
+            frame.setActivateRadioTracing(true);
         }
     }
 
@@ -782,8 +785,8 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public void launchSolverWithConfigs() {
-        ICDCL cdclSolver;
-        ASolverFactory factory;
+        ICDCL<?> cdclSolver;
+        ASolverFactory<?> factory;
         String[] partsSelectedSolver;
         IOrder order;
         double proba;
@@ -807,10 +810,10 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
             } else {
                 factory = org.sat4j.maxsat.SolverFactory.instance();
             }
-            this.solver = (ICDCL) factory
+            this.solver = (ICDCL<?>) factory
                     .createSolverByName(partsSelectedSolver[1]);
 
-            cdclSolver = (ICDCL) this.solver.getSolvingEngine();
+            cdclSolver = (ICDCL<?>) this.solver.getSolvingEngine();
 
             this.telecomStrategy.setSolver(cdclSolver);
 
@@ -828,7 +831,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
         case SOLVER_LINE_PARAM_LINE:
             this.solver = Solvers.configureSolver(this.commandLines, this);
 
-            cdclSolver = (ICDCL) this.solver.getSolvingEngine();
+            cdclSolver = (ICDCL<?>) this.solver.getSolvingEngine();
 
             this.telecomStrategy.setSolver(cdclSolver);
             this.telecomStrategy.setRestartStrategy(cdclSolver
@@ -876,7 +879,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
         case SOLVER_LINE_PARAM_REMOTE:
             this.solver = Solvers.configureSolver(this.commandLines, this);
 
-            cdclSolver = (ICDCL) this.solver.getSolvingEngine();
+            cdclSolver = (ICDCL<?>) this.solver.getSolvingEngine();
 
             cdclSolver.setRestartStrategy(this.telecomStrategy);
             cdclSolver.setOrder(this.randomWalk);
@@ -908,7 +911,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
 
             this.solver = factory.createSolverByName(partsSelectedSolver[1]);
 
-            cdclSolver = (ICDCL) this.solver.getSolvingEngine();
+            cdclSolver = (ICDCL<?>) this.solver.getSolvingEngine();
 
             this.telecomStrategy.setSolver(cdclSolver);
             this.telecomStrategy.setRestartStrategy(cdclSolver
@@ -1084,7 +1087,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public void initSearchListeners() {
-        List<SearchListener> listeners = new ArrayList<SearchListener>();
+        List<SearchListener<ISolverService>> listeners = new ArrayList<SearchListener<ISolverService>>();
 
         if (this.isPlotActivated) {
             if (this.gnuplotBased) {
@@ -1274,7 +1277,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
         }
         listeners.add(this);
 
-        this.solver.setSearchListener(new MultiTracing(listeners));
+        this.solver.setSearchListener(new MultiTracing<ISolverService>(listeners));
 
     }
 
@@ -1332,7 +1335,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
 
     public void setLearnedDeletionStrategyTypeToSolver(
             LearnedConstraintsEvaluationType type) {
-        ((ICDCL) this.solver.getSolvingEngine())
+        ((ICDCL<?>) this.solver.getSolvingEngine())
                 .setLearnedConstraintsDeletionStrategy(this.telecomStrategy,
                         type);
         log("Changed clauses evaluation type to " + type);
@@ -1386,12 +1389,12 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public void setSimplifier(SimplificationType type) {
-        ((ICDCL) this.solver.getSolvingEngine()).setSimplifier(type);
+        ((ICDCL<?>) this.solver.getSolvingEngine()).setSimplifier(type);
         log("Told the solver to use " + type);
     }
 
     public List<String> getListOfSolvers() {
-        ASolverFactory factory;
+        ASolverFactory<?> factory;
 
         List<String> result = new ArrayList<String>();
 
@@ -1418,7 +1421,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public List<String> getListOfSatSolvers() {
-        ASolverFactory factory;
+        ASolverFactory<?> factory;
 
         List<String> result = new ArrayList<String>();
 
@@ -1432,7 +1435,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public List<String> getListOfPBSolvers() {
-        ASolverFactory factory;
+        ASolverFactory<?> factory;
 
         List<String> result = new ArrayList<String>();
 
@@ -1446,7 +1449,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     }
 
     public List<String> getListOfMaxsatSolvers() {
-        ASolverFactory factory;
+        ASolverFactory<?> factory;
 
         List<String> result = new ArrayList<String>();
 
@@ -1696,7 +1699,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
     public void conflictFound(int p) {
     }
 
-    public void solutionFound(int[] model) {
+    public void solutionFound(int[] model,RandomAccessModel lazyModel) {
         log("Found a solution !! ");
         logsameline(this.stringWriter.toString());
         this.stringWriter.getBuffer().delete(0,
@@ -1735,47 +1738,43 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
 
         @Override
         public void setSelectedIndex(int index) {
-            if (this.getTabCount() == 5) {
-                if (index == this.getTabCount() - 1) {
-                    if (DetailedCommandPanel.this.solver != null
-                            && DetailedCommandPanel.this.startStopButton
-                                    .getText().equals(STOP)) {
-                        String s = DetailedCommandPanel.this.solver.toString();
-                        String res = DetailedCommandPanel.this.solver
-                                .toString();
-                        int j = 0;
-                        for (int i = 0; i < s.length(); i++) {
-                            if (s.charAt(i) != '\n') {
-                                j++;
-                            } else {
-                                j = 0;
-                            }
-                            if (j > 80) {
-                                res = new StringBuffer(res).insert(i, '\n')
-                                        .toString();
-                                j = 0;
-                            }
+            if (this.getTabCount() == 5 && index == 4) {
+                if (DetailedCommandPanel.this.solver != null
+                        && DetailedCommandPanel.this.startStopButton.getText()
+                                .equals(STOP)) {
+                    String s = DetailedCommandPanel.this.solver.toString();
+                    String res = DetailedCommandPanel.this.solver.toString();
+                    int j = 0;
+                    for (int i = 0; i < s.length(); i++) {
+                        if (s.charAt(i) != '\n') {
+                            j++;
+                        } else {
+                            j = 0;
                         }
-                        DetailedCommandPanel.this.textArea.setText(res);
-                        DetailedCommandPanel.this.textArea.setEditable(false);
-                        DetailedCommandPanel.this.textArea.repaint();
-                        DetailedCommandPanel.this.aboutSolverPanel
-                                .paint(DetailedCommandPanel.this.aboutSolverPanel
-                                        .getGraphics());
-                        DetailedCommandPanel.this.aboutSolverPanel.repaint();
-                    } else {
-                        DetailedCommandPanel.this.textArea
-                                .setText("No solver is running at the moment");
-                        DetailedCommandPanel.this.textArea.repaint();
-                        DetailedCommandPanel.this.textArea.setEditable(false);
-                        DetailedCommandPanel.this.aboutSolverPanel
-                                .paint(DetailedCommandPanel.this.aboutSolverPanel
-                                        .getGraphics());
-                        DetailedCommandPanel.this.aboutSolverPanel.repaint();
+                        if (j > 80) {
+                            res = new StringBuffer(res).insert(i, '\n')
+                                    .toString();
+                            j = 0;
+                        }
                     }
+                    DetailedCommandPanel.this.textArea.setText(res);
+                    DetailedCommandPanel.this.textArea.setEditable(false);
+                    DetailedCommandPanel.this.textArea.repaint();
+                    DetailedCommandPanel.this.aboutSolverPanel
+                            .paint(DetailedCommandPanel.this.aboutSolverPanel
+                                    .getGraphics());
+                    DetailedCommandPanel.this.aboutSolverPanel.repaint();
+                } else {
+                    DetailedCommandPanel.this.textArea
+                            .setText("No solver is running at the moment");
+                    DetailedCommandPanel.this.textArea.repaint();
+                    DetailedCommandPanel.this.textArea.setEditable(false);
+                    DetailedCommandPanel.this.aboutSolverPanel
+                            .paint(DetailedCommandPanel.this.aboutSolverPanel
+                                    .getGraphics());
+                    DetailedCommandPanel.this.aboutSolverPanel.repaint();
                 }
             }
-
             super.setSelectedIndex(index);
         };
     }
