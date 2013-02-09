@@ -59,6 +59,8 @@ public interface IProblem extends RandomAccessModel {
      */
     int[] primeImplicant();
 
+    int[] primeImplicantBresil();
+
     /**
      * Check if a given literal is part of the prime implicant computed by the
      * {@link #primeImplicant()} method.
