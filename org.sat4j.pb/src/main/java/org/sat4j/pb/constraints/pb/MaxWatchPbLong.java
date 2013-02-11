@@ -266,7 +266,16 @@ public final class MaxWatchPbLong extends WatchPbLong {
 			// compute the new value for watchCumul
 			coefP = this.coefs[indiceP];
 		} else {
-			coefP = this.litToCoeffs.get(p ^ 1);
+			Long coefL = this.litToCoeffs.get(p ^ 1);
+			if (coefL == null) {
+				// we are probably in the case of PI computation
+				coefL = this.litToCoeffs.get(p);
+				if (coefL == null) {
+					throw new IllegalStateException("Cannot find variable"
+							+ (p >> 1) + " in the constraint");
+				}
+			}
+			coefP = coefL;
 		}
 		this.watchCumul = this.watchCumul + coefP;
 	}
