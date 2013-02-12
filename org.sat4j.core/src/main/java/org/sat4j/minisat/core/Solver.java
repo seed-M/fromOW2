@@ -1399,7 +1399,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         }
         System.out.printf("%s implied: %d, decision: %d %n", getLogPrefix(),
                 implied.size(), decisions.size());
-        this.prime = new int[realNumberOfVariables() + 1];
+        this.prime = new int[voc.nVars() + 1];
         int p, d;
         for (int i = 0; i < this.prime.length; i++) {
             this.prime[i] = 0;
@@ -1490,7 +1490,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         if (this.learnedLiterals.size() > 0) {
             this.qhead = trail.size();
         }
-        this.prime = new int[realNumberOfVariables() + 1];
+        this.prime = new int[voc.nVars() + 1];
         int p;
         for (int i = 0; i < this.prime.length; i++) {
             this.prime[i] = 0;
