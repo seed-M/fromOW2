@@ -1517,7 +1517,6 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 forget(Math.abs(d));
                 reduceClausesContainingTheNegationOfPI(toInternal(-d));
                 removed++;
-                System.out.println("Removed " + d);
             }
         }
         cancelUntil(0);
