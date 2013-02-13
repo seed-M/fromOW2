@@ -371,7 +371,7 @@ public final class MaxWatchPbLong extends WatchPbLong {
 		// for each coefficient greater than limit
 		while (ind < this.coefs.length && limit < this.coefs[ind]) {
 			// its corresponding literal is implied
-			if (this.voc.isSatisfied(this.lits[ind])) {
+			if (!this.voc.isFalsified(this.lits[ind])) {
 				l.isMandatory(this.lits[ind]);
 			}
 			ind++;
