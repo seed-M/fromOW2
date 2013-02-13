@@ -1113,7 +1113,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
      */
     public boolean assume(int p) {
         // Precondition: assume propagation queue is empty
-        assert this.trail.size() == this.qhead;
+        // assert this.trail.size() == this.qhead;
         assert !this.trailLim.contains(this.trail.size());
         this.trailLim.push(this.trail.size());
         return enqueue(p);
@@ -1514,8 +1514,10 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                 propagated++;
             } else {
                 // it is not a mandatory literal
+                forget(Math.abs(d));
                 reduceClausesContainingTheNegationOfPI(toInternal(-d));
                 removed++;
+                System.out.println("Removed " + d);
             }
         }
         cancelUntil(0);
