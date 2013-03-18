@@ -49,6 +49,8 @@ import org.sat4j.core.ConstrGroup;
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
+import org.sat4j.minisat.constraints.cnf.BinaryClause;
+import org.sat4j.minisat.constraints.cnf.WLClause;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ILogAble;
@@ -1554,6 +1556,11 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         List<Constr> watch;
         for (int i = 0; i < constrs.size(); i++) {
             constr = constrs.get(i);
+            if (!(constr instanceof WLClause || constr instanceof BinaryClause)) {
+                throw new IllegalStateException(
+                        "Algo2 does not work with constraints other than clauses "
+                                + constr.getClass());
+            }
             count.put(constr, new Counter(0));
             for (int j = 0; j < constr.size(); j++) {
                 watch = watched.get(constr.get(j));
