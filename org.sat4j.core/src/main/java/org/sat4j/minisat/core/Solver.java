@@ -37,8 +37,10 @@ import static org.sat4j.core.LiteralsUtils.var;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -1469,7 +1471,8 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         }
         long end = System.currentTimeMillis();
         if (isVerbose()) {
-            System.out.printf("%s prime implicant computation statistics%n",
+            System.out.printf(
+                    "%s prime implicant computation statistics ORIG%n",
                     getLogPrefix());
             System.out
                     .printf("%s implied: %d, decision: %d (removed %d, tested %d, propagated %d), l2 propagation:%d, time(ms):%d %n",
@@ -1529,7 +1532,78 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         }
         long end = System.currentTimeMillis();
         if (isVerbose()) {
-            System.out.printf("%s prime implicant computation statistics%n",
+            System.out.printf(
+                    "%s prime implicant computation statistics BRESIL%n",
+                    getLogPrefix());
+            System.out
+                    .printf("%s implied: %d, decision: %d (removed %d, propagated %d), time(ms):%d %n",
+                            getLogPrefix(), implied.size(), decisions.size(),
+                            removed, propagated, end - begin);
+        }
+        return implicant;
+    }
+
+    public int[] primeImplicantAlgo2() {
+        long begin = System.currentTimeMillis();
+        Map<Integer, List<Constr>> watched = new HashMap<Integer, List<Constr>>();
+        for (int d : fullmodel) {
+            watched.put(d, new ArrayList<Constr>());
+        }
+        Map<Constr, Counter> count = new HashMap<Constr, Counter>();
+        Constr constr;
+        List<Constr> watch;
+        for (int i = 0; i < constrs.size(); i++) {
+            constr = constrs.get(i);
+            count.put(constr, new Counter(0));
+            for (int j = 0; j < constr.size(); j++) {
+                watch = watched.get(constr.get(j));
+                if (watch != null) {
+                    // satisfied literal
+                    watch.add(constr);
+                }
+            }
+        }
+        for (Map.Entry<Integer, List<Constr>> entry : watched.entrySet()) {
+            for (Constr c : entry.getValue()) {
+                count.get(c).inc();
+            }
+        }
+        this.prime = new int[voc.nVars() + 1];
+        int d;
+        for (int i = 0; i < this.prime.length; i++) {
+            this.prime[i] = 0;
+        }
+        for (IteratorInt it = this.implied.iterator(); it.hasNext();) {
+            d = it.next();
+            this.prime[Math.abs(d)] = d;
+        }
+        int removed = 0;
+        int propagated = 0;
+        top: for (int i = 0; i < this.decisions.size(); i++) {
+            d = this.decisions.get(i);
+            for (Constr c : watched.get(d)) {
+                if (count.get(c).getValue() == 1) {
+                    this.prime[Math.abs(d)] = d;
+                    propagated++;
+                    continue top;
+                }
+            }
+            removed++;
+            for (Constr c : watched.get(d)) {
+                count.get(c).dec();
+            }
+        }
+        int[] implicant = new int[this.prime.length - removed - 1];
+        int index = 0;
+        for (int i : this.prime) {
+            if (i != 0) {
+                implicant[index++] = i;
+            }
+        }
+        long end = System.currentTimeMillis();
+        if (isVerbose()) {
+            System.out.printf(
+                    "%s prime implicant computation statistics ALGO2%n",
                     getLogPrefix());
             System.out
                     .printf("%s implied: %d, decision: %d (removed %d, propagated %d), time(ms):%d %n",

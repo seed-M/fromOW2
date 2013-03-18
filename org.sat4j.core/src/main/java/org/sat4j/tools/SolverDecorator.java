@@ -514,4 +514,9 @@ public abstract class SolverDecorator<T extends ISolver> implements ISolver {
         return this.solver.primeImplicantBresil();
 
     }
+
+    public int[] primeImplicantAlgo2() {
+        return this.solver.primeImplicantAlgo2();
+
+    }
 }

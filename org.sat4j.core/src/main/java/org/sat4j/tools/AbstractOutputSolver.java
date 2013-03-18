@@ -257,4 +257,9 @@ public abstract class AbstractOutputSolver implements ISolver {
         throw new UnsupportedOperationException("Not implemented yet!");
 
     }
+
+    public int[] primeImplicantAlgo2() {
+        throw new UnsupportedOperationException("Not implemented yet!");
+
+    }
 }
