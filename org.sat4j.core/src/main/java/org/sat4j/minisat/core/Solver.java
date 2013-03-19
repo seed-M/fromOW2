@@ -1549,7 +1549,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         for (int d : fullmodel) {
             watched[toInternal(d)] = new VecInt();
         }
-        Counter[] count = new Counter[constrs.size()];
+        int[] count = new int[constrs.size()];
         Constr constr;
         IVecInt watch;
         for (int i = 0; i < constrs.size(); i++) {
@@ -1559,7 +1559,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                         "Algo2 does not work with constraints other than clauses "
                                 + constr.getClass());
             }
-            count[i] = new Counter(0);
+            count[i] = 0;
             for (int j = 0; j < constr.size(); j++) {
                 watch = watched[constr.get(j)];
                 if (watch != null) {
@@ -1571,7 +1571,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         for (int d : fullmodel) {
             for (IteratorInt it = watched[toInternal(d)].iterator(); it
                     .hasNext();) {
-                count[it.next()].inc();
+                count[it.next()]++;
             }
         }
         this.prime = new int[voc.nVars() + 1];
@@ -1589,7 +1589,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
             d = this.decisions.get(i);
             for (IteratorInt it = watched[toInternal(d)].iterator(); it
                     .hasNext();) {
-                if (count[it.next()].getValue() == 1) {
+                if (count[it.next()] == 1) {
                     this.prime[Math.abs(d)] = d;
                     propagated++;
                     continue top;
@@ -1598,7 +1598,7 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
             removed++;
             for (IteratorInt it = watched[toInternal(d)].iterator(); it
                     .hasNext();) {
-                count[it.next()].dec();
+                count[it.next()]--;
             }
         }
         int[] implicant = new int[this.prime.length - removed - 1];
