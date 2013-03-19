@@ -37,10 +37,8 @@ import static org.sat4j.core.LiteralsUtils.var;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -1547,13 +1545,13 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
 
     public int[] primeImplicantAlgo2() {
         long begin = System.currentTimeMillis();
-        Map<Integer, List<Constr>> watched = new HashMap<Integer, List<Constr>>();
+        IVecInt[] watched = new IVecInt[voc.nVars() * 2 + 2];
         for (int d : fullmodel) {
-            watched.put(d, new ArrayList<Constr>());
+            watched[toInternal(d)] = new VecInt();
         }
-        Map<Constr, Counter> count = new HashMap<Constr, Counter>();
+        Counter[] count = new Counter[constrs.size()];
         Constr constr;
-        List<Constr> watch;
+        IVecInt watch;
         for (int i = 0; i < constrs.size(); i++) {
             constr = constrs.get(i);
             if (!(constr instanceof WLClause || constr instanceof BinaryClause)) {
@@ -1561,18 +1559,19 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
                         "Algo2 does not work with constraints other than clauses "
                                 + constr.getClass());
             }
-            count.put(constr, new Counter(0));
+            count[i] = new Counter(0);
             for (int j = 0; j < constr.size(); j++) {
-                watch = watched.get(constr.get(j));
+                watch = watched[constr.get(j)];
                 if (watch != null) {
                     // satisfied literal
-                    watch.add(constr);
+                    watch.push(i);
                 }
             }
         }
-        for (Map.Entry<Integer, List<Constr>> entry : watched.entrySet()) {
-            for (Constr c : entry.getValue()) {
-                count.get(c).inc();
+        for (int d : fullmodel) {
+            for (IteratorInt it = watched[toInternal(d)].iterator(); it
+                    .hasNext();) {
+                count[it.next()].inc();
             }
         }
         this.prime = new int[voc.nVars() + 1];
@@ -1588,16 +1587,18 @@ public class Solver<D extends DataStructureFactory> implements ISolverService,
         int propagated = 0;
         top: for (int i = 0; i < this.decisions.size(); i++) {
             d = this.decisions.get(i);
-            for (Constr c : watched.get(d)) {
-                if (count.get(c).getValue() == 1) {
+            for (IteratorInt it = watched[toInternal(d)].iterator(); it
+                    .hasNext();) {
+                if (count[it.next()].getValue() == 1) {
                     this.prime[Math.abs(d)] = d;
                     propagated++;
                     continue top;
                 }
             }
             removed++;
-            for (Constr c : watched.get(d)) {
-                count.get(c).dec();
+            for (IteratorInt it = watched[toInternal(d)].iterator(); it
+                    .hasNext();) {
+                count[it.next()].dec();
             }
         }
         int[] implicant = new int[this.prime.length - removed - 1];
