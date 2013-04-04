@@ -294,7 +294,7 @@ public class StatisticsSolver implements ISolver {
             return;
         }
         int max = sizeoccurrences.length - 1;
-        for (int i = 1; i < max; i += 2) {
+        for (int i = 2; i < max; i += 2) {
             sizeV = 0;
             oneNull = false;
             for (int k = 0; k < 2; k++) {
