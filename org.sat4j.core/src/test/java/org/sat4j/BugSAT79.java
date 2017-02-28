@@ -3,7 +3,9 @@ package org.sat4j;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
@@ -11,6 +13,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.GateTranslator;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BugSAT79 {
 
     private ISolver solver;
@@ -22,8 +25,8 @@ public class BugSAT79 {
     }
 
     @Test
-    public void testSuccessiveCallsInGlobalTimeout() throws TimeoutException,
-            InterruptedException {
+    public void test01SuccessiveCallsInGlobalTimeout()
+            throws TimeoutException, InterruptedException {
         int nbthreads = Thread.activeCount();
         for (int i = 0; i < 10; i++) {
             solver.isSatisfiable(true);
@@ -36,8 +39,8 @@ public class BugSAT79 {
     // the number of available threads.
 
     @Test
-    public void testSuccessiveCallsInLocalTimeout() throws TimeoutException,
-            InterruptedException {
+    public void test02SuccessiveCallsInLocalTimeout()
+            throws TimeoutException, InterruptedException {
         int nbthreads = Thread.activeCount();
         for (int i = 0; i < 10; i++) {
             solver.isSatisfiable(false);
@@ -47,7 +50,7 @@ public class BugSAT79 {
     }
 
     @Test
-    public void testSuccessiveCallsWithDifferentSolvers()
+    public void test03SuccessiveCallsWithDifferentSolvers()
             throws TimeoutException, ContradictionException,
             InterruptedException {
         int nbthreads = Thread.activeCount();
@@ -62,7 +65,7 @@ public class BugSAT79 {
     }
 
     @Test
-    public void testSuccessiveCallsWithDifferentSolversInsideDecorators()
+    public void test04SuccessiveCallsWithDifferentSolversInsideDecorators()
             throws TimeoutException, ContradictionException,
             InterruptedException {
         int nbthreads = Thread.activeCount();

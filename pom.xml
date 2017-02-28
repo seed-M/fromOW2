@@ -107,7 +107,7 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.4</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
