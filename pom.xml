@@ -224,7 +224,7 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.7</version>
 				<configuration>
-					<source>1.5</source>
+					<source>${javaSource}</source>
                     <!--
 					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
 					<docletArtifact>
