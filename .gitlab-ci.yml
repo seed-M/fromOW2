@@ -1,5 +1,11 @@
 image: maven:3.3.9-jdk-8
 
 mybuild:
+    stage: build
     script: 
       - mvn clean install
+      
+sonar:
+    stage: deploy
+    script: 
+      - mvn sonar:sonar
