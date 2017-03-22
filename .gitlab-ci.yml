@@ -1,5 +1,9 @@
 image: maven:3.3.9-jdk-8
 
+cache:
+    paths:
+    - target
+
 mybuild:
     stage: build
     script: 
@@ -8,4 +12,4 @@ mybuild:
 sonar:
     stage: deploy
     script: 
-      - mvn compile sonar:sonar
+      - mvn sonar:sonar
