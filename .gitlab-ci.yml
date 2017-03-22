@@ -8,4 +8,4 @@ mybuild:
 sonar:
     stage: deploy
     script: 
-      - mvn sonar:sonar
+      - mvn compile sonar:sonar
