@@ -6,9 +6,4 @@ cache:
 mybuild:
     stage: build
     script: 
-      - mvn clean install
-      
-sonar:
-    stage: deploy
-    script: 
-      - mvn sonar:sonar
+      - mvn clean install sonar:sonar
