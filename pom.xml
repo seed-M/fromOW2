@@ -388,6 +388,19 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 					</reportPlugins>
 				</configuration>
 			</plugin>
+                        <plugin>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>0.7.9</version>
+                            <executions>
+                               <execution>
+                                  <phase>pre-integration-test</phase>
+                                  <goals>
+                                    <goal>prepare-agent</goal>
+                                  </goals>
+                               </execution>
+                            </executions>
+                        </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -426,7 +439,18 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 	</build>
 	<reporting>
 		<plugins>
-
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- select non-aggregate reports -->
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
 		</plugins>
 	</reporting>
 	<profiles>
