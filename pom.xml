@@ -86,7 +86,7 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 		<sat4j.custom.version>${project.version}.v${maven.build.timestamp}</sat4j.custom.version>
 		<next.eclipse.release.date>June, 2010</next.eclipse.release.date>
 		<bundle-manifest>${project.build.directory}/META-INF/MANIFEST.MF</bundle-manifest>
-		<sonar.java.libraries>${project.build.directory}/lib/*.jar</sonar.java.libraries>
+		<sonar.java.libraries>${project.basedir}/lib/*.jar</sonar.java.libraries>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>
