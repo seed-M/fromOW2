@@ -33,11 +33,11 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.FakeConstr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
-import org.sat4j.specs.VarMapper;
 import org.sat4j.tools.DimacsStringSolver;
 
 /**
@@ -46,14 +46,12 @@ import org.sat4j.tools.DimacsStringSolver;
  * 
  * @author leberre
  */
-public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
-        IPBSolver {
-
-    private static final String FAKE_I_CONSTR_MSG = "Fake IConstr";
+public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver
+        implements IPBSolver {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     private int indxConstrObj;
@@ -64,38 +62,11 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     private boolean inserted = false;
 
-    private static final IConstr FAKE_CONSTR = new IConstr() {
-
-        public int size() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public boolean learnt() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public double getActivity() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public int get(int i) {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public boolean canBePropagatedMultipleTimes() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public String toString(VarMapper mapper) {
-            return FAKE_I_CONSTR_MSG;
-        }
-    };
-
     private Map<Integer, T> mapping;
 
     /**
-	 * 
-	 */
+     * 
+     */
     public UserFriendlyPBStringSolver() {
     }
 
@@ -128,7 +99,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
             }
             out.append("<= " + d + " ;\n");
         }
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public void setObjectiveFunction(ObjectiveFunction obj) {
@@ -148,7 +119,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
             }
         }
         out.append(">= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     @Override
@@ -164,7 +135,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
             }
         }
         out.append("<= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     @Override
@@ -196,7 +167,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
             out.append("-> false");
         }
         out.append(" ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     /*
@@ -205,7 +176,6 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
      * @see org.sat4j.pb.IPBSolver#getExplanation()
      */
     public String getExplanation() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -217,8 +187,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
      * .IVecInt)
      */
     public void setListOfVariablesForExplanation(IVecInt listOfVariables) {
-        // TODO Auto-generated method stub
-
+        // do nothing
     }
 
     @Override
@@ -296,7 +265,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append("<= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs,
@@ -309,7 +278,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append("<= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
@@ -322,7 +291,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append(">= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs,
@@ -335,7 +304,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append(">= " + degree + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
@@ -348,7 +317,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append("= " + weight + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs,
@@ -361,7 +330,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
                     + " + ");
         }
         out.append("= " + weight + " ;\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
 }

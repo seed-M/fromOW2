@@ -48,26 +48,32 @@ public final class FakeConstr implements IConstr {
         return instance;
     }
 
+    @Override
     public int size() {
         throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
     }
 
+    @Override
     public boolean learnt() {
         throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
     }
 
+    @Override
     public double getActivity() {
         throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
     }
 
+    @Override
     public int get(int i) {
         throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
     }
 
+    @Override
     public boolean canBePropagatedMultipleTimes() {
         throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
     }
 
+    @Override
     public String toString(VarMapper mapper) {
         return FAKE_I_CONSTR_MSG;
     }
