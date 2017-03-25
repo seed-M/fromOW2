@@ -14,12 +14,12 @@
 	<name>SAT4J</name>
 	<url>http://www.sat4j.org/</url>
 	<description>
-The aim of the SAT4J library is to provide an efficient library of SAT solvers in Java. Compared to the OpenSAT project, the SAT4J library targets first users of SAT "black boxes", willing to embed  SAT technologies into their application without worrying about the details. Since we use the library for our own research, it is also possible for SAT researchers to use it as a basis for their work.
+Sat4j is a full featured boolean reasoning library designed to bring state-of-the-art SAT technologies to the Java Virtual Machine.
   </description>
 	<scm>
-		<connection>scm:svn:svn+ssh://leberre@svn.forge.objectweb.org/svnroot/sat4j/maven/trunk/</connection>
-		<url>http://fisheye.ow2.org/browse/Sat4J/maven/trunk</url>
-		<developerConnection>scm:svn:svn+ssh://leberre@svn.forge.objectweb.org/svnroot/sat4j/maven/trunk/</developerConnection>
+		<connection>scm:git:https://gitlab.ow2.org/sat4j/sat4j/</connection>
+		<url>https://gitlab.ow2.org/sat4j/sat4j/</url>
+		<developerConnection>scm:git:https://gitlab.ow2.org/sat4j/sat4j/</developerConnection>
 	</scm>
 	<licenses>
 		<license>
@@ -44,17 +44,17 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 	<mailingLists>
 		<mailingList>
 			<name>Developer List</name>
-			<subscribe>sat4j-dev-subscribe@objectweb.org</subscribe>
-			<unsubscribe>sat4j-dev-unsubscribe@objectweb.org</unsubscribe>
-			<post>sat4j-dev@objectweb.org</post>
-			<archive>http://mail-archive.objectweb.org/sat4j-dev/index.html</archive>
+			<subscribe>sat4j-dev-subscribe@ow2.org</subscribe>
+			<unsubscribe>sat4j-dev-unsubscribe@ow2.org</unsubscribe>
+			<post>sat4j-dev@ow2.org</post>
+			<archive>http://mail-archive.ow2.org/sat4j-dev/index.html</archive>
 		</mailingList>
 		<mailingList>
 			<name>Commits List</name>
-			<subscribe>sat4j-commits-subscribe@objectweb.org</subscribe>
-			<unsubscribe>sat4j-commits-unsubscribe@objectweb.org</unsubscribe>
-			<post>sat4j-commits@objectweb.org</post>
-			<archive>http://mail-archive.objectweb.org/sat4j-commits/index.html</archive>
+			<subscribe>sat4j-commits-subscribe@ow2.org</subscribe>
+			<unsubscribe>sat4j-commits-unsubscribe@ow2.org</unsubscribe>
+			<post>sat4j-commits@ow2.org</post>
+			<archive>http://mail-archive.ow2.org/sat4j-commits/index.html</archive>
 		</mailingList>
 	</mailingLists>
 	<developers>
@@ -156,9 +156,9 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
-                                        <forkCount>3</forkCount>
-                                        <reuseForks>true</reuseForks>
-                                        <enableAssertions>true</enableAssertions>
+					<forkCount>3</forkCount>
+					<reuseForks>true</reuseForks>
+					<enableAssertions>true</enableAssertions>
 					<includes>
 						<include>**/Bug*</include>
 						<include>**/*Test*</include>
@@ -174,7 +174,7 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 						<exclude>**/MiniOPBLongClauseCardMinLearningTest*</exclude>
 						<exclude>**/PBCPMixedConstraintsCautiousTest*</exclude>
 						<exclude>**/MultiObjectiveDependencyHelperTest*</exclude>
-                                                <exclude>org.sat4j.pb.CardConstrFinderTest.class</exclude>
+						<exclude>org.sat4j.pb.CardConstrFinderTest.class</exclude>
 					</excludes>
 					<systemProperties>
 						<property>
@@ -225,16 +225,9 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 				<version>2.7</version>
 				<configuration>
 					<source>${javaSource}</source>
-                    <!--
-					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-					<docletArtifact>
-						<groupId>org.umlgraph</groupId>
-						<artifactId>doclet</artifactId>
-						<version>5.1</version>
-					</docletArtifact>
-					<additionalparam>
-					</additionalparam>
-                    -->
+					<!-- <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet> <docletArtifact> 
+						<groupId>org.umlgraph</groupId> <artifactId>doclet</artifactId> <version>5.1</version> 
+						</docletArtifact> <additionalparam> </additionalparam> -->
 					<useStandardDocletOptions>true</useStandardDocletOptions>
 				</configuration>
 				<executions>
@@ -388,19 +381,19 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 					</reportPlugins>
 				</configuration>
 			</plugin>
-                        <plugin>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>jacoco-maven-plugin</artifactId>
-                            <version>0.7.9</version>
-                            <executions>
-                               <execution>
-                                  <phase>pre-integration-test</phase>
-                                  <goals>
-                                    <goal>prepare-agent</goal>
-                                  </goals>
-                               </execution>
-                            </executions>
-                        </plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.9</version>
+				<executions>
+					<execution>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -427,7 +420,21 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-compiler-plugin</artifactId>
+										<versionRange>[3.6.0,)</versionRange>
+										<goals>
+											<goal>compile</goal>
+											<goal>testCompile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -439,18 +446,18 @@ The aim of the SAT4J library is to provide an efficient library of SAT solvers i
 	</build>
 	<reporting>
 		<plugins>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <!-- select non-aggregate reports -->
-              <report>report</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
 		</plugins>
 	</reporting>
 	<profiles>
