@@ -36,7 +36,7 @@ import java.io.PrintStream;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
-import org.sat4j.tools.SearchListenerAdapter;
+import org.sat4j.specs.SearchListenerAdapter;
 
 public class ConflictTracing extends SearchListenerAdapter<ISolverService> {
 

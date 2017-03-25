@@ -50,6 +50,7 @@ import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.SearchListener;
+import org.sat4j.specs.SearchListenerAdapter;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.specs.UnitClauseProvider;
 import org.sat4j.specs.UnitPropagationListener;

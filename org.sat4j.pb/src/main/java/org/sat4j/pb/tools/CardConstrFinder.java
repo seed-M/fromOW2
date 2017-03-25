@@ -24,8 +24,8 @@ import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.SearchListener;
+import org.sat4j.specs.SearchListenerAdapter;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.SearchListenerAdapter;
 
 public class CardConstrFinder implements Iterator<AtLeastCard>,
         Iterable<AtLeastCard> {

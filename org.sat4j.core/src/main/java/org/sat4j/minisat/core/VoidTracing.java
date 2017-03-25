@@ -29,11 +29,8 @@
  *******************************************************************************/
 package org.sat4j.minisat.core;
 
-import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
-import org.sat4j.specs.Lbool;
-import org.sat4j.specs.RandomAccessModel;
-import org.sat4j.specs.SearchListener;
+import org.sat4j.specs.SearchListenerAdapter;
 
 /**
  * Do-nothing search listener. Used by default by the solver when no
@@ -42,60 +39,7 @@ import org.sat4j.specs.SearchListener;
  * @author leberre
  * 
  */
-final class VoidTracing implements SearchListener<ISolverService> {
+final class VoidTracing extends SearchListenerAdapter<ISolverService> {
     private static final long serialVersionUID = 1L;
 
-    public void assuming(int p) {
-    }
-
-    public void propagating(int p) {
-    }
-
-    public void enqueueing(int p, IConstr reason) {
-    }
-
-    public void backtracking(int p) {
-    }
-
-    public void adding(int p) {
-    }
-
-    public void learn(IConstr clause) {
-    }
-
-    public void learnUnit(int p) {
-    }
-
-    public void delete(IConstr c) {
-    }
-
-    public void conflictFound(IConstr confl, int dlevel, int trailLevel) {
-    }
-
-    public void conflictFound(int p) {
-    }
-
-    public void solutionFound(int[] model, RandomAccessModel lazyModel) {
-    }
-
-    public void beginLoop() {
-    }
-
-    public void start() {
-    }
-
-    public void end(Lbool result) {
-    }
-
-    public void restarting() {
-    }
-
-    public void backjump(int backjumpLevel) {
-    }
-
-    public void init(ISolverService solverService) {
-    }
-
-    public void cleaning() {
-    }
 }

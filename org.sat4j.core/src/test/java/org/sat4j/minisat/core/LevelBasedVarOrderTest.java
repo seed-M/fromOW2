@@ -11,8 +11,8 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.SearchListenerAdapter;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.SearchListenerAdapter;
 
 public class LevelBasedVarOrderTest {
 

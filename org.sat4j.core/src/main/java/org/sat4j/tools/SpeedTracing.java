@@ -31,6 +31,7 @@ package org.sat4j.tools;
 
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.Lbool;
+import org.sat4j.specs.SearchListenerAdapter;
 
 public class SpeedTracing extends SearchListenerAdapter<ISolverService> {
 

@@ -27,13 +27,7 @@
  * Contributors:
  *   CRIL - initial API and implementation
  *******************************************************************************/
-package org.sat4j.tools;
-
-import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolverService;
-import org.sat4j.specs.Lbool;
-import org.sat4j.specs.RandomAccessModel;
-import org.sat4j.specs.SearchListener;
+package org.sat4j.specs;
 
 public abstract class SearchListenerAdapter<S extends ISolverService>
         implements SearchListener<S> {

@@ -38,6 +38,7 @@ import org.sat4j.core.LiteralsUtils;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.Lbool;
+import org.sat4j.specs.SearchListenerAdapter;
 
 /**
  * Output an unsat proof using the reverse unit propagation (RUP) format.

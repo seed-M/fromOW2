@@ -33,6 +33,7 @@ import org.sat4j.specs.Constr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.Lbool;
+import org.sat4j.specs.SearchListenerAdapter;
 
 public class LBDTracing extends SearchListenerAdapter<ISolverService> {
 
