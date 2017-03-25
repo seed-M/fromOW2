@@ -101,7 +101,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
 
     protected IProblem problem;
 
-    public boolean silent = false;
+    private boolean silent = false;
 
     protected boolean prime = System.getProperty("prime") != null;
 
@@ -221,7 +221,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
             String proofFile = problemname + ".rupproof";
             this.solver.setSearchListener(
                     new RupSearchListener<ISolverService>(proofFile));
-            if (!this.silent) {
+            if (!this.isSilent()) {
                 System.out.println(this.solver.getLogPrefix()
                         + "Generating unsat proof in file " + proofFile);
             }
@@ -244,7 +244,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
                 usage();
                 return;
             }
-            if (!this.silent) {
+            if (!this.isSilent()) {
                 this.solver.setVerbose(true);
             }
             configureLauncher();
@@ -308,7 +308,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
      *            a textual information
      */
     public void log(String message) {
-        if (this.silent)
+        if (this.isSilent())
             return;
         if (this.logBuffer != null) {
             this.logBuffer.append(COMMENT_PREFIX).append(message).append('\n');
@@ -435,5 +435,9 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
     protected void flushLog() {
         this.out.print(logBuffer.toString());
         logBuffer = null;
+    }
+
+    public boolean isSilent() {
+        return silent;
     }
 }

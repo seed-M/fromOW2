@@ -312,7 +312,7 @@ public class Launcher extends AbstractLauncher implements ILogAble {
                 usage();
                 System.exit(0);
             }
-            if (!this.silent) {
+            if (!this.isSilent()) {
                 this.solver.setVerbose(true);
             }
             String instanceName = getInstanceName(args);

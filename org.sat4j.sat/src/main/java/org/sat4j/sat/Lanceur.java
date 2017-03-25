@@ -397,7 +397,7 @@ public class Lanceur extends AbstractLauncher implements ILogAble {
                 usage();
                 return;
             }
-            if (!this.silent) {
+            if (!this.isSilent()) {
                 this.solver.setVerbose(true);
             }
             String instanceName = getInstanceName(args);

@@ -90,7 +90,7 @@ public class CSPLauncher extends AbstractLauncher {
 	@Override
 	protected IProblem readProblem(String problemname)
 			throws ParseFormatException, IOException, ContradictionException {
-		this.silent = true;
+		this.setSilent(true);
 		IProblem problem = super.readProblem(problemname);
 		if(this.shouldOnlyDisplayEncoding) {
 			displayEncoding();
