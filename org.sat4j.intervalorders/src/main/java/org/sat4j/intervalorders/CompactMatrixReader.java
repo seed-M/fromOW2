@@ -80,20 +80,16 @@ public class CompactMatrixReader extends Reader {
 			}
 			triedVotes++;
 		}
-		System.out.printf(
-				"Generated %d random votes to reach %d correct votes\n",
-				triedVotes, correctVotes);
+		System.out.printf("Generated %d random votes to reach %d correct votes\n", triedVotes, correctVotes);
 		return agregate;
 	}
 
-	public void generateRandomCase(int n, int nbv, long seed)
-			throws ContradictionException {
+	public void generateRandomCase(int n, int nbv, long seed) throws ContradictionException {
 		rand.setSeed(seed);
 		generateRandomCase(n, nbv);
 	}
 
-	public void generateRandomCase(int n, int nbv)
-			throws ContradictionException {
+	public void generateRandomCase(int n, int nbv) throws ContradictionException {
 		String[] alternatives = new String[n];
 		for (int i = 0; i < n; i++) {
 			alternatives[i] = "alt" + (i + 1);
@@ -113,8 +109,7 @@ public class CompactMatrixReader extends Reader {
 	}
 
 	private boolean checkVote(int[][] vote) {
-		IVec<IRelation> assumptions = new Vec<IRelation>(vote.length
-				* vote.length);
+		IVec<IRelation> assumptions = new Vec<IRelation>(vote.length * vote.length);
 		for (int i = 0; i < vote.length; i++) {
 			for (int j = i + 1; j < vote[i].length; j++) {
 				if (vote[i][j] == 1) {
@@ -207,8 +202,7 @@ public class CompactMatrixReader extends Reader {
 	}
 
 	@Override
-	public IProblem parseInstance(InputStream in) throws ParseFormatException,
-			ContradictionException, IOException {
+	public IProblem parseInstance(InputStream in) throws ParseFormatException, ContradictionException, IOException {
 		int[][] matrix = readMatrixFromFile(in);
 		createStructuralConstraints(numberOfAlternatives);
 		handleMatrix(numberOfAlternatives, numberOfVoters, matrix);
@@ -219,8 +213,7 @@ public class CompactMatrixReader extends Reader {
 		return pbsolver;
 	}
 
-	private int[][] readMatrixFromFile(InputStream in) throws IOException,
-			ParseFormatException {
+	private int[][] readMatrixFromFile(InputStream in) throws IOException, ParseFormatException {
 		scanner = new EfficientScanner(in);
 		String line = scanner.nextLine();
 		String[] alternatives = line.split("\\s+");
@@ -244,8 +237,7 @@ public class CompactMatrixReader extends Reader {
 					prefers(i, j).setNumberOfVotes(matrix[i][j]);
 				} else {
 					if (matrix[i][j] != 0) {
-						throw new IllegalStateException(
-								"Cannot prefer an alternative to itself.");
+						throw new IllegalStateException("Cannot prefer an alternative to itself.");
 					}
 				}
 			}
@@ -253,8 +245,7 @@ public class CompactMatrixReader extends Reader {
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
 				indif(i, j).setNumberOfVotes(
-						nbVoters - prefers(i, j).getNumberOfVotes()
-								- prefers(j, i).getNumberOfVotes());
+						nbVoters - prefers(i, j).getNumberOfVotes() - prefers(j, i).getNumberOfVotes());
 			}
 		}
 	}
@@ -267,11 +258,9 @@ public class CompactMatrixReader extends Reader {
 		for (int i = 0; i < alternatives.length; i++) {
 			for (int j = 0; j < alternatives.length; j++) {
 				if (i != j) {
-					prefers[i * alternatives.length + j] = new Prefer(
-							alternatives[i], alternatives[j]);
+					prefers[i * alternatives.length + j] = new Prefer(alternatives[i], alternatives[j]);
 				}
-				indifferents[i * alternatives.length + j] = new Indifferent(
-						alternatives[i], alternatives[j]);
+				indifferents[i * alternatives.length + j] = new Indifferent(alternatives[i], alternatives[j]);
 			}
 		}
 		return alternatives.length;
@@ -297,33 +286,26 @@ public class CompactMatrixReader extends Reader {
 		return new NegRelation(rel);
 	}
 
-	private void createStructuralConstraints(int n)
-			throws ContradictionException {
+	private void createStructuralConstraints(int n) throws ContradictionException {
 		int nbconstrs = 0;
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
-				helper.clause("Completeness", prefers(i, j), indif(i, j),
-						prefers(j, i));
-				helper.clause("Assymetry", neg(prefers(i, j)),
-						neg(prefers(j, i)));
-				helper.clause("Exclusivity", neg(prefers(i, j)),
-						neg(indif(i, j)));
-				helper.clause("Exclusivity", neg(prefers(j, i)),
-						neg(indif(i, j)));
+				helper.clause("Completeness", prefers(i, j), indif(i, j), prefers(j, i));
+				helper.clause("Assymetry", neg(prefers(i, j)), neg(prefers(j, i)));
+				helper.clause("Exclusivity", neg(prefers(i, j)), neg(indif(i, j)));
+				helper.clause("Exclusivity", neg(prefers(j, i)), neg(indif(i, j)));
 				nbconstrs += 4;
 			}
 			helper.setTrue(indif(i, i), "Reflexivity");
 			nbconstrs++;
 		}
-		System.out.printf("Created %d constraints without Ferrer condition\n",
-				nbconstrs);
+		System.out.printf("Created %d constraints without Ferrer condition\n", nbconstrs);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				for (int k = 0; k < n; k++) {
 					for (int l = 0; l < n; l++) {
 						if (i != j && k != l && i != l && j != l && i != k) {
-							helper.implication(prefers(i, j), indif(j, k),
-									prefers(k, l)).implies(prefers(i, l))
+							helper.implication(prefers(i, j), indif(j, k), prefers(k, l)).implies(prefers(i, l))
 									.named("Ferrers");
 							nbconstrs++;
 						}
@@ -335,8 +317,7 @@ public class CompactMatrixReader extends Reader {
 		System.out.printf("Created %d hard constraints\n", nbconstrs);
 	}
 
-	private void createInstanceConstraints(int n, int nbVoters)
-			throws ContradictionException {
+	private void createInstanceConstraints(int n, int nbVoters) throws ContradictionException {
 		int nbconstrs = 0;
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
@@ -347,48 +328,37 @@ public class CompactMatrixReader extends Reader {
 					helper.setTrue(prefers(j, i), "Unanimity P");
 					nbconstrs++;
 				} else {
-					if (prefers(i, j).getNumberOfVotes() == 0
-							&& prefers(j, i).getNumberOfVotes() == 0) {
+					if (prefers(i, j).getNumberOfVotes() == 0 && prefers(j, i).getNumberOfVotes() == 0) {
 						helper.setTrue(indif(i, j), "Unanimity I");
 						nbconstrs++;
 					}
 				}
 			}
 		}
-		System.out.printf("Created %d instance specific constraints\n",
-				nbconstrs);
+		System.out.printf("Created %d instance specific constraints\n", nbconstrs);
 	}
 
-	private void createHardConstraints(int n, int nbVoters)
-			throws ContradictionException {
+	private void createHardConstraints(int n, int nbVoters) throws ContradictionException {
 		createInstanceConstraints(n, nbVoters);
 	}
 
 	private void createOptimizationFunction(int n, int nbVoters) {
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
-				prefers(i, j).setPenalty(
-						nbVoters + prefers(j, i).getNumberOfVotes()
-								- prefers(i, j).getNumberOfVotes());
-				helper.addToObjectiveFunction(prefers(i, j), prefers(i, j)
-						.getPenalty());
-				prefers(j, i).setPenalty(
-						nbVoters + prefers(i, j).getNumberOfVotes()
-								- prefers(j, i).getNumberOfVotes());
-				helper.addToObjectiveFunction(prefers(j, i), prefers(j, i)
-						.getPenalty());
-				indif(i, j).setPenalty(
-						prefers(i, j).getNumberOfVotes()
-								+ prefers(j, i).getNumberOfVotes());
-				helper.addToObjectiveFunction(indif(i, j), indif(i, j)
-						.getPenalty());
+				prefers(i, j)
+						.setPenalty(nbVoters + prefers(j, i).getNumberOfVotes() - prefers(i, j).getNumberOfVotes());
+				helper.addToObjectiveFunction(prefers(i, j), prefers(i, j).getPenalty());
+				prefers(j, i)
+						.setPenalty(nbVoters + prefers(i, j).getNumberOfVotes() - prefers(j, i).getNumberOfVotes());
+				helper.addToObjectiveFunction(prefers(j, i), prefers(j, i).getPenalty());
+				indif(i, j).setPenalty(prefers(i, j).getNumberOfVotes() + prefers(j, i).getNumberOfVotes());
+				helper.addToObjectiveFunction(indif(i, j), indif(i, j).getPenalty());
 			}
 		}
 	}
 
 	@Override
-	public IProblem parseInstance(java.io.Reader in)
-			throws ParseFormatException, ContradictionException, IOException {
+	public IProblem parseInstance(java.io.Reader in) throws ParseFormatException, ContradictionException, IOException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -433,11 +403,10 @@ public class CompactMatrixReader extends Reader {
 	}
 
 	public Map<Integer, IRelation> mapping() {
-		return helper.getVariablesMapping();
+		return helper.getMappingToDomain();
 	}
 
-	public void discardNotOptimalValues(long cost)
-			throws ContradictionException {
+	public void discardNotOptimalValues(long cost) throws ContradictionException {
 		helper.discardSolutionsWithObjectiveValueGreaterThan(cost);
 	}
 }
