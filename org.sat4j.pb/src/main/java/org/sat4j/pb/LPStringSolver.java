@@ -32,12 +32,12 @@ package org.sat4j.pb;
 import java.math.BigInteger;
 
 import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.FakeConstr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.specs.VarMapper;
 import org.sat4j.tools.DimacsStringSolver;
 
 /**
@@ -53,11 +53,9 @@ import org.sat4j.tools.DimacsStringSolver;
  */
 public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
 
-    private static final String FAKE_I_CONSTR_MSG = "Fake IConstr";
-
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     private int indxConstrObj;
@@ -67,39 +65,6 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
     private ObjectiveFunction obj;
 
     private boolean inserted = false;
-
-    private static final IConstr FAKE_CONSTR = new IConstr() {
-
-        public int size() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public boolean learnt() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public double getActivity() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public int get(int i) {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public boolean canBePropagatedMultipleTimes() {
-            throw new UnsupportedOperationException(FAKE_I_CONSTR_MSG);
-        }
-
-        public String toString(VarMapper mapper) {
-            return FAKE_I_CONSTR_MSG;
-        }
-    };
-
-    /**
-	 * 
-	 */
-    public LPStringSolver() {
-    }
 
     /**
      * @param initSize
@@ -163,7 +128,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
             }
         }
         out.append(">= " + (degree - negationweight) + " \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     @Override
@@ -195,7 +160,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
             }
         }
         out.append(">= " + (-degree + negationweight) + " \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     @Override
@@ -226,7 +191,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
             }
         }
         out.append(">= " + (1 - negationweight) + "\n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     /*
@@ -251,7 +216,8 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
 
     }
 
-    public void objectiveFunctionToLP(ObjectiveFunction obj, StringBuilder buffer) {
+    public void objectiveFunctionToLP(ObjectiveFunction obj,
+            StringBuilder buffer) {
         buffer.append("Minimize \n");
         buffer.append("obj: ");
         IVecInt variables = obj.getVars();
@@ -363,7 +329,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append(">= ");
         out.append(-degree);
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs,
@@ -393,7 +359,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append(">= ");
         out.append(degree.negate());
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
@@ -423,7 +389,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append(">= ");
         out.append(degree);
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs,
@@ -453,7 +419,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append(">= ");
         out.append(degree);
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
 
     }
 
@@ -484,7 +450,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append("= ");
         out.append(weight);
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs,
@@ -514,7 +480,7 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         out.append("= ");
         out.append(weight);
         out.append(" \n");
-        return FAKE_CONSTR;
+        return FakeConstr.instance();
     }
 
 }
