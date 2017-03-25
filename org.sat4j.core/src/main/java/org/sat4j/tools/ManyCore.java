@@ -305,7 +305,7 @@ public class ManyCore<S extends ISolver>
     }
 
     public String toString(String prefix) {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         res.append(prefix);
         res.append("ManyCore solver with ");
         res.append(this.numberOfSolvers);

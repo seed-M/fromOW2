@@ -134,7 +134,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
     @Override
     public IConstr addAtLeast(IVecInt literals, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         int negationweight = 0;
         int p;
@@ -155,7 +155,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
     @Override
     public IConstr addAtMost(IVecInt literals, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         int negationweight = 0;
         int p;
@@ -175,7 +175,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     @Override
     public IConstr addClause(IVecInt literals) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         int negationweight = 0;
         int lit;
@@ -216,9 +216,9 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     @Override
     public String toString() {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         if (!this.inserted) {
-            StringBuffer tmp = new StringBuffer();
+            StringBuilder tmp = new StringBuilder();
             tmp.append("* #variable= ");
             tmp.append(nVars());
             tmp.append(" #constraint= ");
@@ -242,7 +242,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     @Override
     public int newVar(int howmany) {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         setNbVars(howmany);
         // to add later the number of constraints
         this.indxConstrObj = out.length();
@@ -265,7 +265,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addAtMost(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -282,7 +282,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger degree) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -299,7 +299,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -316,7 +316,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger degree) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -335,7 +335,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
     @Override
     public IConstr addExactly(IVecInt literals, int weight)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         int negationweight = 0;
         int p;
@@ -355,7 +355,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -372,7 +372,7 @@ public class OPBStringSolver extends DimacsStringSolver implements IPBSolver {
 
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger weight) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {

@@ -167,7 +167,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 			throw new IllegalStateException("decoding a model needs to know the solver state");
 		}
 		if(model.length == 0) return "";
-		StringBuffer strModelBuffer = new StringBuffer();
+		StringBuilder strModelBuffer = new StringBuilder();
 		switch(this.launcher.getExitCode()) {
 		case OPTIMUM_FOUND:
 			strModelBuffer.append("<instantiation type=\"optimum\" cost=\"")
@@ -192,10 +192,10 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		return strModelBuffer.toString();
 	}
 
-	private void appendModel(StringBuffer strModelBuffer, int[] model) {
-		StringBuffer sbufList = new StringBuffer();
+	private void appendModel(StringBuilder strModelBuffer, int[] model) {
+		StringBuilder sbufList = new StringBuilder();
 		sbufList.append("v \t<list> ");
-		StringBuffer sbufValues = new StringBuffer();
+		StringBuilder sbufValues = new StringBuilder();
 		sbufValues.append("v \t<values> ");
 		decodeModel(sbufList, sbufValues);
 		sbufValues.append(" </values>\n");
@@ -205,7 +205,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	}
 	
 	public String decodeModelAsValueSequence(int model[]) { // remove dependence to sat4j (type Var)
-		StringBuffer sbufValues = new StringBuffer();
+		StringBuilder sbufValues = new StringBuilder();
 		for(int i=0; i<this.allVars.size(); ++i) {
 			if(i>0) sbufValues.append(' ');
 			XVar xvar = this.allVars.get(i);
@@ -228,7 +228,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		return this.cspToSatEncoder.addClause(clArray);
 	}
 	
-	private void decodeModel(StringBuffer sbufList, StringBuffer sbufValues) {
+	private void decodeModel(StringBuilder sbufList, StringBuilder sbufValues) {
 		int[] model = this.solver.model();
 		for(int i=0; i<this.allVars.size(); ++i) {
 			if(i > 0) {
@@ -241,7 +241,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		}
 	}
 
-	private void appendVarValue(StringBuffer buffer, XVar xvar, int[] model) {
+	private void appendVarValue(StringBuilder buffer, XVar xvar, int[] model) {
 		int[] domain = this.cspToSatEncoder.getCspVarDomain(xvar.id);
 		if(domain == null) {
 			buffer.append(((XDomInteger)xvar.dom).getFirstValue());

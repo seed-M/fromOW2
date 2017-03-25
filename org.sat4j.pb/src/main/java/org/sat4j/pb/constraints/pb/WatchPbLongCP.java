@@ -506,7 +506,7 @@ public abstract class WatchPbLongCP implements IWatchPb, Propagatable,
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {
@@ -720,7 +720,7 @@ public abstract class WatchPbLongCP implements IWatchPb, Propagatable,
     }
 
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {

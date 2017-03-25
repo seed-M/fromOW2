@@ -274,7 +274,7 @@ public class MapPb implements IDataStructurePB {
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int ind = 0; ind < size(); ind++) {
             stb.append(this.weightedLits.getCoef(ind));
             stb.append(".");

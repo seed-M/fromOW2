@@ -78,7 +78,7 @@ public class SDWebStart extends JFrame implements MainProgramWindow {
     }
 
     public String readFile() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         try {
             FileContents fc = fos.openFileDialog(null, null);
             InputStream is = fc.getInputStream();
@@ -89,7 +89,7 @@ public class SDWebStart extends JFrame implements MainProgramWindow {
                 ch = is.read();
             }
         } catch (Exception e) {
-            result = new StringBuffer("File not read");
+            result = new StringBuilder("File not read");
         }
 
         return result.toString();

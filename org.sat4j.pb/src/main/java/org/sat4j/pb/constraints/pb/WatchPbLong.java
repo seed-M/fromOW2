@@ -472,7 +472,7 @@ public abstract class WatchPbLong implements Propagatable, Constr, Undoable,
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {
@@ -676,7 +676,7 @@ public abstract class WatchPbLong implements Propagatable, Constr, Undoable,
     }
 
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {

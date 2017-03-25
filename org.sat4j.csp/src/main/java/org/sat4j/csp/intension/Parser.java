@@ -53,7 +53,7 @@ public class Parser {
 	}
 
 	private IExpression parseExpression() {
-		final StringBuffer exprBuf = new StringBuffer();
+		final StringBuilder exprBuf = new StringBuilder();
 		boolean expressionEnded = false;
 		while(!expressionEnded && (this.currentCharIndex < this.charArray.length)) {
 			final char current = this.charArray[this.currentCharIndex];

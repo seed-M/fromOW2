@@ -309,7 +309,7 @@ public class AtLeast implements Propagatable, Constr, Undoable, Serializable {
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append("Card (" + this.lits.length + ") : ");
         for (int lit : this.lits) {
             // if (voc.isUnassigned(lits[i])) {
@@ -413,7 +413,7 @@ public class AtLeast implements Propagatable, Constr, Undoable, Serializable {
     }
 
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int lit : this.lits) {
             stb.append(" + "); //$NON-NLS-1$
             stb.append(mapper.map(LiteralsUtils.toDimacs(lit)));

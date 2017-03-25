@@ -92,7 +92,7 @@ public class DimacsArrayReader implements Serializable {
     }
 
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer(4 * model.length);
+        StringBuilder stb = new StringBuilder(4 * model.length);
         for (int element : model) {
             stb.append(element);
             stb.append(" ");

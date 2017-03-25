@@ -79,7 +79,7 @@ public class OPBEclipseReader2007 extends OPBReader2007 {
     protected void readVariablesExplanation() throws IOException,
             ParseFormatException {
         char c;
-        StringBuffer var = new StringBuffer();
+        StringBuilder var = new StringBuilder();
 
         // read variables line (if any)
         // if the problem is unsatisfiable, and if these variables are part of

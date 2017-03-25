@@ -52,7 +52,7 @@ public class CountingCtrBuilder {
 
 	public boolean buildCtrSum(String id, XVarInteger[] list, int[] coeffs, Condition condition) {
 		String varId;
-		StringBuffer exprBuf = new StringBuffer();
+		StringBuilder exprBuf = new StringBuilder();
 		exprBuf.append(((ConditionRel)condition).operator.toString().toLowerCase());
 		exprBuf.append('(');
 		for(int i=0; i<list.length-1; ++i) {
@@ -91,7 +91,7 @@ public class CountingCtrBuilder {
 	}
 
 	private boolean buildCtrCount(String id, XVarInteger[] list, int[] values, StringCondition condition) {
-		StringBuffer inExprBuf = new StringBuffer();
+		StringBuilder inExprBuf = new StringBuilder();
 		inExprBuf.append("set(").append(Integer.toString(values[0]));
 		for(int i=1; i<values.length; ++i) {
 			inExprBuf.append(',');
@@ -114,7 +114,7 @@ public class CountingCtrBuilder {
 
 	private boolean buildCtrCount(String id, XVarInteger[] list, XVarInteger[] values, StringCondition condition) {
 		int listLength = list.length;
-		StringBuffer inExprBuf = new StringBuffer();
+		StringBuilder inExprBuf = new StringBuilder();
 		inExprBuf.append("set(").append(CtrBuilderUtils.normalizeCspVarName(values[0].id));
 		for(int i=1; i<values.length; ++i) {
 			inExprBuf.append(',');
@@ -174,7 +174,7 @@ public class CountingCtrBuilder {
 	}
 	
 	private boolean buildCtrNValuesExcept(String id, XVarInteger[] list, int[] except, StringCondition strCond) {
-		StringBuffer sbuf = new StringBuffer();
+		StringBuilder sbuf = new StringBuilder();
 		boolean firstAddMember = true;
 		sbuf.append("add(");
 		for(int i=0; i<list.length; ++i) {
@@ -228,7 +228,7 @@ public class CountingCtrBuilder {
 		if(!closed) return false;
 		for(int i=0; i<list.length; ++i) {
 			String normVar = CtrBuilderUtils.normalizeCspVarName(list[i].id);
-			StringBuffer exprBuff = new StringBuffer();
+			StringBuilder exprBuff = new StringBuilder();
 			exprBuff.append("or(eq(").append(normVar).append(',').append(values[0]).append(')');
 			for(int j=1; j<values.length; ++j) {
 				exprBuff.append(",eq(").append(normVar).append(',').append(values[j]).append(')');

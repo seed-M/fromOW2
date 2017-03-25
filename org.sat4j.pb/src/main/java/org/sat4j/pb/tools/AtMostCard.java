@@ -45,7 +45,7 @@ public class AtMostCard {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (IteratorInt it = this.lits.iterator(); it.hasNext();) {
             sb.append(it.next());
             sb.append(" + ");

@@ -124,7 +124,7 @@ public class EfficientScanner implements Serializable {
     }
 
     public BigInteger nextBigInteger() throws IOException, ParseFormatException {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         char currentChar = skipSpaces();
         if (currentChar == '-') {
             stb.append(currentChar);
@@ -149,7 +149,7 @@ public class EfficientScanner implements Serializable {
      *             never used in that method.
      */
     public String next() throws IOException, ParseFormatException {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         char currentChar = skipSpaces();
         while (currentChar != ' ' && currentChar != '\n') {
             stb.append(currentChar);
@@ -169,7 +169,7 @@ public class EfficientScanner implements Serializable {
     }
 
     public String nextLine() throws IOException {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         char car;
         do {
             car = (char) this.in.read();

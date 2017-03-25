@@ -63,7 +63,7 @@ public class AraliaParser {
 
 		@Override
 		public String toString() {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append(this.nodeType.getPrefix());
 			if (this.nodeType == LogicFormulaNodeType.TERM) {
 				sb.append(this.label);
@@ -177,7 +177,7 @@ public class AraliaParser {
 
 	private LogicFormulaNode readTerm(String s) {
 		LogicFormulaNode node = new LogicFormulaNode(LogicFormulaNodeType.TERM);
-		StringBuffer label = new StringBuffer();
+		StringBuilder label = new StringBuilder();
 		for (char c : s.toCharArray()) {
 			if ((c != '(') && (c != ')')) {
 				label.append(c);

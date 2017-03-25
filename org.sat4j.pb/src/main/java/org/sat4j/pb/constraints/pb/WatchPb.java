@@ -473,7 +473,7 @@ public abstract class WatchPb implements IWatchPb, Propagatable, Undoable,
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {
@@ -674,7 +674,7 @@ public abstract class WatchPb implements IWatchPb, Propagatable, Undoable,
         throw new UnsupportedOperationException("Not implemented yet");
     }
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             for (int i = 0; i < this.lits.length; i++) {

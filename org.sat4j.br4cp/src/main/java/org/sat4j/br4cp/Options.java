@@ -32,7 +32,7 @@ public class Options {
 	}
 
 	public void parseCommandLine(String args[]) {
-		StringBuffer errBuff = new StringBuffer();
+		StringBuilder errBuff = new StringBuilder();
 		for (String arg : args) {
 			if (arg.startsWith("-")) {
 				try {

@@ -73,7 +73,7 @@ public class CtrBuilderUtils {
 	}
 	
 	public static String chainExpressionsForAssociativeOp(String[] exprs, String op) {
-		StringBuffer exprBuf = new StringBuffer();
+		StringBuilder exprBuf = new StringBuilder();
 		exprBuf.append(op).append('(').append(exprs[0]);
 		for(int i=1; i<exprs.length; ++i) exprBuf.append(',').append(exprs[i]);
 		exprBuf.append(')');
@@ -81,7 +81,7 @@ public class CtrBuilderUtils {
 	}
 	
 	public static String chainExpressionsAssociative(String[] exprs, String op) {
-		StringBuffer exprBuff = new StringBuffer();
+		StringBuilder exprBuff = new StringBuilder();
 		exprBuff.append(exprs[0]);
 		for(int i=1; i<exprs.length; ++i) {
 			exprBuff.append(op);
@@ -121,13 +121,13 @@ public class CtrBuilderUtils {
 	}
 	
 	public static String syntaxTreeRootToString(final XNodeParent<XVarInteger> syntaxTreeRoot) {
-		final StringBuffer treeToString = new StringBuffer();
+		final StringBuilder treeToString = new StringBuilder();
 		fillSyntacticStrBuffer(syntaxTreeRoot, treeToString);
 		return treeToString.toString();
 	}
 
 	private static void fillSyntacticStrBuffer(final XNode<XVarInteger> child,
-			final StringBuffer treeToString) {
+			final StringBuilder treeToString) {
 		if(child instanceof XNodeLeaf<?>) {
 			treeToString.append(CtrBuilderUtils.normalizeCspVarName(child.toString()));
 			return;

@@ -76,7 +76,7 @@ public class SchedulingCtrBuilder {
 		// trivial case
 		if(stretchBeginIndex+widthMax >= list.length) return false;
 		// (l[i] == value && l[i]-1 != value) => (l[i+1] != value || ... || l[i+max] != value)
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("imp(");
 		// COND part
 		if(stretchBeginIndex > 0) {
@@ -105,7 +105,7 @@ public class SchedulingCtrBuilder {
 			return preventUnderLengthDueToBeginIndex(value, list, stretchBeginIndex);
 		}
 		// (l[i] == value && l[i]-1 != value) => (l[i+1] == value && ... && l[i+min-1] == value)
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("imp(");
 		// COND part
 		if(stretchBeginIndex > 0) {
@@ -127,7 +127,7 @@ public class SchedulingCtrBuilder {
 	}
 
 	private boolean preventUnderLengthDueToBeginIndex(int value, XVarInteger[] list, int stretchBeginIndex) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		if(stretchBeginIndex > 0) {
 			sb.append("or(");
 		}
@@ -153,7 +153,7 @@ public class SchedulingCtrBuilder {
 			String normVar1 = CtrBuilderUtils.normalizeCspVarName(list[i].id);
 			String normVar2 = CtrBuilderUtils.normalizeCspVarName(list[i+1].id);
 			String predExprCond = "ne("+normVar1+","+normVar2+")";
-			StringBuffer predExprImplBuf = new StringBuffer();
+			StringBuilder predExprImplBuf = new StringBuilder();
 			predExprImplBuf.append("or(");
 			predExprImplBuf.append("and(eq("+normVar1+","+Integer.toString(patterns[0][0])+"),eq("+normVar2+","+Integer.toString(patterns[0][1])+"))");
 			for(int j=1; j<patterns.length; ++j) {
@@ -170,7 +170,7 @@ public class SchedulingCtrBuilder {
 	public boolean buildCtrCumulative(String id, XVarInteger[] origins, int[] lengths, int[] heights, Condition condition) {
 		int maxT = computeMaxT(origins, lengths);
 		for(int t=0; t<maxT; ++t) {
-			StringBuffer exprBuff = new StringBuffer();
+			StringBuilder exprBuff = new StringBuilder();
 			exprBuff.append("add(");
 			builtCtrCumulativeHeightComp(origins, 0, lengths, t, heights, exprBuff);
 			for(int i=1; i<origins.length; ++i) {
@@ -185,14 +185,14 @@ public class SchedulingCtrBuilder {
 	}
 
 	private void builtCtrCumulativeHeightComp(XVarInteger[] origins, int originIndex, int[] lengths, int t,
-			int[] heights, StringBuffer exprBuff) {
+			int[] heights, StringBuilder exprBuff) {
 		exprBuff.append("ite(");
 		buildCtrCumulativeHeightCompCondition(origins, originIndex, lengths, t, exprBuff);
 		exprBuff.append(',').append(Integer.toString(heights[originIndex])).append(",0)");
 	}
 	
 	private void builtCtrCumulativeHeightComp(XVarInteger[] origins, int originIndex, int[] lengths, int t,
-			XVarInteger[] heights, StringBuffer exprBuff) {
+			XVarInteger[] heights, StringBuilder exprBuff) {
 		exprBuff.append("ite(");
 		buildCtrCumulativeHeightCompCondition(origins, originIndex, lengths, t, exprBuff);
 		exprBuff.append(',');
@@ -202,7 +202,7 @@ public class SchedulingCtrBuilder {
 	}
 	
 	private void builtCtrCumulativeHeightComp(XVarInteger[] origins, int originIndex, XVarInteger[] lengths, int t,
-			int[] heights, StringBuffer exprBuff) { // TODO: some refactoring needed here (pass all arguments as text to common method
+			int[] heights, StringBuilder exprBuff) { // TODO: some refactoring needed here (pass all arguments as text to common method
 		exprBuff.append("ite(");
 		buildCtrCumulativeHeightCompCondition(origins, originIndex, lengths, t, exprBuff);
 		exprBuff.append(',');
@@ -211,7 +211,7 @@ public class SchedulingCtrBuilder {
 	}
 	
 	private void builtCtrCumulativeHeightComp(XVarInteger[] origins, int originIndex, XVarInteger[] lengths, int t,
-			XVarInteger[] heights, StringBuffer exprBuff) {
+			XVarInteger[] heights, StringBuilder exprBuff) {
 		exprBuff.append("ite(");
 		buildCtrCumulativeHeightCompCondition(origins, originIndex, lengths, t, exprBuff);
 		exprBuff.append(',');
@@ -221,7 +221,7 @@ public class SchedulingCtrBuilder {
 	}
 
 	private void buildCtrCumulativeHeightCompCondition(XVarInteger[] origins, int originIndex, int[] lengths, int t,
-			StringBuffer exprBuff) {
+			StringBuilder exprBuff) {
 		// and(le(x,t),gt(add(x,l),t))
 		exprBuff.append("and(le(");
 		String normVar = CtrBuilderUtils.normalizeCspVarName(origins[originIndex].id);
@@ -229,7 +229,7 @@ public class SchedulingCtrBuilder {
 	}
 
 	private void buildCtrCumulativeHeightCompCondition(XVarInteger[] origins, int originIndex, XVarInteger[] lengths,
-			int t, StringBuffer exprBuff) {
+			int t, StringBuilder exprBuff) {
 		// and(le(x,t),gt(add(x,l),t))
 		exprBuff.append("and(le(");
 		String normVar = CtrBuilderUtils.normalizeCspVarName(origins[originIndex].id);
@@ -258,7 +258,7 @@ public class SchedulingCtrBuilder {
 	public boolean buildCtrCumulative(String id, XVarInteger[] origins, int[] lengths, XVarInteger[] heights, Condition condition) {
 		int maxT = computeMaxT(origins, lengths);
 		for(int t=0; t<maxT; ++t) {
-			StringBuffer exprBuff = new StringBuffer();
+			StringBuilder exprBuff = new StringBuilder();
 			exprBuff.append("add(");
 			builtCtrCumulativeHeightComp(origins, 0, lengths, t, heights, exprBuff);
 			for(int i=1; i<origins.length; ++i) {
@@ -275,7 +275,7 @@ public class SchedulingCtrBuilder {
 	public boolean buildCtrCumulative(String id, XVarInteger[] origins, XVarInteger[] lengths, int[] heights, Condition condition) {
 		int maxT = computeMaxT(origins, lengths);
 		for(int t=0; t<maxT; ++t) {
-			StringBuffer exprBuff = new StringBuffer();
+			StringBuilder exprBuff = new StringBuilder();
 			exprBuff.append("add(");
 			builtCtrCumulativeHeightComp(origins, 0, lengths, t, heights, exprBuff);
 			for(int i=1; i<origins.length; ++i) {
@@ -292,7 +292,7 @@ public class SchedulingCtrBuilder {
 	public boolean buildCtrCumulative(String id, XVarInteger[] origins, XVarInteger[] lengths, XVarInteger[] heights, Condition condition) {
 		int maxT = computeMaxT(origins, lengths);
 		for(int t=0; t<maxT; ++t) {
-			StringBuffer exprBuff = new StringBuffer();
+			StringBuilder exprBuff = new StringBuilder();
 			exprBuff.append("add(");
 			builtCtrCumulativeHeightComp(origins, 0, lengths, t, heights, exprBuff);
 			for(int i=1; i<origins.length; ++i) {
@@ -314,7 +314,7 @@ public class SchedulingCtrBuilder {
 
 	private boolean buildCtrCumulativeEnds(XVarInteger[] origins, int[] lengths, XVarInteger[] ends) {
 		for(int i=0; i<origins.length; ++i) {
-			StringBuffer sbuff = new StringBuffer();
+			StringBuilder sbuff = new StringBuilder();
 			sbuff.append("eq(add(");
 			String normVar = CtrBuilderUtils.normalizeCspVarName(origins[i].id);
 			sbuff.append(normVar).append(',').append(Integer.toString(lengths[i])).append("),");
@@ -328,7 +328,7 @@ public class SchedulingCtrBuilder {
 	
 	private boolean buildCtrCumulativeEnds(XVarInteger[] origins, XVarInteger[] lengths, XVarInteger[] ends) {
 		for(int i=0; i<origins.length; ++i) {
-			StringBuffer sbuff = new StringBuffer();
+			StringBuilder sbuff = new StringBuilder();
 			sbuff.append("eq(add(");
 			String normVar = CtrBuilderUtils.normalizeCspVarName(origins[i].id);
 			sbuff.append(normVar).append(',');
@@ -407,7 +407,7 @@ public class SchedulingCtrBuilder {
 
 	private String buildCtrNoOverlapStr(List<String> strOrigins1, List<String> strLengths1, List<String> strOrigins2,
 			List<String> strLengths2, boolean zeroIgn) {
-		StringBuffer sbuf = new StringBuffer();
+		StringBuilder sbuf = new StringBuilder();
 		sbuf.append("or(");
 		sbuf.append("le(add(").append(strOrigins1.get(0)).append(',').append(strLengths1.get(0)).append(')').append(',').append(strOrigins2.get(0)).append(')');
 		sbuf.append(",le(add(").append(strOrigins2.get(0)).append(',').append(strLengths2.get(0)).append(')').append(',').append(strOrigins1.get(0)).append(')');
@@ -424,7 +424,7 @@ public class SchedulingCtrBuilder {
 	}
 
 	private String zeroLengthCtr(List<String> strLengths) {
-		StringBuffer sbuf = new StringBuffer();
+		StringBuilder sbuf = new StringBuilder();
 		sbuf.append("and(eq(0,").append(strLengths.get(0)).append(')');
 		for(int i=1; i<strLengths.size(); ++i) sbuf.append(',').append("eq(0,").append(strLengths.get(0)).append(')');
 		sbuf.append(')');

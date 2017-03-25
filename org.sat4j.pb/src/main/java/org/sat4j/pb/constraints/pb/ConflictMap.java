@@ -831,7 +831,7 @@ public class ConflictMap extends MapPb implements IConflict {
     @Override
     public String toString() {
         int lit;
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < size(); i++) {
             lit = this.weightedLits.getLit(i);
             stb.append(this.weightedLits.getCoef(i));

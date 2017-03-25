@@ -99,7 +99,7 @@ public class OPBReader2007 extends OPBReader2006 {
     }
 
     @Override
-    protected void checkId(StringBuffer s) throws ParseFormatException {
+    protected void checkId(StringBuilder s) throws ParseFormatException {
         // Small check on the coefficient ID to make sure everything is ok
         int cpt = 1;
         if (s.charAt(0) == '~') {
@@ -122,7 +122,7 @@ public class OPBReader2007 extends OPBReader2006 {
     protected int nbNewSymbols;
 
     @Override
-    protected void readTerm(StringBuffer coeff, StringBuffer var)
+    protected void readTerm(StringBuilder coeff, StringBuilder var)
             throws IOException, ParseFormatException {
         readInteger(coeff);
 
@@ -130,7 +130,7 @@ public class OPBReader2007 extends OPBReader2006 {
 
         var.setLength(0);
         IVec<String> tmpLit = new Vec<String>();
-        StringBuffer tmpVar = new StringBuffer();
+        StringBuilder tmpVar = new StringBuilder();
         while (readIdentifier(tmpVar)) {
             tmpLit = tmpLit.push(tmpVar.toString());
             skipSpaces();
@@ -321,7 +321,7 @@ public class OPBReader2007 extends OPBReader2006 {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         int p;
         for (int element : model) {
             p = element;

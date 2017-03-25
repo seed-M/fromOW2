@@ -102,7 +102,7 @@ public class ObjBuilder {
 	}
 	
 	private String opExpr(final String op, final XVarInteger[] xlist, final int[] xcoeffs) {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append(op);
 		sb.append('(');
 		sb.append(chainObjVars(xlist, xcoeffs));
@@ -111,7 +111,7 @@ public class ObjBuilder {
 	}
 	
 	private String chainObjVars(final XVarInteger[] xlist, final int[] xcoeffs) {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		for(int i=0; i<xlist.length; ++i) {
 			if(i>0) sb.append(',');
 			if(xcoeffs[i] == 1) {
@@ -163,7 +163,7 @@ public class ObjBuilder {
 	}
 
 	private String nValuesExpr(final XVarInteger[] list, final int[] coeffs) {
-		final StringBuffer sbuf = new StringBuffer();
+		final StringBuilder sbuf = new StringBuilder();
 		boolean firstAddMember = true;
 		sbuf.append("add(");
 		for(int i=0; i<list.length; ++i) {

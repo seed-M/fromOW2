@@ -48,7 +48,7 @@ public class SDApplication extends JFrame implements MainProgramWindow {
     }
 
     public String readFile() {
-        StringBuffer result = new StringBuffer();
+    	StringBuilder result = new StringBuilder();
         int returnVal = inputFileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
@@ -61,7 +61,7 @@ public class SDApplication extends JFrame implements MainProgramWindow {
                     ch = is.read();
                 }
             } catch (Exception e) {
-                result = new StringBuffer("File not read");
+                result = new StringBuilder("File not read");
             }
         }
         return result.toString();

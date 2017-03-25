@@ -200,7 +200,7 @@ public class Br4cpAraliaReader {
 
 	private String removeSpaces(String line) {
 		char[] chars = line.toCharArray();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < chars.length; ++i) {
 			if (chars[i] != ' ') {
 				sb.append(chars[i]);

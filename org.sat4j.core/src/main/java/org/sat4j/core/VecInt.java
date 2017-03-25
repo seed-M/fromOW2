@@ -348,7 +348,7 @@ public final class VecInt implements IVecInt {
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < this.nbelem - 1; i++) {
             stb.append(this.myarray[i]);
             stb.append(","); //$NON-NLS-1$

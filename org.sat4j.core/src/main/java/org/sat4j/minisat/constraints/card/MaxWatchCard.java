@@ -374,7 +374,7 @@ public final class MaxWatchCard
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             if (this.voc.isUnassigned(this.lits[0])) {
@@ -509,7 +509,7 @@ public final class MaxWatchCard
     }
 
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         if (this.lits.length > 0) {
             if (this.voc.isUnassigned(this.lits[0])) {

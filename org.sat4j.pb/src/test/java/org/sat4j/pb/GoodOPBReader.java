@@ -201,7 +201,7 @@ public class GoodOPBReader extends Reader implements Serializable {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < model.length; i++) {
             if (model[i] < 0) {
                 stb.append("-");

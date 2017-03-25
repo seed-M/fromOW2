@@ -823,7 +823,7 @@ public class DependencyHelper<T, C> {
 
     public String getObjectiveFunction() {
         ObjectiveFunction obj = this.solver.getObjectiveFunction();
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < obj.getVars().size(); i++) {
             stb.append(obj.getCoeffs().get(i)
                     + (obj.getVars().get(i) > 0 ? " " : "~")

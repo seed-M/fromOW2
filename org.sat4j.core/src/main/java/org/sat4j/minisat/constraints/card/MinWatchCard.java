@@ -438,7 +438,7 @@ public class MinWatchCard
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         // stb.append("Card (" + this.lits.length + ") : ");
         if (this.lits.length > 0) {
             // if (voc.isUnassigned(lits[0])) {
@@ -734,7 +734,7 @@ public class MinWatchCard
         if (mapper == null) {
             return toString();
         }
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         // stb.append("Card (" + this.lits.length + ") : ");
         if (this.lits.length > 0) {
             // if (voc.isUnassigned(lits[0])) {

@@ -194,7 +194,7 @@ public abstract class HTClause implements Propagatable, Constr, Serializable {
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append(Lits.toString(this.head));
         stb.append("["); //$NON-NLS-1$
         stb.append(this.voc.valueToString(this.head));
@@ -351,7 +351,7 @@ public abstract class HTClause implements Propagatable, Constr, Serializable {
     }
 
     public String toString(VarMapper mapper) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append(mapper.map(LiteralsUtils.toDimacs(this.head)));
         stb.append("["); //$NON-NLS-1$
         stb.append(this.voc.valueToString(this.head));

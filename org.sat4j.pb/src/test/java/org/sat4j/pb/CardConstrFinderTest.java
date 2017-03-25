@@ -57,7 +57,7 @@ public class CardConstrFinderTest {
     private void assertRightDetection(int expectedRemainingConstrs) {
         ccFinder.searchCards();
         int nCards = this.expectedCards.size();
-        StringBuffer actual = new StringBuffer();
+        StringBuilder actual = new StringBuilder();
         actual.append('[');
         for (AtLeastCard card : ccFinder) {
             assertTrue(card + " is not valid here",

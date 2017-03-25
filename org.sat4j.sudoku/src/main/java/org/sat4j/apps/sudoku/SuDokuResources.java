@@ -54,7 +54,7 @@ public class SuDokuResources {
     }
 
     String checkForEscapes(String s) {
-        StringBuffer result = new StringBuffer();
+    	StringBuilder result = new StringBuilder();
         int i = 0;
         while (i < s.length()) {
             char ch = s.charAt(i);

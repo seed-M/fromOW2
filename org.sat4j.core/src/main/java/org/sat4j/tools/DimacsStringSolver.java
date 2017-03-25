@@ -57,7 +57,7 @@ public class DimacsStringSolver extends AbstractOutputSolver
      */
     private static final long serialVersionUID = 1L;
 
-    private StringBuffer out;
+    private StringBuilder out;
 
     private int firstCharPos;
 
@@ -70,11 +70,11 @@ public class DimacsStringSolver extends AbstractOutputSolver
     }
 
     public DimacsStringSolver(int initSize) {
-        this.out = new StringBuffer(initSize);
+        this.out = new StringBuilder(initSize);
         this.initBuilderSize = initSize;
     }
 
-    public StringBuffer getOut() {
+    public StringBuilder getOut() {
         return this.out;
     }
 
@@ -174,7 +174,7 @@ public class DimacsStringSolver extends AbstractOutputSolver
     public void reset() {
         this.fixedNbClauses = false;
         this.firstConstr = true;
-        this.out = new StringBuffer(this.initBuilderSize);
+        this.out = new StringBuilder(this.initBuilderSize);
         this.maxvarid = 0;
     }
 

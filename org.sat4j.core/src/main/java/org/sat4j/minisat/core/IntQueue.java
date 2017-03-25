@@ -102,7 +102,7 @@ public final class IntQueue implements Serializable {
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append(">"); //$NON-NLS-1$
         for (int i = this.first; i < this.size - 1; i++) {
             stb.append(this.myarray[i]);

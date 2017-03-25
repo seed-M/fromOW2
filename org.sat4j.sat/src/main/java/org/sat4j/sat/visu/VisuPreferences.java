@@ -299,7 +299,7 @@ public class VisuPreferences {
                     + " | wc -l\")!=0){";
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append("plot");
 
@@ -374,7 +374,7 @@ public class VisuPreferences {
             GnuplotDataFile[] dfArray2, GnuplotFunction[] functions,
             boolean slidingThisWindows, int nbLines) {
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append("plot ");
 

@@ -152,7 +152,7 @@ public class ObjectiveFunction implements Serializable {
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         IVecInt lits = getVars();
         IVec<BigInteger> coefs = getCoeffs();
         BigInteger coef;

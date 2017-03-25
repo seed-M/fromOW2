@@ -93,7 +93,7 @@ public class ConnectionCtrBuilder {
 	}
 	
 	private boolean buildCtrMinOrMax(XVarInteger[] list, Condition condition, boolean isMax) {
-		final StringBuffer leftOpBuf = new StringBuffer();
+		final StringBuilder leftOpBuf = new StringBuilder();
 		leftOpBuf.append(isMax ? "max(" : "min(");
 		String norm = CtrBuilderUtils.normalizeCspVarName(list[0].id);
 		leftOpBuf.append(norm);
@@ -143,7 +143,7 @@ public class ConnectionCtrBuilder {
 	
 	private boolean buildCtrMinOrMaxAtIndex(XVarInteger[] list, XVarInteger index, int startIndex, boolean isMax) {
 		String normIndex = CtrBuilderUtils.normalizeCspVarName(index.id);
-		StringBuffer maxExprBuf = new StringBuffer();
+		StringBuilder maxExprBuf = new StringBuilder();
 		maxExprBuf.append(isMax ? "max(" : "min(");
 		for(int i=0; i<list.length; ++i) {
 			String normVar = CtrBuilderUtils.normalizeCspVarName(list[i].id);
@@ -165,7 +165,7 @@ public class ConnectionCtrBuilder {
 			// index==i => and(x0<xi,...,x(i-1)<xi)
 			String normIndex = CtrBuilderUtils.normalizeCspVarName(index.id);
 			String normMax = CtrBuilderUtils.normalizeCspVarName(list[i-startIndex].id);
-			StringBuffer andExprBuf = new StringBuffer();
+			StringBuilder andExprBuf = new StringBuilder();
 			andExprBuf.append("and(");
 			for(int j=0; j<i-startIndex; ++j) {
 				String normCurVar = CtrBuilderUtils.normalizeCspVarName(list[j].id);
@@ -184,7 +184,7 @@ public class ConnectionCtrBuilder {
 			// index==i => and(x(i+1)<xi,...,xn<xi)
 			String normIndex = CtrBuilderUtils.normalizeCspVarName(index.id);
 			String normMax = CtrBuilderUtils.normalizeCspVarName(list[i-startIndex].id);
-			StringBuffer andExprBuf = new StringBuffer();
+			StringBuilder andExprBuf = new StringBuilder();
 			andExprBuf.append("and(");
 			for(int j=i-startIndex+1; j<list.length; ++j) {
 				String normCurVar = CtrBuilderUtils.normalizeCspVarName(list[j].id);
@@ -271,7 +271,7 @@ public class ConnectionCtrBuilder {
 			// or(ne(i,index),and(eq(i,index),eq(xi,value),ne(x0,value),...,ne(xi-1,value)))
 			String normIndex = CtrBuilderUtils.normalizeCspVarName(index.id);
 			String normValue = CtrBuilderUtils.normalizeCspVarName(value.id);
-			StringBuffer sbuf = new StringBuffer();
+			StringBuilder sbuf = new StringBuilder();
 			sbuf.append("or(ne(").append(i+startIndex).append(',').append(normIndex).append("),and(eq(").append(i+startIndex).append(',').append(normIndex).append("),eq(").append(CtrBuilderUtils.normalizeCspVarName(list[i].id)).append(',').append(normValue).append(')');
 			for(int j=0; j<i; ++j) {
 				sbuf.append(",ne(").append(CtrBuilderUtils.normalizeCspVarName(list[j].id)).append(',').append(normValue).append(')'); // end NE operator
@@ -287,7 +287,7 @@ public class ConnectionCtrBuilder {
 			// or(ne(i,index),and(eq(i,index),eq(xi,value),ne(xi+1,value),...,ne(xn,value)))
 			String normIndex = CtrBuilderUtils.normalizeCspVarName(index.id);
 			String normValue = CtrBuilderUtils.normalizeCspVarName(value.id);
-			StringBuffer sbuf = new StringBuffer();
+			StringBuilder sbuf = new StringBuilder();
 			sbuf.append("or(ne(").append(i+startIndex).append(',').append(normIndex).append("),and(eq(").append(i+startIndex).append(',').append(normIndex).append("),eq(").append(CtrBuilderUtils.normalizeCspVarName(list[i].id)).append(',').append(normValue).append(')'); // end EQ2 operator
 			for(int j=i+1; j<list.length; ++j) {
 				sbuf.append(",ne(").append(CtrBuilderUtils.normalizeCspVarName(list[j].id)).append(',').append(normValue).append(')');

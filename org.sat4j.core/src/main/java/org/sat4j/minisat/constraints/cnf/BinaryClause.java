@@ -151,7 +151,7 @@ public abstract class BinaryClause implements Propagatable, Constr,
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append(Lits.toString(this.head));
         stb.append("["); //$NON-NLS-1$
         stb.append(this.voc.valueToString(this.head));
@@ -283,7 +283,7 @@ public abstract class BinaryClause implements Propagatable, Constr,
         if (mapper == null) {
             return toString();
         }
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         stb.append(mapper.map(LiteralsUtils.toDimacs(this.head)));
         stb.append("["); //$NON-NLS-1$
         stb.append(this.voc.valueToString(this.head));

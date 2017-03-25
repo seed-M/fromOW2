@@ -309,7 +309,7 @@ public class OPBReader2005 extends Reader implements Serializable {
      * @throws IOException
      */
     public String readWord() throws IOException {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         char c;
 
         skipSpaces();
@@ -326,10 +326,10 @@ public class OPBReader2005 extends Reader implements Serializable {
      * read a integer from file
      * 
      * @param s
-     *            a StringBuffer to store the integer that was read
+     *            a StringBuilder to store the integer that was read
      * @throws IOException
      */
-    public void readInteger(StringBuffer s) throws IOException {
+    public void readInteger(StringBuilder s) throws IOException {
         char c;
 
         skipSpaces();
@@ -356,7 +356,7 @@ public class OPBReader2005 extends Reader implements Serializable {
      * @throws IOException
      * @throws ParseFormatException
      */
-    protected boolean readIdentifier(StringBuffer s)
+    protected boolean readIdentifier(StringBuilder s)
             throws IOException, ParseFormatException {
         char c;
 
@@ -403,7 +403,7 @@ public class OPBReader2005 extends Reader implements Serializable {
         return Character.isLetter(c) || Character.isDigit(c) || c == '_';
     }
 
-    protected void checkId(StringBuffer s) throws ParseFormatException {
+    protected void checkId(StringBuilder s) throws ParseFormatException {
         // Small check on the coefficient ID to make sure everything is ok
         int varID = Integer.parseInt(s.substring(1));
         if (varID > this.nbVars) {
@@ -511,7 +511,7 @@ public class OPBReader2005 extends Reader implements Serializable {
      * @throws IOException
      * @throws ParseException
      */
-    protected void readTerm(StringBuffer coeff, StringBuffer var)
+    protected void readTerm(StringBuilder coeff, StringBuilder var)
             throws IOException, ParseFormatException {
         char c;
 
@@ -578,8 +578,8 @@ public class OPBReader2005 extends Reader implements Serializable {
      */
     protected void readObjective() throws IOException, ParseFormatException {
         char c;
-        StringBuffer var = new StringBuffer();
-        StringBuffer coeff = new StringBuffer();
+        StringBuilder var = new StringBuilder();
+        StringBuilder coeff = new StringBuilder();
 
         // read objective line (if any)
 
@@ -635,8 +635,8 @@ public class OPBReader2005 extends Reader implements Serializable {
      */
     protected void readConstraint()
             throws IOException, ParseFormatException, ContradictionException {
-        StringBuffer var = new StringBuffer();
-        StringBuffer coeff = new StringBuffer();
+        StringBuilder var = new StringBuilder();
+        StringBuilder coeff = new StringBuilder();
         char c;
 
         beginConstraint();
@@ -773,7 +773,7 @@ public class OPBReader2005 extends Reader implements Serializable {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
 
         for (int i = 0; i < model.length; i++) {
             if (model[i] < 0) {

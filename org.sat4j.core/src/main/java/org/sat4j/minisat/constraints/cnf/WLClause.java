@@ -169,7 +169,7 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int lit : this.lits) {
             stb.append(Lits.toString(lit));
             stb.append("["); //$NON-NLS-1$
@@ -184,7 +184,7 @@ public abstract class WLClause implements Propagatable, Constr, Serializable {
         if (mapper == null) {
             return toString();
         }
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int lit : this.lits) {
             stb.append(mapper.map(LiteralsUtils.toDimacs(lit)));
             stb.append("["); //$NON-NLS-1$

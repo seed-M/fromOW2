@@ -259,7 +259,7 @@ public class CBClause implements Constr, Undoable, Propagatable, Serializable {
 
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < lits.length; i++) {
             stb.append(lits[i]);
             stb.append("["); //$NON-NLS-1$

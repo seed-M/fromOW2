@@ -263,7 +263,7 @@ public class DimacsReader extends Reader implements Serializable {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int element : model) {
             stb.append(element);
             stb.append(" ");

@@ -62,7 +62,7 @@ public class OPBReader2006 extends OPBReader2005 {
      * @throws ParseException
      */
     @Override
-    protected void readTerm(StringBuffer coeff, StringBuffer var)
+    protected void readTerm(StringBuilder coeff, StringBuilder var)
             throws IOException, ParseFormatException {
         readInteger(coeff);
 

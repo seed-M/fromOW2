@@ -254,7 +254,7 @@ public class LecteurDimacs extends Reader implements Serializable {
 
     private char manageCommentLine() throws IOException {
         char car;
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         do {
             car = (char) this.in.read();
             stb.append(car);
@@ -292,7 +292,7 @@ public class LecteurDimacs extends Reader implements Serializable {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int element : model) {
             stb.append(element);
             stb.append(" ");

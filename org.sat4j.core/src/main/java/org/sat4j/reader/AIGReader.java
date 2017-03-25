@@ -62,7 +62,7 @@ public class AIGReader extends Reader {
 
     @Override
     public String decode(int[] model) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (int i = 0; i < this.nbinputs; i++) {
             stb.append(model[i] > 0 ? 1 : 0);
         }

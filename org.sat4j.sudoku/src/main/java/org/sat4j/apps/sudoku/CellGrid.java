@@ -202,7 +202,7 @@ class CellGrid extends JPanel implements Printable {
     }
 
     public String exportString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String separator = System.getProperty("line.separator");
 
         for (int r = 0; r < sdSize.getLargeSide(); r++) {

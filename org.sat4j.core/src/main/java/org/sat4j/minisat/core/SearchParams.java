@@ -109,7 +109,7 @@ public class SearchParams implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         for (Field field : SearchParams.class.getDeclaredFields()) {
             if (!field.getName().startsWith("serial")
                     && !field.getName().startsWith("class")) {

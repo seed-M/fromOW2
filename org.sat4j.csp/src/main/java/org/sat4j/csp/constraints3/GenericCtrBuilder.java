@@ -167,7 +167,7 @@ public class GenericCtrBuilder {
 	}
 	
 	private boolean buildCtrSupports(XVarInteger[] list, int[][] tuples) {
-		StringBuffer sbuf = new StringBuffer();
+		StringBuilder sbuf = new StringBuilder();
 		sbuf.append("or(");
 		boolean firstTuple = true;
 		for(int[] tuple : tuples) {

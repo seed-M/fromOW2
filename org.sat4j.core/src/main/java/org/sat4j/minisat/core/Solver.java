@@ -2019,7 +2019,7 @@ public class Solver<D extends DataStructureFactory>
      * @see java.lang.Object#toString()
      */
     public String toString(String prefix) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         Object[] objs = { this.dsfactory, this.learner, this.params, this.order,
                 this.simplifier, this.restarter,
                 this.learnedConstraintsDeletionStrategy };

@@ -112,7 +112,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addPseudoBoolean(IVecInt lits, IVec<BigInteger> coeffs,
             boolean moreThan, BigInteger d) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert lits.size() == coeffs.size();
         this.nbOfConstraints++;
         if (moreThan) {
@@ -138,7 +138,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
     @Override
     public IConstr addAtLeast(IVecInt literals, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         for (IteratorInt iterator = literals.iterator(); iterator.hasNext();) {
             out.append(this.mapping.get(iterator.next()));
@@ -154,7 +154,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
     @Override
     public IConstr addAtMost(IVecInt literals, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         for (IteratorInt iterator = literals.iterator(); iterator.hasNext();) {
             out.append(this.mapping.get(iterator.next()));
@@ -169,7 +169,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     @Override
     public IConstr addClause(IVecInt literals) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         this.nbOfConstraints++;
         int lit;
         boolean beginning = true;
@@ -223,9 +223,9 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     @Override
     public String toString() {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         if (!this.inserted) {
-            StringBuffer tmp = new StringBuffer();
+            StringBuilder tmp = new StringBuilder();
             tmp.append("* #variable= ");
             tmp.append(nVars());
             tmp.append(" #constraint= ");
@@ -243,7 +243,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
     }
 
     private Object decode(ObjectiveFunction obj2) {
-        StringBuffer stb = new StringBuffer();
+        StringBuilder stb = new StringBuilder();
         IVecInt vars = obj2.getVars();
         IVec<BigInteger> coeffs = obj2.getCoeffs();
         int lit;
@@ -270,7 +270,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     @Override
     public int newVar(int howmany) {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         setNbVars(howmany);
         // to add later the number of constraints
         this.indxConstrObj = out.length();
@@ -288,7 +288,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addAtMost(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -301,7 +301,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger degree) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -314,7 +314,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -327,7 +327,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger degree) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -340,7 +340,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
             throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {
@@ -353,7 +353,7 @@ public class UserFriendlyPBStringSolver<T> extends DimacsStringSolver implements
 
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs,
             BigInteger weight) throws ContradictionException {
-        StringBuffer out = getOut();
+        StringBuilder out = getOut();
         assert literals.size() == coeffs.size();
         this.nbOfConstraints++;
         for (int i = 0; i < literals.size(); i++) {

@@ -82,7 +82,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
 
     protected transient PrintWriter out = new PrintWriter(System.out, true);
 
-    private StringBuffer logBuffer;
+    private StringBuilder logBuffer;
 
     private boolean displaySolutionLine = true;
 
@@ -429,7 +429,7 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
     }
 
     protected void bufferizeLog() {
-        this.logBuffer = new StringBuffer();
+        this.logBuffer = new StringBuilder();
     }
 
     protected void flushLog() {

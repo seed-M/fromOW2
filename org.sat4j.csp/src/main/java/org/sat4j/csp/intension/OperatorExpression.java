@@ -110,7 +110,7 @@ public class OperatorExpression implements IExpression {
 
 	@Override
 	public String toString() {
-		final StringBuffer sbuf = new StringBuffer();
+		final StringBuilder sbuf = new StringBuilder();
 		sbuf.append(this.op.nameAsString()).append('(');
 		if(operands.length > 0) sbuf.append(operands[0].toString());
 		for(int i=1; i<this.operands.length; ++i) sbuf.append(',').append(operands[i].toString());

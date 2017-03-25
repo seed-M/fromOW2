@@ -49,7 +49,7 @@ public class ElementaryCtrBuilder {
 
 	public boolean buildCtrClause(String id, XVarInteger[] pos, XVarInteger[] neg) {
 		int nPos = pos.length;
-		StringBuffer expressionBuffer = new StringBuffer();
+		StringBuilder expressionBuffer = new StringBuilder();
 		boolean first = true;
 		expressionBuffer.append("or(");
 		for(int i=0; i<nPos; ++i) {

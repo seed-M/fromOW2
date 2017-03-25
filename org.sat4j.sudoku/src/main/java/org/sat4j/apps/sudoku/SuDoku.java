@@ -550,7 +550,7 @@ public class SuDoku {
         boolean showModel = false;
         System.gc();
         fullCNF = true;
-        StringBuffer model = new StringBuffer("s SATISFIABLE\n");
+        StringBuilder model = new StringBuilder("s SATISFIABLE\n");
         clauses = 0;
 
         solver = SolverFactory.newDefault();
@@ -641,7 +641,7 @@ public class SuDoku {
             throws Exception {
         System.gc();
         fullCNF = true;
-        StringBuffer model = new StringBuffer("s SATISFIABLE\n");
+        StringBuilder model = new StringBuilder("s SATISFIABLE\n");
         clauses = 0;
 
         solver = SolverFactory.newDefault();
@@ -972,14 +972,14 @@ public class SuDoku {
     }
 
     static class StringClauseHandler implements ClauseHandler {
-        StringBuffer buffer;
+    	StringBuilder buffer;
 
         String string;
 
         int clauses, variables;
 
         StringClauseHandler(int variables) {
-            buffer = new StringBuffer();
+            buffer = new StringBuilder();
             this.variables = variables;
             clauses = 0;
         }

@@ -1758,7 +1758,7 @@ public class DetailedCommandPanel extends JPanel implements SolverController,
                             j = 0;
                         }
                         if (j > 80) {
-                            res = new StringBuffer(res).insert(i, '\n')
+                            res = new StringBuilder(res).insert(i, '\n')
                                     .toString();
                             j = 0;
                         }
