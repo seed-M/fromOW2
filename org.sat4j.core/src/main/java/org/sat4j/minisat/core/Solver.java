@@ -643,10 +643,10 @@ public class Solver<D extends DataStructureFactory>
         Constr c = this.dsfactory.createUnregisteredClause(outLearnt);
         // slistener.learn(c);
         this.learnedConstraintsDeletionStrategy.onClauseLearning(c);
-        results.reason = c;
+        results.setReason(c);
 
         assert outBtlevel > -1;
-        results.backtrackLevel = outBtlevel;
+        results.setBacktrackLevel(outBtlevel);
     }
 
     /**
@@ -1317,8 +1317,8 @@ public class Solver<D extends DataStructureFactory>
                 } catch (TimeoutException e) {
                     return Lbool.UNDEFINED;
                 }
-                assert this.analysisResult.backtrackLevel < decisionLevel();
-                backjumpLevel = Math.max(this.analysisResult.backtrackLevel,
+                assert this.analysisResult.getBacktrackLevel() < decisionLevel();
+                backjumpLevel = Math.max(this.analysisResult.getBacktrackLevel(),
                         this.rootLevel);
                 this.slistener.backjump(backjumpLevel);
                 cancelUntil(backjumpLevel);
@@ -1326,14 +1326,14 @@ public class Solver<D extends DataStructureFactory>
                     this.restarter.onBackjumpToRootLevel();
                 }
                 assert decisionLevel() >= this.rootLevel
-                        && decisionLevel() >= this.analysisResult.backtrackLevel;
-                if (this.analysisResult.reason == null) {
+                        && decisionLevel() >= this.analysisResult.getBacktrackLevel();
+                if (this.analysisResult.getReason() == null) {
                     return Lbool.FALSE;
                 }
-                record(this.analysisResult.reason);
-                this.restarter.newLearnedClause(this.analysisResult.reason,
+                record(this.analysisResult.getReason());
+                this.restarter.newLearnedClause(this.analysisResult.getReason(),
                         conflictTrailLevel);
-                this.analysisResult.reason = null;
+                this.analysisResult.setReason(null);
                 decayActivities();
             }
         } while (this.undertimeout);

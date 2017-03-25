@@ -43,6 +43,22 @@ public final class Pair implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public int backtrackLevel;
-    public Constr reason;
+    private int backtrackLevel;
+    private Constr reason;
+
+    public int getBacktrackLevel() {
+        return backtrackLevel;
+    }
+
+    public void setBacktrackLevel(int backtrackLevel) {
+        this.backtrackLevel = backtrackLevel;
+    }
+
+    public Constr getReason() {
+        return reason;
+    }
+
+    public void setReason(Constr reason) {
+        this.reason = reason;
+    }
 }

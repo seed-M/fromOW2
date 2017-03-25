@@ -215,24 +215,24 @@ public class InprocCardConstrLearningSolver extends PBSolverCP {
         if (confl.size() == 0
                 || (decisionLevel() == 0 || this.trail.size() == 0)
                 && confl.slackConflict().signum() < 0) {
-            results.reason = null;
-            results.backtrackLevel = -1;
+            results.setReason(null);
+            results.setBacktrackLevel(-1);
             return;
         }
 
         // assertive PB-constraint is build and referenced
         PBConstr resConstr = (PBConstr) this.dsfactory
                 .createUnregisteredPseudoBooleanConstraint(confl);
-        results.reason = resConstr;
+        results.setReason(resConstr);
 
         // the conflict give the highest decision level for the backtrack
         // (which is less than current level)
         // assert confl.isAssertive(currentLevel);
         if (decisionLevel() == 0 || this.trail.size() == 0) {
-            results.backtrackLevel = -1;
-            results.reason = null;
+            results.setBacktrackLevel(-1);
+            results.setReason(null);
         } else {
-            results.backtrackLevel = confl.getBacktrackLevel(currentLevel);
+            results.setBacktrackLevel(confl.getBacktrackLevel(currentLevel));
         }
     }
 
