@@ -419,7 +419,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	 */
 	@Override
 	public void buildCtrAllDifferent(String id, XVarInteger[] list) {
-		this.contradictionFound |= this.comparisonCtrBuilder.buildCtrAllDifferent(id, list);
+		this.contradictionFound |= this.comparisonCtrBuilder.buildCtrAllDifferent(list);
 	}
 
 	/**
