@@ -35,6 +35,8 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.specs.IConstr;
@@ -46,8 +48,8 @@ import org.sat4j.specs.VarMapper;
 
 /**
  * Class allowing to express the search as a tree in the dot language. The
- * resulting file can be viewed in a tool like <a
- * href="http://www.graphviz.org/">Graphviz</a>
+ * resulting file can be viewed in a tool like
+ * <a href="http://www.graphviz.org/">Graphviz</a>
  * 
  * To use only on small benchmarks.
  * 
@@ -78,7 +80,8 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService>
     /**
      * @since 2.1
      */
-    public DotSearchTracing(final String fileNameToSave, Map<Integer, T> mapping) {
+    public DotSearchTracing(final String fileNameToSave,
+            Map<Integer, T> mapping) {
         this.pile = new Vec<String>();
         this.mapping = mapping;
         try {
@@ -158,9 +161,9 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService>
                     + newName + "\"" + "[label=" + "\" " + map(p)
                     + "\", fontcolor = gray, color = gray, style = bold]"));
             String reasonName = newName + ".reason";
-            saveLine(lineTab("\"" + reasonName + "\" [label=\""
-                    + reason.toString(this)
-                    + "\", shape=box, color=\"gray\", style=dotted]"));
+            saveLine(lineTab(
+                    "\"" + reasonName + "\" [label=\"" + reason.toString(this)
+                            + "\", shape=box, color=\"gray\", style=dotted]"));
             saveLine("\"" + reasonName + "\"" + "--" + "\""
                     + this.currentNodeName + "\""
                     + "[label=\"\", color=gray, style=dotted]");
@@ -188,8 +191,7 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService>
     @Override
     public final void learn(final IConstr constr) {
         String learned = this.currentNodeName + "_learned";
-        saveLine(lineTab("\"" + learned + "\" [label=\""
-                + constr.toString(this)
+        saveLine(lineTab("\"" + learned + "\" [label=\"" + constr.toString(this)
                 + "\", shape=box, color=\"orange\", style=dotted]"));
         saveLine("\"" + learned + "\"" + "--" + "\"" + this.currentNodeName
                 + "\"" + "[label=\"\", color=orange, style=dotted]");
@@ -252,12 +254,13 @@ public class DotSearchTracing<T> extends SearchListenerAdapter<ISolverService>
                 this.out.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Something went wrong when saving dot file", e);
         }
     }
 
-    private void readObject(ObjectInputStream stream) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
         // if the solver is serialized, out is linked to stdout
         stream.defaultReadObject();
         this.out = new PrintWriter(System.out);

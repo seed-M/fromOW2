@@ -32,6 +32,8 @@ package org.sat4j.tools;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.core.VecInt;
@@ -46,19 +48,12 @@ public class CheckMUSSolutionListener implements SolutionFoundListener {
 
     private String explain;
 
-    // public CheckThatItIsAMUS(List<IVecInt> clauses) {
-    // this.clauses = clauses;
-    // }
     private final ASolverFactory<? extends ISolver> factory;
 
     public CheckMUSSolutionListener(ASolverFactory<? extends ISolver> factory) {
         this.clauses = new ArrayList<IVecInt>();
         this.factory = factory;
     }
-
-    // public void setOriginalClauses(List<IVecInt> clauses) {
-    // this.clauses = clauses;
-    // }
 
     public void addOriginalClause(IVecInt clause) {
         IVecInt newClause = new VecInt(clause.size());
@@ -94,9 +89,12 @@ public class CheckMUSSolutionListener implements SolutionFoundListener {
             }
 
         } catch (ContradictionException e) {
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Trivial inconsistency", e);
             result = true;
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Timeout when checking unsatisfiability", e);
         }
 
         try {
@@ -116,9 +114,12 @@ public class CheckMUSSolutionListener implements SolutionFoundListener {
                 }
             }
         } catch (ContradictionException e) {
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Trivial inconsistency", e);
             result = false;
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Timeout when checking satisfiability", e);
         }
 
         return result;

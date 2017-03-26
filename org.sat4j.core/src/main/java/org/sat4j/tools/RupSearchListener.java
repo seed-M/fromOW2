@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.logging.Logger;
 
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.specs.IConstr;
@@ -49,8 +50,8 @@ import org.sat4j.specs.SearchListenerAdapter;
  *            a solver service
  * @since 2.3.4
  */
-public class RupSearchListener<S extends ISolverService> extends
-        SearchListenerAdapter<S> {
+public class RupSearchListener<S extends ISolverService>
+        extends SearchListenerAdapter<S> {
 
     /**
      * 
@@ -80,7 +81,10 @@ public class RupSearchListener<S extends ISolverService> extends
             out.close();
         } else {
             out.close();
-            file.delete();
+            if (!file.delete()) {
+                Logger.getLogger("org.sat4j.core")
+                        .info("Cannot delete file " + file.getName());
+            }
         }
     }
 

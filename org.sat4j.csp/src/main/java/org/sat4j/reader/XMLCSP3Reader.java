@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -288,10 +290,12 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		} catch(ParseFormatException | ContradictionException | IOException e) {
 			throw e;
 		} catch(RuntimeException e) {
-			e.printStackTrace();
+			Logger.getLogger("org.sat4j.csp").log(Level.INFO,
+                    "Runtime exception", e);
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger("org.sat4j.csp").log(Level.INFO,
+                    "Exception", e);
 		}
 		if(this.contradictionFound) {
 			throw new ContradictionException();

@@ -31,6 +31,8 @@ package org.sat4j.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.core.VecInt;
@@ -189,7 +191,8 @@ public class AllMUSes {
                 }
             }
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Timeout when computing all muses", e);
         }
         if (css.isVerbose()) {
             System.out.println(css.getLogPrefix() + "... done.");
@@ -281,12 +284,15 @@ public class AllMUSes {
                 try {
                     css.addBlockingClause(blockingClause);
                 } catch (ContradictionException e) {
+                    Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                            "Trivial inconsistency", e);
                     break;
                 }
             }
 
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Timeout during the first stage", e);
         }
         if (css.isVerbose()) {
             System.out.println(css.getLogPrefix() + "... done.");

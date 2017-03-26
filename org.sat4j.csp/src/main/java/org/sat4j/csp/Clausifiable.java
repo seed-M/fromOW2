@@ -22,6 +22,7 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
 
+@FunctionalInterface
 public interface Clausifiable {
 
 	void toClause(ISolver solver, IVec<Var> scope, IVec<Evaluable> vars)

@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -78,7 +80,8 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
         }
     }
 
-    public OrderedObjsOWAOptimizer(IIntegerPBSolver solver, BigInteger[] weights) {
+    public OrderedObjsOWAOptimizer(IIntegerPBSolver solver,
+            BigInteger[] weights) {
         super(solver);
         this.weights = weights;
     }
@@ -115,8 +118,8 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
         IVec<BigInteger> sumObjCoeffs = new Vec<BigInteger>();
         IVec<BigInteger> lexObjCoeffs = new Vec<BigInteger>();
         BigInteger lexFactor = BigInteger.ONE;
-        for (Iterator<IntegerVariable> intVarIt = objBoundVariables.iterator(); intVarIt
-                .hasNext();) {
+        for (Iterator<IntegerVariable> intVarIt = objBoundVariables
+                .iterator(); intVarIt.hasNext();) {
             BigInteger sumFactor = BigInteger.ONE;
             IntegerVariable nextBoundVar = intVarIt.next();
             for (IteratorInt nextBoundVarLitsIt = nextBoundVar.getVars()
@@ -132,8 +135,8 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
         this.lexObj = new ObjectiveFunction(auxObjsVars, lexObjCoeffs);
     }
 
-    private void addBoundConstraint(int boundVarIndex,
-            IntegerVariable boundVar, int objIndex) {
+    private void addBoundConstraint(int boundVarIndex, IntegerVariable boundVar,
+            int objIndex) {
         IVecInt literals = new VecInt();
         IVec<BigInteger> coeffs = new Vec<BigInteger>();
         super.objs.get(objIndex).getVars().copyTo(literals);
@@ -176,8 +179,8 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
     private BigInteger maxObjValue(ObjectiveFunction obj) {
         IVec<BigInteger> objCoeffs = obj.getCoeffs();
         BigInteger coeffsSum = BigInteger.ZERO;
-        for (Iterator<BigInteger> objCoeffsIt = objCoeffs.iterator(); objCoeffsIt
-                .hasNext();) {
+        for (Iterator<BigInteger> objCoeffsIt = objCoeffs
+                .iterator(); objCoeffsIt.hasNext();) {
             coeffsSum = coeffsSum.add(objCoeffsIt.next());
         }
         return coeffsSum;
@@ -188,8 +191,8 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
         super.objectiveValue = BigInteger.ZERO;
         BigInteger[] objValues = getObjectiveValues();
         for (int i = 0; i < objValues.length; ++i) {
-            super.objectiveValue = super.objectiveValue.add(objValues[i]
-                    .multiply(this.weights[i]));
+            super.objectiveValue = super.objectiveValue
+                    .add(objValues[i].multiply(this.weights[i]));
         }
         return super.objectiveValue;
     }
@@ -205,8 +208,6 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
         super.discardCurrentSolution();
         this.lexCstr = integerSolver.addAtMost(objBoundVariables.get(0),
                 objectiveValue.divide(weights[weights.length - 1]).intValue());
-        // this.lexCstr = decorated().addAtMost(this.lexObj.getVars(),
-        // this.lexObj.getCoeffs(), maxLexBound());
         this.sumCstr = decorated().addAtMost(this.sumObj.getVars(),
                 this.sumObj.getCoeffs(), maxSumBound());
     }
@@ -222,11 +223,12 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
     }
 
     private BigInteger maxLexBound() {
-        BigInteger maxObjValue = super.objectiveValue.divide(
-                BigInteger.valueOf(super.objs.size())).add(BigInteger.ONE);
-        return maxObjValue.multiply(BigInteger.valueOf(
-                1 << objBoundVariables.get(0).getVars().size()).multiply(
-                BigInteger.valueOf(super.objs.size() - 1)));
+        BigInteger maxObjValue = super.objectiveValue
+                .divide(BigInteger.valueOf(super.objs.size()))
+                .add(BigInteger.ONE);
+        return maxObjValue.multiply(BigInteger
+                .valueOf(1 << objBoundVariables.get(0).getVars().size())
+                .multiply(BigInteger.valueOf(super.objs.size() - 1)));
     }
 
     @Override
@@ -241,11 +243,11 @@ public class OrderedObjsOWAOptimizer extends AbstractLinMultiObjOptimizer {
                     new ObjectiveFunction(new VecInt(), new Vec<BigInteger>()));
             for (int i = 0; i < objBoundVariables.size(); ++i) {
                 this.integerSolver.addIntegerVariableToObjectiveFunction(
-                        objBoundVariables.get(i), weights[weights.length - i
-                                - 1]);
+                        objBoundVariables.get(i),
+                        weights[weights.length - i - 1]);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.pb").log(Level.INFO, "Exception", e);
             throw new RuntimeException(e);
         }
     }
