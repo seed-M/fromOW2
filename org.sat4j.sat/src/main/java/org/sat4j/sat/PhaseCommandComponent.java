@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -95,11 +97,11 @@ public class PhaseCommandComponent extends CommandComponent {
             this.solverController.setPhaseSelectionStrategy(phase);
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
         }
 
     }

@@ -3,6 +3,8 @@ package org.sat4j.pb.tools;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.pb.IPBSolver;
 import org.sat4j.pb.OPBStringSolver;
@@ -19,6 +21,8 @@ import org.sat4j.specs.ContradictionException;
  *
  */
 public class DimacsToOpb {
+
+    private static final Logger LOGGER = Logger.getLogger("org.sat4j.pb");
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -37,14 +41,11 @@ public class DimacsToOpb {
             out.close();
 
         } catch (ParseFormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.log(Level.INFO, "Input format error", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.log(Level.INFO, "Input error", e);
         } catch (ContradictionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.log(Level.INFO, "Formula is UNSAT", e);
         }
 
     }

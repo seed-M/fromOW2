@@ -86,6 +86,7 @@ Sat4j is a full featured boolean reasoning library designed to bring state-of-th
 		<sat4j.custom.version>${project.version}.v${maven.build.timestamp}</sat4j.custom.version>
 		<next.eclipse.release.date>June, 2010</next.eclipse.release.date>
 		<bundle-manifest>${project.build.directory}/META-INF/MANIFEST.MF</bundle-manifest>
+		<sonar.java.source>${javaSource}</sonar.java.source>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>

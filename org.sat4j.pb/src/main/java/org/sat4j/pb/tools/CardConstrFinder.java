@@ -16,6 +16,8 @@ import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.pb.IPBSolver;
@@ -27,15 +29,12 @@ import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.SearchListenerAdapter;
 import org.sat4j.specs.TimeoutException;
 
-public class CardConstrFinder implements Iterator<AtLeastCard>,
-        Iterable<AtLeastCard> {
+public class CardConstrFinder
+        implements Iterator<AtLeastCard>, Iterable<AtLeastCard> {
 
     private final IPBSolver coSolver;
 
     private BitSet propagated = null;
-
-    // private final Map<BitSet, BitSet> implied = new HashMap<BitSet,
-    // BitSet>();
 
     private final SearchListener<ISolverService> oldListener;
 
@@ -91,13 +90,12 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
         if (verbose)
             System.out.println("c executing riss subprocess");
         try {
-            Process p = Runtime
-                    .getRuntime()
+            Process p = Runtime.getRuntime()
                     .exec(rissLocation
                             + " -findCard -card_print -no-card_amt -no-card_amo -no-card_sub -no-card_twoProd -no-card_merge -card_noLim "
                             + instance);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    p.getErrorStream()));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(p.getErrorStream()));
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("c "))
@@ -120,18 +118,20 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
             reader.close();
             status = p.waitFor();
             if (verbose)
-                System.out.println("c riss process exited with status "
-                        + status);
+                System.out
+                        .println("c riss process exited with status " + status);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.pb").log(Level.INFO,
+                    "Issue when riss subprocess", e);
         }
         for (Iterator<AtLeastCard> cardIt = this.atLeastCards.iterator(); cardIt
                 .hasNext();) {
             AtLeastCard card = cardIt.next();
             BitSet atLeastLits = new BitSet(card.getLits().size());
-            for (IteratorInt litIt = card.getLits().iterator(); litIt.hasNext();)
-                atLeastLits.set(litIt.next()
-                        + this.coSolver.realNumberOfVariables());
+            for (IteratorInt litIt = card.getLits().iterator(); litIt
+                    .hasNext();)
+                atLeastLits.set(
+                        litIt.next() + this.coSolver.realNumberOfVariables());
             if (cardIsSubsumed(atLeastLits, card.getDegree())) {
                 cardIt.remove();
             }
@@ -155,8 +155,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
             BitSet atLeastLits = new BitSet(atLeastCard.getLits().size());
             for (IteratorInt itLits = atLeastCard.getLits().iterator(); itLits
                     .hasNext();) {
-                atLeastLits.set(itLits.next()
-                        + this.coSolver.realNumberOfVariables());
+                atLeastLits.set(
+                        itLits.next() + this.coSolver.realNumberOfVariables());
             }
             if (!cardIsSubsumed(atLeastLits, atLeastCard.getDegree())) {
                 BitSet cardFound = searchCardFromAtLeastCard(atLeastLits,
@@ -197,7 +197,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
         return atMostLits;
     }
 
-    private BitSet searchCardFromAtLeastCard(BitSet atLeastLits, int threshold) {
+    private BitSet searchCardFromAtLeastCard(BitSet atLeastLits,
+            int threshold) {
         BitSet atMostLits = new BitSet(atLeastLits.cardinality());
         int from = 0;
         int cur;
@@ -215,15 +216,15 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
             return null;
         storeAtLeastCard(atLeastLits, atLeastLits.cardinality() - atMostDegree);
         if (this.printCards)
-            System.out.println("c newConstr: "
-                    + new AtMostCard(atMostLits, atMostDegree, -this.coSolver
-                            .realNumberOfVariables()));
+            System.out.println("c newConstr: " + new AtMostCard(atMostLits,
+                    atMostDegree, -this.coSolver.realNumberOfVariables()));
         return atMostLits;
     }
 
     private boolean cardIsSubsumed(BitSet atLeastLits, int threshold) {
-        List<BitSet> storedCards = this.atLeastCardCache.get(atLeastLits
-                .nextSetBit(0) - this.coSolver.realNumberOfVariables());
+        List<BitSet> storedCards = this.atLeastCardCache
+                .get(atLeastLits.nextSetBit(0)
+                        - this.coSolver.realNumberOfVariables());
         if (storedCards == null) {
             return false;
         }
@@ -236,8 +237,9 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
                 // L>=d dominates L'>=d' iff |L\L'| <= d-d'
                 BitSet intersection = ((BitSet) storedCard.clone());
                 intersection.andNot(atLeastLits);
-                if (intersection.cardinality() <= this.atLeastCardDegree
-                        .get(storedCard) - threshold) {
+                if (intersection
+                        .cardinality() <= this.atLeastCardDegree.get(storedCard)
+                                - threshold) {
                     return true;
                 }
             }
@@ -249,8 +251,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
         int from = 0;
         int cur;
         while ((cur = atLeastLits.nextSetBit(from)) != -1) {
-            List<BitSet> cardsList = this.atLeastCardCache.get(cur
-                    - this.coSolver.realNumberOfVariables());
+            List<BitSet> cardsList = this.atLeastCardCache
+                    .get(cur - this.coSolver.realNumberOfVariables());
             if (cardsList == null) {
                 cardsList = new LinkedList<BitSet>();
                 this.atLeastCardCache.put(
@@ -297,7 +299,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
             int newLitInCard, BitSet candidates) {
         if (degree == 1) {
             BitSet newLit = new BitSet(1);
-            newLit.set(2 * this.coSolver.realNumberOfVariables() - newLitInCard);
+            newLit.set(
+                    2 * this.coSolver.realNumberOfVariables() - newLitInCard);
             BitSet implied = impliedBy(newLit);
             candidates.and(implied);
         } else {
@@ -316,7 +319,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
 
     private BitSet computeInitialCandidates(BitSet atMostLits, int degree) {
         BitSet candidates = null;
-        CombinationIterator combIt = new CombinationIterator(degree, atMostLits);
+        CombinationIterator combIt = new CombinationIterator(degree,
+                atMostLits);
         while (combIt.hasNext()) {
             BitSet nextBitSet = combIt.nextBitSet();
             BitSet implied = impliedBy(nextBitSet);
@@ -342,8 +346,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
         BitSet cached = this.implied.get(lits);
         if (cached != null)
             return cached;
-        IVecInt litVec = new VecInt(this.zeroProps.cardinality()
-                + lits.cardinality());
+        IVecInt litVec = new VecInt(
+                this.zeroProps.cardinality() + lits.cardinality());
         int from = 0;
         int cur;
         while ((cur = lits.nextSetBit(from)) != -1) {
@@ -374,8 +378,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
             this.authorizedExtLits.add(it.next());
     }
 
-    private class CardConstrFinderListener extends
-            SearchListenerAdapter<IPBSolverService> {
+    private class CardConstrFinderListener
+            extends SearchListenerAdapter<IPBSolverService> {
 
         private static final long serialVersionUID = 1L;
         private final CardConstrFinder ccf;
@@ -416,8 +420,8 @@ public class CardConstrFinder implements Iterator<AtLeastCard>,
         cardIt.remove();
     }
 
-    private static class AtLeastCardDegreeComparator implements
-            Comparator<AtLeastCard>, Serializable {
+    private static class AtLeastCardDegreeComparator
+            implements Comparator<AtLeastCard>, Serializable {
 
         /**
          * 

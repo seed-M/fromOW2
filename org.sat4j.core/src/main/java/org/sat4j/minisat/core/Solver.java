@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.ConstrGroup;
 import org.sat4j.core.LiteralsUtils;
@@ -641,7 +643,6 @@ public class Solver<D extends DataStructureFactory>
         this.simplifier.simplify(outLearnt);
 
         Constr c = this.dsfactory.createUnregisteredClause(outLearnt);
-        // slistener.learn(c);
         this.learnedConstraintsDeletionStrategy.onClauseLearning(c);
         results.setReason(c);
 
@@ -817,7 +818,9 @@ public class Solver<D extends DataStructureFactory>
             f = Solver.class.getDeclaredField(simp.toString());
             this.simplifier = (ISimplifier) f.get(this);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.core").log(Level.INFO,
+                    "Issue when assigning simplifier: disabling simplification",
+                    e);
             this.simplifier = NO_SIMPLIFICATION;
         }
     }
@@ -1317,8 +1320,10 @@ public class Solver<D extends DataStructureFactory>
                 } catch (TimeoutException e) {
                     return Lbool.UNDEFINED;
                 }
-                assert this.analysisResult.getBacktrackLevel() < decisionLevel();
-                backjumpLevel = Math.max(this.analysisResult.getBacktrackLevel(),
+                assert this.analysisResult
+                        .getBacktrackLevel() < decisionLevel();
+                backjumpLevel = Math.max(
+                        this.analysisResult.getBacktrackLevel(),
                         this.rootLevel);
                 this.slistener.backjump(backjumpLevel);
                 cancelUntil(backjumpLevel);
@@ -1326,7 +1331,8 @@ public class Solver<D extends DataStructureFactory>
                     this.restarter.onBackjumpToRootLevel();
                 }
                 assert decisionLevel() >= this.rootLevel
-                        && decisionLevel() >= this.analysisResult.getBacktrackLevel();
+                        && decisionLevel() >= this.analysisResult
+                                .getBacktrackLevel();
                 if (this.analysisResult.getReason() == null) {
                     return Lbool.FALSE;
                 }
@@ -1381,7 +1387,6 @@ public class Solver<D extends DataStructureFactory>
                             // clauses
                             // as decisions to allow blocking models by
                             // decisions.
-                            // TODO check the impact on implicant computation
                             || reason != null && reason.learnt()) {
                         this.decisions.push(tempmodel.last());
                     } else {

@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.pb.IPBSolver;
 import org.sat4j.pb.ObjectiveFunction;
@@ -59,7 +61,7 @@ public class CriterionOptimumComputer<S extends IPBSolver> {
 
     private final List<ObjectiveFunction> objs = new ArrayList<ObjectiveFunction>();
 
-    private BigInteger opts[];
+    private BigInteger[] opts;
 
     protected Semaphore lock;
 
@@ -94,7 +96,6 @@ public class CriterionOptimumComputer<S extends IPBSolver> {
             try {
                 this.lock.acquire();
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -126,7 +127,6 @@ public class CriterionOptimumComputer<S extends IPBSolver> {
         try {
             this.lock.acquire(this.objs.size());
         } catch (InterruptedException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -142,13 +142,13 @@ public class CriterionOptimumComputer<S extends IPBSolver> {
         }
 
         public synchronized void onSolutionFound(int[] solution) {
-            coc.opts[solverIndex] = coc.objs.get(solverIndex).calculateDegree(
-                    coc.solvers.getSolvers().get(solverIndex));
+            coc.opts[solverIndex] = coc.objs.get(solverIndex)
+                    .calculateDegree(coc.solvers.getSolvers().get(solverIndex));
         }
 
         public synchronized void onSolutionFound(IVecInt solution) {
-            coc.opts[solverIndex] = coc.objs.get(solverIndex).calculateDegree(
-                    coc.solvers.getSolvers().get(solverIndex));
+            coc.opts[solverIndex] = coc.objs.get(solverIndex)
+                    .calculateDegree(coc.solvers.getSolvers().get(solverIndex));
         }
 
         public synchronized void onUnsatTermination() {
@@ -169,6 +169,7 @@ public class CriterionOptimumComputer<S extends IPBSolver> {
             try {
                 this.solver.isSatisfiable();
             } catch (TimeoutException e) {
+                Logger.getLogger("org.sat4j.pb").log(Level.INFO, "Timeout", e);
                 timeoutOccured = true;
                 lock.release();
             }

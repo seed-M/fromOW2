@@ -31,6 +31,8 @@ package org.sat4j.minisat.core;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Some parameters used during the search.
@@ -41,6 +43,8 @@ import java.lang.reflect.Field;
 public class SearchParams implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = Logger.getLogger("org.sat4j.core");
 
     /**
      * Default search parameters.
@@ -118,9 +122,12 @@ public class SearchParams implements Serializable {
                 try {
                     stb.append(field.get(this));
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.INFO,
+                            "Issue when reflectively accessing field", e);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.INFO,
+                            "Access issue when reflectively accessing field",
+                            e);
                 }
                 stb.append(" "); //$NON-NLS-1$
             }

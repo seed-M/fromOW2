@@ -31,6 +31,8 @@ package org.sat4j.pb.constraints;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -57,8 +59,8 @@ import org.sat4j.specs.IVecInt;
  * @author leberre To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public abstract class AbstractPBDataStructureFactory extends
-        AbstractDataStructureFactory implements PBDataStructureFactory {
+public abstract class AbstractPBDataStructureFactory
+        extends AbstractDataStructureFactory implements PBDataStructureFactory {
 
     interface INormalizer {
         PBContainer nice(IVecInt ps, IVec<BigInteger> bigCoefs,
@@ -154,7 +156,8 @@ public abstract class AbstractPBDataStructureFactory extends
             f = AbstractPBDataStructureFactory.class.getDeclaredField(simp);
             this.norm = (INormalizer) f.get(this);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.pb").log(Level.INFO,
+                    "Issue when setting normalizer, using competition one", e);
             this.norm = FOR_COMPETITION;
         }
     }
@@ -164,8 +167,8 @@ public abstract class AbstractPBDataStructureFactory extends
     }
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     public Constr createClause(IVecInt literals) throws ContradictionException {

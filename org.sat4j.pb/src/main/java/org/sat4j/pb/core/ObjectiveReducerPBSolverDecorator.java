@@ -38,6 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -296,7 +298,8 @@ public class ObjectiveReducerPBSolverDecorator implements IPBSolver {
                     }
                 } catch (ContradictionException e) {
                     // should not occur
-                    e.printStackTrace();
+                    Logger.getLogger("org.sat4j.pb").log(Level.SEVERE,
+                            "Inconsistency found, should not happen", e);
                 }
 
                 newVars.push(newObjVar);

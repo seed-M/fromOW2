@@ -1,6 +1,8 @@
 package org.sat4j.pb;
 
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sat4j.pb.reader.OPBReader2012;
 import org.sat4j.pb.tools.PreprocCardConstrLearningSolver;
@@ -48,7 +50,6 @@ public class CardConstrLearningSolverLauncher {
         try {
             reader.parseInstance(instance);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new IllegalStateException(e);
         }
         solver.setVerbose(verbose);
@@ -89,8 +90,7 @@ public class CardConstrLearningSolverLauncher {
                 System.out.println("s UNSATISFIABLE");
             }
         } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Logger.getLogger("org.sat4j.pb").log(Level.INFO, "Timeout", e);
         }
     }
 
