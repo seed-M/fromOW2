@@ -33,9 +33,9 @@ import org.sat4j.specs.IteratorInt;
 
 public class BinarySupportEncoding implements Encoding {
 
-    private final Map<Integer, IVecInt> supportsa = new HashMap<Integer, IVecInt>();
+    private final Map<Integer, IVecInt> supportsa = new HashMap<>();
 
-    private final Map<Integer, IVecInt> supportsb = new HashMap<Integer, IVecInt>();
+    private final Map<Integer, IVecInt> supportsb = new HashMap<>();
 
     private static final Encoding INSTANCE = new BinarySupportEncoding();
 

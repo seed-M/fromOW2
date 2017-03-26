@@ -59,7 +59,7 @@ public abstract class Supports implements Relation {
         assert vars.size() == 0;
         assert scope.size() == arity;
         int[] tuple = new int[scope.size()];
-        mtuple = new HashMap<Evaluable, Integer>();
+        mtuple = new HashMap<>();
         lastmatch = -1;
         encoding = chooseEncoding(scope);
         encoding.onInit(solver, scope);

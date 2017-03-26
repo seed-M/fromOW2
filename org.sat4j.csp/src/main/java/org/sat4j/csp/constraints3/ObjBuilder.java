@@ -88,7 +88,7 @@ public class ObjBuilder {
 		final String varId = x.id;
 		int[] domain = this.cspToSatEncoder.getCspVarDomain(varId);
 		final IVecInt literals = new VecInt(domain.length);
-		final IVec<BigInteger> coeffs = new Vec<BigInteger>(domain.length);
+		final IVec<BigInteger> coeffs = new Vec<>(domain.length);
 		for(Integer val : domain) {
 			literals.push(this.cspToSatEncoder.getSolverVar(varId, val));
 			coeffs.push(BigInteger.valueOf(val));

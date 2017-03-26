@@ -35,7 +35,7 @@ import org.sat4j.specs.IteratorInt;
 
 public class GeneralizedSupportEncoding implements Encoding {
 
-    private final Map<Set<Integer>, IVecInt> supports = new HashMap<Set<Integer>, IVecInt>();
+    private final Map<Set<Integer>, IVecInt> supports = new HashMap<>();
 
     private static final Encoding INSTANCE = new GeneralizedSupportEncoding();
 
@@ -49,8 +49,7 @@ public class GeneralizedSupportEncoding implements Encoding {
 
     public void onFinish(ISolver solver, IVec<Var> scope)
             throws ContradictionException {
-        // TODO Auto-generated method stub
-
+         // nothing to do
     }
 
     public void onInit(ISolver solver, IVec<Var> scope) {
@@ -61,13 +60,13 @@ public class GeneralizedSupportEncoding implements Encoding {
 
     public void onNogood(ISolver solver, IVec<Var> scope,
             Map<Evaluable, Integer> tuple) throws ContradictionException {
-
+    	// nothing to do
     }
 
     public void onSupport(ISolver solver, IVec<Var> scope,
             Map<Evaluable, Integer> tuple) throws ContradictionException {
         for (int i = 0; i < scope.size(); i++) {
-            Set<Integer> set = new TreeSet<Integer>();
+            Set<Integer> set = new TreeSet<>();
             Var vari = scope.get(i);
             for (int j = 0; j < scope.size(); j++) {
                 if (i != j) {
@@ -85,7 +84,7 @@ public class GeneralizedSupportEncoding implements Encoding {
             Map<Set<Integer>, IVecInt> theSupports) {
         if (n == scope.size()) {
             for (int j = 0; j < acc.length; j++) {
-                Set<Integer> set = new TreeSet<Integer>();
+                Set<Integer> set = new TreeSet<>();
                 for (int i = 0; i < acc.length; i++)
                     if (i != j)
                         set.add(scope.get(i).translate(acc[i]));

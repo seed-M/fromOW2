@@ -41,7 +41,7 @@ public class ComparisonCtrBuilder {
 		this.intensionCtrEncoder = intensionEnc;
 	}
 
-	public boolean buildCtrAllDifferent(String id, XVarInteger[] list) { // TODO:
+	public boolean buildCtrAllDifferent(XVarInteger[] list) { // TODO:
 																			// remove
 																			// dependence
 																			// to
@@ -66,7 +66,7 @@ public class ComparisonCtrBuilder {
 		XVarInteger[] cleanList = new XVarInteger[varSet.size()];
 		cleanList = varSet.toArray(cleanList);
 		if (except.length == 0) {
-			return buildCtrAllDifferent(id, cleanList);
+			return buildCtrAllDifferent(cleanList);
 		}
 		if (cleanList.length < 2)
 			return false;
@@ -121,10 +121,10 @@ public class ComparisonCtrBuilder {
 		boolean contradictionFound = false;
 		XVarInteger[][] tMatrix = CtrBuilderUtils.transposeMatrix(matrix);
 		for (int i = 0; i < matrix.length; ++i) {
-			contradictionFound |= buildCtrAllDifferent(id, matrix[i]);
+			contradictionFound |= buildCtrAllDifferent(matrix[i]);
 		}
 		for (int i = 0; i < tMatrix.length; ++i) {
-			contradictionFound |= buildCtrAllDifferent(id, tMatrix[i]);
+			contradictionFound |= buildCtrAllDifferent(tMatrix[i]);
 		}
 		return contradictionFound;
 	}

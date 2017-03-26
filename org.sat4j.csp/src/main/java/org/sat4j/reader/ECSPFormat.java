@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +76,7 @@ public enum ECSPFormat {
 		/**
 		 * @see ECSPFormat#decoratePrintWriter(PrintWriter)
 		 */
+		@Override
 		public PrintWriter decoratePrintWriter(boolean shouldOnlyDisplayEncoding, PrintWriter pw) {
 			return pw;
 		}
@@ -93,6 +96,7 @@ public enum ECSPFormat {
 		/**
 		 * @see ECSPFormat#decoratePrintWriter(PrintWriter)
 		 */
+		@Override
 		public PrintWriter decoratePrintWriter(boolean shouldOnlyDisplayEncoding, PrintWriter pw) {
 			if(shouldOnlyDisplayEncoding) {
 				return pw;
@@ -117,6 +121,7 @@ public enum ECSPFormat {
 		/**
 		 * @see ECSPFormat#decoratePrintWriter(PrintWriter)
 		 */
+		@Override
 		public PrintWriter decoratePrintWriter(boolean shouldOnlyDisplayEncoding, PrintWriter pw) {
 			return pw;
 		}
@@ -194,9 +199,8 @@ public enum ECSPFormat {
 					return tryToInferXmlTypeFromRootMarkup(line);
 				}
 			}
-		} catch (FileNotFoundException e) {
-			return UNKNOWN;
 		} catch (IOException e) {
+			Logger.getLogger("org.sat4j.csp").log(Level.INFO, "IO issue", e);
 			return UNKNOWN;
 		}
 		return UNKNOWN;

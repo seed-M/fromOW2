@@ -38,7 +38,7 @@ public class StringCondition {
 
 	private String asString;
 	
-	private List<String> vars = new ArrayList<String>();
+	private List<String> vars = new ArrayList<>();
 
 	public StringCondition(ConditionVar condition) {
 		String varId = ((ConditionVar)condition).x.id();

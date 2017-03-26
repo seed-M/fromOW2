@@ -25,6 +25,8 @@ public class PhaseCommandComponent extends CommandComponent {
      */
     private static final long serialVersionUID = 1L;
 
+    private static final Logger LOGGER = Logger.getLogger("org.sat4j.sat");
+    
     private String currentPhaseSelectionStrategy;
 
     private JComboBox phaseList;
@@ -97,11 +99,11 @@ public class PhaseCommandComponent extends CommandComponent {
             this.solverController.setPhaseSelectionStrategy(phase);
 
         } catch (ClassNotFoundException e) {
-            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
+            LOGGER.log(Level.INFO, "Invalid Phase Class error", e);
         } catch (IllegalAccessException e) {
-            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
+            LOGGER.log(Level.INFO, "Invalid Phase Access error", e);
         } catch (InstantiationException e) {
-            Logger.getLogger("org.sat4j.sat").log(Level.INFO, "Invalid Phase error", e);
+            LOGGER.log(Level.INFO, "Invalid Phase Instanciation error", e);
         }
 
     }

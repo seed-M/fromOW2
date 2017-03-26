@@ -94,8 +94,8 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      */
     public static <L extends ILits> Solver<DataStructureFactory> newMiniSAT(
             DataStructureFactory dsf) {
-        MiniSATLearning<DataStructureFactory> learning = new MiniSATLearning<DataStructureFactory>();
-        Solver<DataStructureFactory> solver = new Solver<DataStructureFactory>(learning, dsf,
+        MiniSATLearning<DataStructureFactory> learning = new MiniSATLearning<>();
+        Solver<DataStructureFactory> solver = new Solver<>(learning, dsf,
                 new VarOrderHeap(), new MiniSATRestarts());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
@@ -113,9 +113,6 @@ public class SolverFactory extends ASolverFactory<ISolver> {
      *      instance of ASolverFactory.
      */
     public static ISolver newDefault() {
-//        Solver<DataStructureFactory> solver = newMiniSAT(new MixedDataStructureDanielWL());
-//        solver.setSimplifier(solver.EXPENSIVE_SIMPLIFICATION);
-//        return solver;
     	return newSAT();
     }
 

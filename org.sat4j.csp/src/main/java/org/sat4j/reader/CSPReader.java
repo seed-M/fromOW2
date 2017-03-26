@@ -80,13 +80,13 @@ public class CSPReader extends Reader implements org.sat4j.csp.xml.ICSPCallback 
 
 	private int currentdomainsize;
 
-	private final Map<String, Domain> domainmapping = new HashMap<String, Domain>();
+	private final Map<String, Domain> domainmapping = new HashMap<>();
 
-	private final Map<String, Var> varmapping = new LinkedHashMap<String, Var>();
+	private final Map<String, Var> varmapping = new LinkedHashMap<>();
 
-	private final Map<String, Integer> relmapping = new HashMap<String, Integer>();
+	private final Map<String, Integer> relmapping = new HashMap<>();
 
-	private final Map<String, Clausifiable> predmapping = new HashMap<String, Clausifiable>();
+	private final Map<String, Clausifiable> predmapping = new HashMap<>();
 
 	private int nbvarstocreate;
 
@@ -96,9 +96,9 @@ public class CSPReader extends Reader implements org.sat4j.csp.xml.ICSPCallback 
 
 	private Predicate currentpredicate;
 
-	private final IVec<Evaluable> variables = new Vec<Evaluable>();
+	private final IVec<Evaluable> variables = new Vec<>();
 
-	private final IVec<Var> scope = new Vec<Var>();
+	private final IVec<Var> scope = new Vec<>();
 
 	private int nbvars;
 

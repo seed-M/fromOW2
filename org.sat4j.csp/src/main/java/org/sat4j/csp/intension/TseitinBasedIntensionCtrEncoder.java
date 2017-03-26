@@ -65,7 +65,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 		final IExpression expression = parser.getExpression();
 		Map<Integer, Integer> map = encodeWithTseitin(expression);
 		IVecInt vars = new VecInt(map.size());
-		IVec<BigInteger> coeffs = new Vec<BigInteger>(map.size());
+		IVec<BigInteger> coeffs = new Vec<>(map.size());
 		for(Map.Entry<Integer, Integer> entry : map.entrySet()) {
 			vars.push(entry.getValue());
 			coeffs.push(BigInteger.valueOf(entry.getKey()));

@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
@@ -41,102 +43,100 @@ import org.sat4j.specs.IVec;
  */
 public class Predicate implements Clausifiable {
 
-    private String expr;
+	private String expr;
 
-    private Encoding encoding;
+	private Encoding encoding;
 
-    private final IVec<String> variables = new Vec<String>();
+	private final IVec<String> variables = new Vec<>();
 
-    private static Context cx;
+	private static Context cx;
 
-    private static Scriptable scope;
+	private static Scriptable scope;
 
-    static {
-        cx = Context.enter(); 
-        scope = cx.initStandardObjects();
-        try {
-            URL url = Predicate.class.getResource("predefinedfunctions.js");
-            cx.evaluateReader(scope, new InputStreamReader(url.openStream()),
-                    "predefinedfunctions.js", 1, null);
+	private final Map<Evaluable, Integer> valuemapping = new HashMap<>();
 
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
+	private Script myscript;
 
-    public Predicate() {
-    }
+	static {
+		cx = Context.enter();
+		scope = cx.initStandardObjects();
+		try {
+			URL url = Predicate.class.getResource("predefinedfunctions.js");
+			cx.evaluateReader(scope, new InputStreamReader(url.openStream()), "predefinedfunctions.js", 1, null);
 
-    public void setExpression(String expr) {
-        this.expr = expr.replaceAll("if\\(", "ite(").replaceAll("([^m])in\\(", "$1inSet(").replaceAll("^in\\(", "inSet(");
-    }
+		} catch (IOException e) {
+			Logger.getLogger("org.sat4j.csp").log(Level.SEVERE, "Problem with javascript file", e);
+		}
+	}
 
-    public void addVariable(String name) {
-        variables.push(name);
-    }
-    
-    public boolean containsVariable(String name) {
-        for(int i=0; i<variables.size(); ++i) {
-            if(variables.get(i).equals(name)) return true;
-        }
-        return false;
-    }
+	public void setExpression(String expr) {
+		this.expr = expr.replaceAll("if\\(", "ite(").replaceAll("([^m])in\\(", "$1inSet(").replaceAll("^in\\(",
+				"inSet(");
+	}
 
-    private boolean evaluate(int[] values) {
-        assert values.length == variables.size();
-        for (int i = 0; i < variables.size(); i++) {
-            scope.put(variables.get(i), scope, values[i]);
-        }
-        Object result = myscript.exec(cx, scope);
-        return Context.toBoolean(result);
-    }
+	public void addVariable(String name) {
+		variables.push(name);
+	}
 
-    public void toClause(ISolver solver, IVec<Var> vscope, IVec<Evaluable> vars)
-            throws ContradictionException {
-        if (myscript == null) {
-            myscript = cx.compileString(expr, "rhino.log", 1, null);
-        }
-        if (vscope.size() == 2) {
-            encoding = BinarySupportEncoding.instance();
-        } else {
-            encoding = DirectEncoding.instance();
-        }
-        encoding.onInit(solver, vscope);
-        int[] tuple = new int[vars.size()];
-        valuemapping.clear();
-        find(tuple, 0, vscope, vars, solver);
-        encoding.onFinish(solver, vscope);
-    }
+	public boolean containsVariable(String name) {
+		for (int i = 0; i < variables.size(); ++i) {
+			if (variables.get(i).equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    private final Map<Evaluable, Integer> valuemapping = new HashMap<Evaluable, Integer>();
+	private boolean evaluate(int[] values) {
+		assert values.length == variables.size();
+		for (int i = 0; i < variables.size(); i++) {
+			scope.put(variables.get(i), scope, values[i]);
+		}
+		Object result = myscript.exec(cx, scope);
+		return Context.toBoolean(result);
+	}
 
-    private Script myscript;
+	public void toClause(ISolver solver, IVec<Var> vscope, IVec<Evaluable> vars) throws ContradictionException {
+		if (myscript == null) {
+			myscript = cx.compileString(expr, "rhino.log", 1, null);
+		}
+		if (vscope.size() == 2) {
+			encoding = BinarySupportEncoding.instance();
+		} else {
+			encoding = DirectEncoding.instance();
+		}
+		encoding.onInit(solver, vscope);
+		int[] tuple = new int[vars.size()];
+		valuemapping.clear();
+		find(tuple, 0, vscope, vars, solver);
+		encoding.onFinish(solver, vscope);
+	}
 
-    private void find(int[] tuple, int n, IVec<Var> theScope,
-            IVec<Evaluable> vars, ISolver solver) throws ContradictionException {
-        if (valuemapping.size() == theScope.size()) {
-            for (int i = 0; i < tuple.length; i++) {
-                Evaluable ev = vars.get(i);
-                Integer value = valuemapping.get(ev);
-                if (value == null) {
-                    tuple[i] = ev.domain().get(0);
-                } else {
-                    tuple[i] = value;
-                }
-            }
-            if (evaluate(tuple)) {
-                encoding.onSupport(solver, theScope, valuemapping);
-            } else {
-                encoding.onNogood(solver, theScope, valuemapping);
-            }
-        } else {
-            Var var = theScope.get(n);
-            Domain domain = var.domain();
-            for (int i = 0; i < domain.size(); i++) {
-                valuemapping.put(var, domain.get(i));
-                find(tuple, n + 1, theScope, vars, solver);
-            }
-            valuemapping.remove(var);
-        }
-    }
+	private void find(int[] tuple, int n, IVec<Var> theScope, IVec<Evaluable> vars, ISolver solver)
+			throws ContradictionException {
+		if (valuemapping.size() == theScope.size()) {
+			for (int i = 0; i < tuple.length; i++) {
+				Evaluable ev = vars.get(i);
+				Integer value = valuemapping.get(ev);
+				if (value == null) {
+					tuple[i] = ev.domain().get(0);
+				} else {
+					tuple[i] = value;
+				}
+			}
+			if (evaluate(tuple)) {
+				encoding.onSupport(solver, theScope, valuemapping);
+			} else {
+				encoding.onNogood(solver, theScope, valuemapping);
+			}
+		} else {
+			Var var = theScope.get(n);
+			Domain domain = var.domain();
+			for (int i = 0; i < domain.size(); i++) {
+				valuemapping.put(var, domain.get(i));
+				find(tuple, n + 1, theScope, vars, solver);
+			}
+			valuemapping.remove(var);
+		}
+	}
 }

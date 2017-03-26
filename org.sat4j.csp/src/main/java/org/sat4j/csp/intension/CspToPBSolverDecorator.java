@@ -44,10 +44,10 @@ public class CspToPBSolverDecorator implements ICspToSatEncoder {
 	private final IPBSolver solver;
 	
 	/** a mapping from the CSP variable names to Sat4j CSP variables */
-	private final Map<String, Var> varmapping = new LinkedHashMap<String, Var>();
+	private final Map<String, Var> varmapping = new LinkedHashMap<>();
 
 	/** a mapping from a Sat4j CSP variable to the first solver internal variable used to encode it */
-	private final Map<Var, Integer> firstInternalVarMapping = new LinkedHashMap<Var, Integer>();
+	private final Map<Var, Integer> firstInternalVarMapping = new LinkedHashMap<>();
 
 	public CspToPBSolverDecorator(IPBSolver solver) {
 		this.solver = solver;

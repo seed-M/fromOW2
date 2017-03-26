@@ -35,10 +35,10 @@ public class Domains {
 	private static Domains instance;
 	
 	/** a mapping used to store "full domains", that is domains that contain all integer values between their bounds */
-	private Map<Integer, Map<Integer, Domain>> fullDomains = new HashMap<Integer, Map<Integer, Domain>>();
+	private Map<Integer, Map<Integer, Domain>> fullDomains = new HashMap<>();
 	
 	/** a mapping used to store "enum domains", that is domains built from set of values which are not "full domains" */
-	private Map<Integer, Domain> enumDomains = new HashMap<Integer, Domain>();
+	private Map<Integer, Domain> enumDomains = new HashMap<>();
 	
 	private Domains() {
 		// singleton DP; prevents public instantiation
@@ -67,7 +67,7 @@ public class Domains {
 	public Domain getDomain(int minValue, int maxValue) {
 		Map<Integer, Domain> fromMin = fullDomains.get(minValue);
 		if(fromMin == null) {
-			fromMin = new HashMap<Integer, Domain>();
+			fromMin = new HashMap<>();
 			fullDomains.put(minValue, fromMin);
 		}
 		Domain dom = fromMin.get(maxValue);
