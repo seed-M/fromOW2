@@ -42,12 +42,12 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-public abstract class AbstractPBClauseCardConstrDataStructure extends
-        AbstractPBDataStructureFactory {
+public abstract class AbstractPBClauseCardConstrDataStructure
+        extends AbstractPBDataStructureFactory {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     static final BigInteger MAX_INT_VALUE = BigInteger
@@ -153,8 +153,17 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
                 int tmp = literals.get(indLit);
                 literals.set(indLit, literals.get(0));
                 literals.set(0, tmp);
+                BigInteger coeftmp = resCoefs.get(indLit);
+                resCoefs.set(indLit, resCoefs.get(0));
+                resCoefs.set(0, coeftmp);
             }
-            return constructLearntClause(literals);
+            VecInt realLiterals = new VecInt();
+            for (int i = 0; i < resCoefs.size(); i++) {
+                if (!resCoefs.get(i).equals(BigInteger.ZERO)) {
+                    realLiterals.push(literals.get(i));
+                }
+            }
+            return constructLearntClause(realLiterals);
         }
         if (dspb.isCardinality()) {
             return constructLearntCard(dspb);
@@ -174,8 +183,8 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
         literals.copyTo(lits);
         BigInteger[] bc = new BigInteger[coefs.size()];
         coefs.copyTo(bc);
-        degree = Pseudos.niceCheckedParametersForCompetition(lits, bc,
-                moreThan, degree);
+        degree = Pseudos.niceCheckedParametersForCompetition(lits, bc, moreThan,
+                degree);
 
         if (degree.equals(BigInteger.ONE)) {
             return constructLearntClause(new VecInt(lits));
@@ -244,18 +253,18 @@ public abstract class AbstractPBClauseCardConstrDataStructure extends
 
     protected Constr constructLearntCard(IVecInt literals,
             IVec<BigInteger> coefs, BigInteger degree) {
-        return this.icardc.constructLearntCard(getVocabulary(), new MapPb(
-                literals, coefs, degree));
+        return this.icardc.constructLearntCard(getVocabulary(),
+                new MapPb(literals, coefs, degree));
     }
 
     protected Constr constructLearntPB(IDataStructurePB dspb) {
         return this.ipbc.constructLearntPB(getVocabulary(), dspb);
     }
 
-    protected Constr constructLearntPB(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree) {
-        return this.ipbc.constructLearntPB(getVocabulary(), new MapPb(literals,
-                coefs, degree));
+    protected Constr constructLearntPB(IVecInt literals, IVec<BigInteger> coefs,
+            BigInteger degree) {
+        return this.ipbc.constructLearntPB(getVocabulary(),
+                new MapPb(literals, coefs, degree));
     }
 
     public static final BigInteger sumOfCoefficients(BigInteger[] coefs) {

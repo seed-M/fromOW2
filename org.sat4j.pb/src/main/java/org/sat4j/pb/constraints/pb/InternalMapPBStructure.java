@@ -124,6 +124,13 @@ public class InternalMapPBStructure {
         return this.lits.size();
     }
 
+    boolean delete(int indLit) {
+        this.allLits.set(this.lits.get(indLit), -1);
+        this.lits.delete(indLit);
+        this.coefs.delete(indLit);
+        return true;
+    }
+
     void put(int lit, BigInteger newValue) {
         int indLit = this.allLits.get(lit);
         if (indLit != -1) {
