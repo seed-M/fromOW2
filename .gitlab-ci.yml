@@ -9,5 +9,5 @@ mybuild:
       - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dmaven.test.failure.ignore=true -Dmaven.repo.local=/cache/maven.repo
     artifacts:
        paths:
-        - */target/*.jar
+        - org.*/target/*.jar
        expire_in: 4 weeks
