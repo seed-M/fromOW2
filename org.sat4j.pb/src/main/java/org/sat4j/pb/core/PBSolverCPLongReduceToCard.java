@@ -63,10 +63,8 @@ public class PBSolverCPLongReduceToCard extends PBSolverCP {
 
     @Override
     public String toString(String prefix) {
-        return super.toString(prefix)
-                + "\n"
-                + prefix
-                + "Reduce coefficients of asserted PB constraints from BigInteger to Long and reduce to cardinality constraint during conflict analysis if necessary";
+        return super.toString(prefix) + "\n" + prefix
+                + "Reduce to cardinality constraint during conflict analysis if necessary";
     }
 
 }
