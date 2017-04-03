@@ -4,7 +4,7 @@ import org.sat4j.pb.IPBSolver;
 import org.sat4j.pb.SolverFactory;
 
 public class PBCPMaxClauseCardConstrClauseLearningTest
-        extends AbstractPseudoBooleanAndPigeonHoleTest {
+        extends AbstractEZPseudoBooleanAndPigeonHoleTest {
 
     public PBCPMaxClauseCardConstrClauseLearningTest(String arg) {
         super(arg);
