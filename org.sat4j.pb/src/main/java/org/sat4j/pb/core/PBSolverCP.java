@@ -169,6 +169,7 @@ public class PBSolverCP extends PBSolver {
             stats.numberOfRightShiftsForCoeffs = stats.numberOfRightShiftsForCoeffs
                     + nbBits;
         }
+        confl.postProcess(currentLevel);
         PBConstr resConstr = (PBConstr) this.dsfactory
                 .createUnregisteredPseudoBooleanConstraint(confl);
         results.setReason(resConstr);
