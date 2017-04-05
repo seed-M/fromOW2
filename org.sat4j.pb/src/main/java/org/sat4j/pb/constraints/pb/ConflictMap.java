@@ -255,48 +255,6 @@ public class ConflictMap extends MapPb implements IConflict {
         }
     }
 
-    // private class PostProcessToCard implements IPostProcess {
-    // public void postProcess(int dl) {
-    // assert ConflictMap.this.isAssertive(dl);
-    // System.out.println("PostcessToCard - current level : " + dl);
-    // String origine = ConflictMap.this.toString();
-    // System.out.println(origine);
-    // VecInt litsImplied = ConflictMap.this.impliedLiterals(dl);
-    // assert litsImplied.size() > 0;
-    // int ilit, litLevel;
-    // for (int i = 0; i < ConflictMap.this.size(); i++) {
-    // ilit = ConflictMap.this.weightedLits.getLit(i);
-    // litLevel = ConflictMap.this.voc.getLevel(ilit);
-    // if ((litLevel < dl) && ConflictMap.this.voc.isFalsified(ilit))
-    // ConflictMap.this.weightedLits.changeCoef(i, BigInteger.ONE);
-    // else
-    // ConflictMap.this.weightedLits.changeCoef(i,
-    // BigInteger.ZERO);
-    // }
-    // int lit;
-    // for (int i = 0; i < litsImplied.size(); i++) {
-    // lit = ConflictMap.this.weightedLits
-    // .getFromAllLits(litsImplied.get(i));
-    // ConflictMap.this.weightedLits.changeCoef(lit, BigInteger.ONE);
-    // }
-    // ConflictMap.this.degree = BigInteger.valueOf(litsImplied.size());
-    // ConflictMap.this.currentSlack = ConflictMap.this.computeSlack(dl);
-    // System.out.println(ConflictMap.this);
-    // if (!ConflictMap.this.isAssertive(dl)) {
-    // System.out.println("**********");
-    // System.out.println("current level : " + dl);
-    // System.out.print(
-    // "Littéraux impliqués (" + litsImplied.size() + ") : ");
-    // for (int i = 0; i < litsImplied.size(); i++)
-    // System.out.print(litsImplied.get(i) + " - ");
-    // System.out.println();
-    // System.out.println(origine);
-    // System.out.println(ConflictMap.this);
-    // }
-    // assert ConflictMap.this.isAssertive(dl);
-    // }
-    // }
-
     public void postProcess(int dl) {
         this.postProcess.postProcess(dl);
     }

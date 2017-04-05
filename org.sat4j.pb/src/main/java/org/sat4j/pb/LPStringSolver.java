@@ -264,7 +264,6 @@ public class LPStringSolver extends DimacsStringSolver implements IPBSolver {
         }
         // out.append("\n");
         out.append("Binary \n");
-        // TODO : V�rifier que les variables sont bien num�rot�es de 1 �
         // maxvarid
         for (int i = 1; i <= nVars(); i++) {
             out.append("x" + i + "\n");
