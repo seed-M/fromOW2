@@ -140,7 +140,7 @@ public final class Backbone {
 
     /**
      * Computes the backbone of a formula following the iterative algorithm
-     * described in João Marques-Silva, Mikolás Janota, Inês Lynce: On Computing
+     * described in Joao Marques-Silva, Mikolas Janota, Ines Lynce: On Computing
      * Backbones of Propositional Theories. ECAI 2010: 15-20 and using Sat4j
      * specific prime implicant computation.
      * 
@@ -213,7 +213,8 @@ public final class Backbone {
                     }
                     solver.removeConstr(constr);
                 } catch (ContradictionException e) {
-                    for (IteratorInt it = litsToTest.iterator(); it.hasNext();) {
+                    for (IteratorInt it = litsToTest.iterator(); it
+                            .hasNext();) {
                         candidates.push(-it.next());
                     }
                     litsToTest.clear();
