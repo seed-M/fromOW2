@@ -989,10 +989,7 @@ public class ConflictMap extends MapPb implements IConflict {
         int indLitLevel = levelToIndex(litLevel);
         assert indLitLevel < this.byLevel.length;
         assert this.byLevel[indLitLevel] != null;
-        if (!this.byLevel[indLitLevel].contains(lit)) {
-            System.out.println("literal : " + lit);
-        }
-        // assert this.byLevel[indLitLevel].contains(lit);
+		assert this.byLevel[indLitLevel].contains(lit);
         this.byLevel[indLitLevel].remove(lit);
         super.removeCoef(lit);
     }
