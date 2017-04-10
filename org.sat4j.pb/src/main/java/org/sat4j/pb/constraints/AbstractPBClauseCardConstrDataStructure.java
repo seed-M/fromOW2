@@ -157,13 +157,7 @@ public abstract class AbstractPBClauseCardConstrDataStructure
                 resCoefs.set(indLit, resCoefs.get(0));
                 resCoefs.set(0, coeftmp);
             }
-            VecInt realLiterals = new VecInt();
-            for (int i = 0; i < resCoefs.size(); i++) {
-                if (!resCoefs.get(i).equals(BigInteger.ZERO)) {
-                    realLiterals.push(literals.get(i));
-                }
-            }
-            return constructLearntClause(realLiterals);
+            return constructLearntClause(literals);
         }
         if (dspb.isCardinality()) {
             return constructLearntCard(dspb);

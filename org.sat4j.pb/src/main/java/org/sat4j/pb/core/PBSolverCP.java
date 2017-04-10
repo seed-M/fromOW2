@@ -149,6 +149,7 @@ public class PBSolverCP extends PBSolver {
                 || decisionLevel() == 0;
 
         assert currentLevel == decisionLevel();
+        confl.undoOne(this.trail.last());
         undoOne();
         this.qhead = this.trail.size();
         updateNumberOfReducedLearnedConstraints(confl);

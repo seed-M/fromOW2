@@ -77,4 +77,6 @@ public interface IConflict extends IDataStructurePB {
     void updateSlack(int level);
 
     boolean slackIsCorrect(int decisionLevel);
+
+    void undoOne(int lit);
 }

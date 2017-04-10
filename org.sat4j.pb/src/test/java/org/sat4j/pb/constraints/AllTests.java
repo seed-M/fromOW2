@@ -39,16 +39,24 @@ public class AllTests {
         // $JUnit-BEGIN$
         // suite.addTestSuite(LitTest.class);
         // suite.addTestSuite(AbstractPigeonHoleWithCardinalityTest.class);
-        suite.addTestSuite(CounterPBConstrClauseImpliedWithClauseCardConstrLearning.class);
+        suite.addTestSuite(
+                CounterPBConstrClauseImpliedWithClauseCardConstrLearning.class);
         suite.addTestSuite(CounterPBConstrOnRandomCardProblemsTest.class);
-        suite.addTestSuite(CounterPBConstrWithClauseAtLeastConstrLearningTest.class);
-        suite.addTestSuite(CounterPBConstrWithClauseCardConstrLearningTest.class);
+        suite.addTestSuite(
+                CounterPBConstrWithClauseAtLeastConstrLearningTest.class);
+        suite.addTestSuite(
+                CounterPBConstrWithClauseCardConstrLearningTest.class);
         suite.addTestSuite(CounterPBConstrWithClauseLearningTest.class);
         suite.addTestSuite(CounterPBConstrWithPBConstrLearningTest.class);
-        suite.addTestSuite(CounterPBWithClauseCardConstrLearningReduceToClauseTest.class);
+        suite.addTestSuite(
+                CounterPBWithClauseCardConstrLearningReduceToClauseTest.class);
         suite.addTestSuite(PBCPMixedConstraintsCautiousTest.class);
-        suite.addTestSuite(PuebloWatchedPbClauseAtLeastConstrWithPBConstrLearningTest.class);
-        suite.addTestSuite(PuebloWatchedPBClauseCardConstrWithPBConstrLearningTest.class);
+        suite.addTestSuite(PBCPMaxClauseCardConstrClauseLearningTest.class);
+        suite.addTestSuite(PBCPMaxClauseCardConstrCardLearningTest.class);
+        suite.addTestSuite(
+                PuebloWatchedPbClauseAtLeastConstrWithPBConstrLearningTest.class);
+        suite.addTestSuite(
+                PuebloWatchedPBClauseCardConstrWithPBConstrLearningTest.class);
         suite.addTestSuite(PuebloWatchedPBConstrOnRandomCardProblemsTest.class);
         suite.addTestSuite(PuebloWatchedPBConstrWithClauseLearningTest.class);
         suite.addTestSuite(PuebloWatchedPBConstrWithPBConstrLearningTest.class);

@@ -55,6 +55,6 @@ public class PBSolverClause extends PBSolverCP {
     @Override
     public String toString(String prefix) {
         return super.toString(prefix) + "\n" + prefix
-                + "Simplify asserted PB constraints to clauses";
+                + "Simplify during conflict analysis PB constraints to clauses";
     }
 }

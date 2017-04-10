@@ -97,7 +97,8 @@ public class MapPb implements IDataStructurePB {
     public boolean isCardinality() {
         boolean newcase = false;
         for (int i = 0; i < size(); i++) {
-            if (!this.weightedLits.getCoef(i).equals(BigInteger.ONE)) {
+            if (!(this.weightedLits.getCoef(i).equals(BigInteger.ONE)
+                    || this.weightedLits.getCoef(i).equals(BigInteger.ZERO))) {
                 newcase = true;
                 break;
             }
@@ -247,8 +248,12 @@ public class MapPb implements IDataStructurePB {
             IVec<BigInteger> resCoefs) {
         resLits.clear();
         resCoefs.clear();
-        this.weightedLits.copyCoefs(resCoefs);
-        this.weightedLits.copyLits(resLits);
+        for (int i = 0; i < this.weightedLits.size(); i++) {
+            if (!this.weightedLits.getCoef(i).equals(BigInteger.ZERO)) {
+                resLits.push(this.weightedLits.getLit(i));
+                resCoefs.push(this.weightedLits.getCoef(i));
+            }
+        }
     };
 
     public void buildConstraintFromMapPb(int[] resLits, BigInteger[] resCoefs) {

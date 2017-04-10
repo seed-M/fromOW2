@@ -35,6 +35,7 @@ import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.VarActivityListener;
+import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
 /**
@@ -44,6 +45,10 @@ import org.sat4j.specs.IteratorInt;
 public class ConflictMap extends MapPb implements IConflict {
 
     final ILits voc;
+
+    public static final int NOPOSTPROCESS = 0;
+    public static final int POSTPROCESSTOCLAUSE = 1;
+    public static final int POSTPROCESSTOCARD = 2;
 
     protected boolean hasBeenReduced = false;
     protected long numberOfReductions = 0;
@@ -77,32 +82,38 @@ public class ConflictMap extends MapPb implements IConflict {
 
     public static IConflict createConflict(PBConstr cpb, int level,
             boolean noRemove) {
-        return new ConflictMap(cpb, level, noRemove, false);
+        return new ConflictMap(cpb, level, noRemove, NOPOSTPROCESS);
     }
 
     public static IConflict createConflict(PBConstr cpb, int level,
-            boolean noRemove, boolean clausePostProcessing) {
-        return new ConflictMap(cpb, level, noRemove, clausePostProcessing);
+            boolean noRemove, int postProcessing) {
+        return new ConflictMap(cpb, level, noRemove, postProcessing);
     }
 
     ConflictMap(PBConstr cpb, int level) {
-        this(cpb, level, false, false);
+        this(cpb, level, false, NOPOSTPROCESS);
     }
 
     ConflictMap(PBConstr cpb, int level, boolean noRemove) {
-        this(cpb, level, noRemove, false);
+        this(cpb, level, noRemove, NOPOSTPROCESS);
     }
 
-    ConflictMap(PBConstr cpb, int level, boolean noRemove,
-            boolean clausePostProcessing) {
+    ConflictMap(PBConstr cpb, int level, boolean noRemove, int postProcessing) {
         super(cpb, level, noRemove);
         this.voc = cpb.getVocabulary();
         this.currentLevel = level;
         initStructures();
-        if (clausePostProcessing)
+        switch (postProcessing) {
+        case POSTPROCESSTOCLAUSE:
             this.postProcess = new PostProcessToClause();
-        else
+            break;
+        case POSTPROCESSTOCARD:
+            this.postProcess = new PostProcessToCard();
+            break;
+        default:
             this.postProcess = new NoPostProcess();
+            break;
+        }
         if (noRemove)
             this.rmSatLit = new NoRemoveSatisfied();
         else
@@ -227,10 +238,12 @@ public class ConflictMap extends MapPb implements IConflict {
         public void postProcess(int dl) {
             if (ConflictMap.this.isAssertive(dl)
                     && (!ConflictMap.this.degree.equals(BigInteger.ONE))) {
-                int lit, litLevel, ilit, index;
+                int litLevel, ilit;
                 if (ConflictMap.this.assertiveLiteral != -1) {
-                    lit = ConflictMap.this.weightedLits
+                    int lit = ConflictMap.this.weightedLits
                             .getLit(ConflictMap.this.assertiveLiteral);
+
+                    IVecInt toSuppress = new VecInt();
 
                     for (int i = 0; i < ConflictMap.this.size(); i++) {
                         ilit = ConflictMap.this.weightedLits.getLit(i);
@@ -239,13 +252,17 @@ public class ConflictMap extends MapPb implements IConflict {
                                 && ConflictMap.this.voc.isFalsified(ilit))
                             ConflictMap.this.weightedLits.changeCoef(i,
                                     BigInteger.ONE);
-                        else {
-                            ConflictMap.this.weightedLits.changeCoef(i,
-                                    BigInteger.ZERO);
+                        else if (ilit != lit) {
+                            toSuppress.push(ilit);
                         }
                     }
+
                     ConflictMap.this.weightedLits.changeCoef(
                             ConflictMap.this.assertiveLiteral, BigInteger.ONE);
+
+                    for (int i = 0; i < toSuppress.size(); i++)
+                        ConflictMap.this.removeCoef(toSuppress.get(i));
+
                     ConflictMap.this.degree = BigInteger.ONE;
                     ConflictMap.this.currentSlack = ConflictMap.this
                             .computeSlack(dl);
@@ -255,47 +272,83 @@ public class ConflictMap extends MapPb implements IConflict {
         }
     }
 
-    // private class PostProcessToCard implements IPostProcess {
-    // public void postProcess(int dl) {
-    // assert ConflictMap.this.isAssertive(dl);
-    // System.out.println("PostcessToCard - current level : " + dl);
-    // String origine = ConflictMap.this.toString();
-    // System.out.println(origine);
-    // VecInt litsImplied = ConflictMap.this.impliedLiterals(dl);
-    // assert litsImplied.size() > 0;
-    // int ilit, litLevel;
-    // for (int i = 0; i < ConflictMap.this.size(); i++) {
-    // ilit = ConflictMap.this.weightedLits.getLit(i);
-    // litLevel = ConflictMap.this.voc.getLevel(ilit);
-    // if ((litLevel < dl) && ConflictMap.this.voc.isFalsified(ilit))
-    // ConflictMap.this.weightedLits.changeCoef(i, BigInteger.ONE);
-    // else
-    // ConflictMap.this.weightedLits.changeCoef(i,
-    // BigInteger.ZERO);
-    // }
-    // int lit;
-    // for (int i = 0; i < litsImplied.size(); i++) {
-    // lit = ConflictMap.this.weightedLits
-    // .getFromAllLits(litsImplied.get(i));
-    // ConflictMap.this.weightedLits.changeCoef(lit, BigInteger.ONE);
-    // }
-    // ConflictMap.this.degree = BigInteger.valueOf(litsImplied.size());
-    // ConflictMap.this.currentSlack = ConflictMap.this.computeSlack(dl);
-    // System.out.println(ConflictMap.this);
-    // if (!ConflictMap.this.isAssertive(dl)) {
-    // System.out.println("**********");
-    // System.out.println("current level : " + dl);
-    // System.out.print(
-    // "Littéraux impliqués (" + litsImplied.size() + ") : ");
-    // for (int i = 0; i < litsImplied.size(); i++)
-    // System.out.print(litsImplied.get(i) + " - ");
-    // System.out.println();
-    // System.out.println(origine);
-    // System.out.println(ConflictMap.this);
-    // }
-    // assert ConflictMap.this.isAssertive(dl);
-    // }
-    // }
+    private class PostProcessToCard implements IPostProcess {
+        public void postProcess(int dl) {
+            // procedure Reduce-to-cardinality 4.3.9 proposed by H. Dixon
+            // (Dixon's dissertation, page 67)
+            if (ConflictMap.this.isAssertive(dl)
+                    && (!ConflictMap.this.degree.equals(BigInteger.ONE))) {
+                int lit, litLevel, ilit;
+                BigInteger coefLit;
+                if (ConflictMap.this.assertiveLiteral != -1) {
+                    lit = ConflictMap.this.weightedLits
+                            .getLit(ConflictMap.this.assertiveLiteral);
+                    coefLit = ConflictMap.this.weightedLits
+                            .getCoef(ConflictMap.this.assertiveLiteral);
+
+                    // compute sum of coefficients of confl
+                    BigInteger sumCoefsTmp = BigInteger.ZERO;
+                    for (int i = 0; i < ConflictMap.this.size(); i++) {
+                        sumCoefsTmp = sumCoefsTmp
+                                .add(ConflictMap.this.weightedLits.getCoef(i));
+                    }
+
+                    // if it is already a cardinality constraint, return
+                    if (sumCoefsTmp.compareTo(
+                            BigInteger.valueOf(ConflictMap.this.size())) == 0) {
+                        return;
+                    }
+                    IVecInt compLSet = new VecInt();
+                    BigInteger coefMax = coefLit;
+                    BigInteger coefTmp;
+
+                    // construct lSet with all falsified literals s.t. sum of
+                    // the coefs of compl(lSet) < degree
+                    // first we add the assertive literal
+                    sumCoefsTmp = sumCoefsTmp.subtract(coefLit);
+                    ConflictMap.this.changeCoef(
+                            ConflictMap.this.assertiveLiteral, BigInteger.ONE);
+                    // then the needed falsified literals
+                    for (int i = 0; i < ConflictMap.this.size(); i++) {
+                        ilit = ConflictMap.this.weightedLits.getLit(i);
+                        litLevel = ConflictMap.this.voc.getLevel(ilit);
+                        coefTmp = ConflictMap.this.weightedLits.getCoef(i);
+                        if (ilit != lit) {
+                            if (litLevel < dl
+                                    && ConflictMap.this.voc.isFalsified(ilit)) {
+                                ConflictMap.this.changeCoef(i, BigInteger.ONE);
+                                sumCoefsTmp = sumCoefsTmp.subtract(coefTmp);
+                                if (coefMax.compareTo(coefTmp) < 0)
+                                    coefMax = coefTmp;
+                            } else
+                                compLSet.push(ilit);
+                        }
+                    }
+                    assert sumCoefsTmp.compareTo(ConflictMap.this.degree) < 0;
+
+                    // add into lSet the sSet literals which are not already in
+                    // L and with coef > coefMax
+                    int degreeCard = 1;
+                    for (int i = 0; i < compLSet.size(); i++) {
+                        ilit = ConflictMap.this.weightedLits
+                                .getFromAllLits(compLSet.get(i));
+                        if (coefMax.compareTo(ConflictMap.this.weightedLits
+                                .getCoef(ilit)) <= 0) {
+                            ConflictMap.this.changeCoef(ilit, BigInteger.ONE);
+                            degreeCard++;
+                        } else {
+                            ConflictMap.this.removeCoef(compLSet.get(i));
+                        }
+                    }
+
+                    ConflictMap.this.degree = BigInteger.valueOf(degreeCard);
+
+                    assert ConflictMap.this.isAssertive(dl);
+                }
+            }
+        }
+
+    }
 
     public void postProcess(int dl) {
         this.postProcess.postProcess(dl);
@@ -655,39 +708,6 @@ public class ConflictMap extends MapPb implements IConflict {
         return false;
     }
 
-    // given the slack already computed, returns all the literals
-    // that are implied at a particular level
-    // uses the byLevel data structure to parse each literal by decision level
-    private VecInt impliedLiterals(int dl) {
-        BigInteger slack = computeSlack(dl);
-        slack = slack.subtract(this.degree);
-        // unassigned literals are tried first
-        int unassigned = levelToIndex(-1);
-        int lit;
-        VecInt vec = new VecInt();
-        if (this.byLevel[unassigned] != null) {
-            for (IteratorInt iterator = this.byLevel[unassigned]
-                    .iterator(); iterator.hasNext();) {
-                lit = iterator.next();
-                if (slack.compareTo(this.weightedLits.get(lit)) < 0)
-                    vec.push(lit);
-            }
-        }
-        // then we have to look at every literal at a decision level >=dl
-        BigInteger tmp;
-        int level = levelToIndex(this.currentLevel);
-        if (this.byLevel[level] != null) {
-            for (IteratorInt iterator = this.byLevel[level].iterator(); iterator
-                    .hasNext();) {
-                lit = iterator.next();
-                tmp = this.weightedLits.get(lit);
-                if (tmp != null && slack.compareTo(tmp) < 0)
-                    vec.push(lit);
-            }
-        }
-        return vec;
-    }
-
     /**
      * computes the least common factor of two integers (Plus Petit Commun
      * Multiple in french)
@@ -969,7 +989,10 @@ public class ConflictMap extends MapPb implements IConflict {
         int indLitLevel = levelToIndex(litLevel);
         assert indLitLevel < this.byLevel.length;
         assert this.byLevel[indLitLevel] != null;
-        assert this.byLevel[indLitLevel].contains(lit);
+        if (!this.byLevel[indLitLevel].contains(lit)) {
+            System.out.println("literal : " + lit);
+        }
+        // assert this.byLevel[indLitLevel].contains(lit);
         this.byLevel[indLitLevel].remove(lit);
         super.removeCoef(lit);
     }
@@ -1012,6 +1035,26 @@ public class ConflictMap extends MapPb implements IConflict {
 
     public long getNumberOfReductions() {
         return this.numberOfReductions;
+    }
+
+    public void undoOne(int lit) {
+        int nLit = lit ^ 1;
+        if (this.weightedLits.containsKey(nLit)) {
+            lit = nLit;
+        }
+        int litLevel = this.voc.getLevel(lit);
+        int indLitLevel = levelToIndex(litLevel);
+        assert indLitLevel < this.byLevel.length;
+        if (this.byLevel[indLitLevel] != null
+                && this.byLevel[indLitLevel].contains(lit)) {
+            this.byLevel[indLitLevel].remove(lit);
+            // then lit is added at the level "unassigned"
+            if (this.byLevel[0] == null) {
+                this.byLevel[0] = new VecInt();
+            }
+            this.byLevel[0].push(lit);
+        }
+
     }
 
 }

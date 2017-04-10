@@ -8,21 +8,16 @@ import org.sat4j.pb.constraints.pb.ConflictMap;
 import org.sat4j.pb.constraints.pb.IConflict;
 import org.sat4j.pb.constraints.pb.PBConstr;
 
-public class PBSolverCPClauseLearning extends PBSolverCPLong {
+public class PBSolverCPCardLearning extends PBSolverCPLong {
 
-    /**
-     * after conflict analysis, performs (or not) a post-processing in order to
-     * learn clauses only.
-     */
-
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, IOrder order) {
         super(learner, dsf, order);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             RestartStrategy restarter) {
@@ -30,21 +25,21 @@ public class PBSolverCPClauseLearning extends PBSolverCPLong {
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order) {
         super(learner, dsf, params, order);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, IOrder order, boolean noRemove) {
         super(learner, dsf, order, noRemove);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             RestartStrategy restarter, boolean noRemove) {
@@ -52,7 +47,7 @@ public class PBSolverCPClauseLearning extends PBSolverCPLong {
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPClauseLearning(
+    public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             boolean noRemove) {
@@ -63,13 +58,13 @@ public class PBSolverCPClauseLearning extends PBSolverCPLong {
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
         return ConflictMap.createConflict(myconfl, level, noRemove,
-                ConflictMap.POSTPROCESSTOCLAUSE);
+                ConflictMap.POSTPROCESSTOCARD);
     }
 
     @Override
     public String toString(String prefix) {
         return super.toString(prefix) + "\n" + prefix
-                + "Performs a post-processing after conflict analysis in order to learn clauses";
+                + "Performs a post-processing after conflict analysis in order to learn only cardinality caonstraints";
     }
 
 }
