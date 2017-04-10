@@ -664,11 +664,6 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
         return newPBCP(dsf, new VarOrderHeap());
     }
 
-    private static PBSolverCP newPBCP(PBDataStructureFactory dsf,
-            boolean noRemove) {
-        return newPBCP(dsf, new VarOrderHeap(), noRemove);
-    }
-
     /**
      * Cutting Planes based solver. The inference during conflict analysis is
      * based on cutting planes instead of resolution as in a SAT solver.
@@ -735,7 +730,19 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
      *         system.
      */
     public static IPBSolver newBoth() {
-        return new ManyCorePB(newResolution(), newCuttingPlanes());
+        return new ManyCorePB<IPBSolver>(newResolution(), newCuttingPlanes());
+    }
+
+    /**
+     * Resolution and CuttingPlanesStar based solvers running in parallel. Does
+     * only make sense if run on a computer with several cores.
+     * 
+     * @return a parallel solver using both resolution and cutting planes star
+     *         proof system.
+     */
+    public static IPBSolver newBothStar() {
+        return new ManyCorePB<IPBSolver>(newResolution(),
+                newCuttingPlanesStar());
     }
 
     /**
@@ -745,7 +752,7 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
      * @return a parallel solver for both SAT and UNSAT problems.
      */
     public static IPBSolver newSATUNSAT() {
-        return new ManyCorePB(newSAT(), newUNSAT());
+        return new ManyCorePB<IPBSolver>(newSAT(), newUNSAT());
     }
 
     /**
