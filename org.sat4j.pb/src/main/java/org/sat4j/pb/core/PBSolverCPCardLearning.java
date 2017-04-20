@@ -11,6 +11,11 @@ import org.sat4j.pb.constraints.pb.PBConstr;
 
 public class PBSolverCPCardLearning extends PBSolverCPLong {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public PBSolverCPCardLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, IOrder order) {
