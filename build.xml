@@ -179,7 +179,7 @@
                 </antcall>
 	</target>
 
-	<target name="remote" depends="core,pseudo" description="Build a jar file suitable for build the incredible sat4j remote control">
+	<target name="remote" depends="core,pseudo,maxsat" description="Build a jar file suitable for build the incredible sat4j remote control">
 		<echo>Building the Java SAT Solvers toolkit</echo>
                 <antcall target="build">
 		   <param name="package" value="sat"/>
