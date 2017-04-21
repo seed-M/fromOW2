@@ -390,7 +390,7 @@ Sat4j is a full featured boolean reasoning library designed to bring state-of-th
 				<version>0.7.9</version>
 				<executions>
 					<execution>
-						<phase>pre-integration-test</phase>
+						<phase>process-test-classes</phase>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
