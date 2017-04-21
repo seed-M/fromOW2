@@ -49,7 +49,6 @@ public class ConflictMap extends MapPb implements IConflict {
     public static final int NOPOSTPROCESS = 0;
     public static final int POSTPROCESSTOCLAUSE = 1;
     public static final int POSTPROCESSTOCARD = 2;
-    public static final int POSTPROCESSTOCARDALLIMPLIED = 3;
 
     protected boolean hasBeenReduced = false;
     protected long numberOfReductions = 0;
@@ -110,9 +109,6 @@ public class ConflictMap extends MapPb implements IConflict {
             break;
         case POSTPROCESSTOCARD:
             this.postProcess = new PostProcessToCard();
-            break;
-        case POSTPROCESSTOCARDALLIMPLIED:
-            this.postProcess = new PostProcessToCardAllImplied();
             break;
         default:
             this.postProcess = new NoPostProcess();
@@ -474,9 +470,6 @@ public class ConflictMap extends MapPb implements IConflict {
                             .getFromAllLits(lit);
 
                     assert this.backtrackLevel == oldGetBacktrackLevel(dl);
-                    // ConflictMap.this.currentSlack = ConflictMap.this
-                    // .computeSlack(this.assertiveLevel);
-                    // assert ConflictMap.this.isAssertive(this.backtrackLevel);
                 }
             }
         }
@@ -540,110 +533,6 @@ public class ConflictMap extends MapPb implements IConflict {
             assert this.backtrackLevel == oldGetBacktrackLevel(maxLevel);
             assert literals.size() > 0;
             return maxLit;
-        }
-
-        public int getBacktrackLevel(int maxLevel) {
-            return this.backtrackLevel;
-        }
-
-    }
-
-    private class PostProcessToCardAllImplied implements IPostProcess {
-        public void postProcess(int dl) {
-            // keep all the falsified and the implied literals at the current
-            // level
-            // construct a cardinality with a degree equals to card(implied
-            // literals)
-            if (ConflictMap.this.isAssertive(dl)
-                    && (!ConflictMap.this.degree.equals(BigInteger.ONE))) {
-                int litLevel, ilit;
-                IVecInt toSuppress = new VecInt();
-                IVecInt toKeep = detectAssertivesLiterals(dl);
-                int cpt = toKeep.size();
-                BigInteger slack = computeSlack(this.assertiveLevel)
-                        .subtract(ConflictMap.this.degree);
-                for (int i = 0; i < ConflictMap.this.size(); i++) {
-                    ilit = ConflictMap.this.weightedLits.getLit(i);
-                    litLevel = ConflictMap.this.voc.getLevel(ilit);
-                    if (litLevel < this.assertiveLevel
-                            && ConflictMap.this.voc.isFalsified(ilit)) {
-                        toKeep.push(ilit);
-                    } else if (((litLevel < this.assertiveLevel
-                            && ConflictMap.this.voc.isSatisfied(ilit))
-                            || (slack.compareTo(ConflictMap.this.weightedLits
-                                    .getCoef(i)) >= 0))) {
-                        toSuppress.push(ilit);
-                    }
-                }
-                if (cpt > 0) {
-
-                    for (int i = 0; i < toKeep.size(); i++) {
-                        ilit = ConflictMap.this.weightedLits
-                                .getFromAllLits(toKeep.get(i));
-                        ConflictMap.this.changeCoef(ilit, BigInteger.ONE);
-                    }
-                    for (int i = 0; i < toSuppress.size(); i++) {
-                        ConflictMap.this.removeCoef(toSuppress.get(i));
-                    }
-
-                    ConflictMap.this.assertiveLiteral = ConflictMap.this.weightedLits
-                            .getFromAllLits(toKeep.get(0));
-                    ConflictMap.this.degree = BigInteger.valueOf(cpt);
-
-                    assert this.backtrackLevel == oldGetBacktrackLevel(dl);
-                }
-            }
-        }
-
-        private int assertiveLevel;
-        private int backtrackLevel;
-
-        public IVecInt detectAssertivesLiterals(int maxLevel) {
-            // we are looking for a level higher than maxLevel
-            // where the constraint is still assertive
-            IVecInt lits;
-            int level;
-            int indStop = levelToIndex(maxLevel); // ou maxLevel - 1 ???
-            int indStart = levelToIndex(0);
-            BigInteger slack = ConflictMap.this.computeSlack(0)
-                    .subtract(ConflictMap.this.degree);
-            int previous = 0;
-            IVecInt literals = new VecInt();
-            for (int indLevel = indStart; indLevel <= indStop; indLevel++) {
-                if (ConflictMap.this.byLevel[indLevel] != null) {
-                    level = indexToLevel(indLevel);
-                    assert ConflictMap.this.computeSlack(level)
-                            .subtract(ConflictMap.this.degree).equals(slack);
-                    if (ConflictMap.this.isImplyingLiteralOrdered(level, slack,
-                            literals)) {
-                        this.assertiveLevel = level;
-                        this.backtrackLevel = previous;
-                        break;
-                    }
-                    // updating the new slack
-                    lits = ConflictMap.this.byLevel[indLevel];
-                    int lit;
-                    for (IteratorInt iterator = lits.iterator(); iterator
-                            .hasNext();) {
-                        lit = iterator.next();
-                        if (ConflictMap.this.voc.isFalsified(lit)
-                                && ConflictMap.this.voc.getLevel(
-                                        lit) == indexToLevel(indLevel)) {
-                            slack = slack.subtract(
-                                    ConflictMap.this.weightedLits.get(lit));
-                        }
-                    }
-                    if (!lits.isEmpty()) {
-                        previous = level;
-                    }
-                }
-            }
-
-            assert literals.size() > 0;
-
-            assert this.backtrackLevel == oldGetBacktrackLevel(maxLevel);
-            assert literals.size() > 0;
-            return literals;
         }
 
         public int getBacktrackLevel(int maxLevel) {
