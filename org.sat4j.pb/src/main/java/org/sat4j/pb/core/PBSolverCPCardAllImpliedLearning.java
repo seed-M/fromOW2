@@ -9,21 +9,21 @@ import org.sat4j.pb.constraints.pb.ConflictMapReduceToClause;
 import org.sat4j.pb.constraints.pb.IConflict;
 import org.sat4j.pb.constraints.pb.PBConstr;
 
-public class PBSolverCPCardLearning extends PBSolverCPLong {
+public class PBSolverCPCardAllImpliedLearning extends PBSolverCPLong {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, IOrder order) {
         super(learner, dsf, order);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             RestartStrategy restarter) {
@@ -31,21 +31,21 @@ public class PBSolverCPCardLearning extends PBSolverCPLong {
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order) {
         super(learner, dsf, params, order);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, IOrder order, boolean noRemove) {
         super(learner, dsf, order, noRemove);
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             RestartStrategy restarter, boolean noRemove) {
@@ -53,7 +53,7 @@ public class PBSolverCPCardLearning extends PBSolverCPLong {
         // TODO Auto-generated constructor stub
     }
 
-    public PBSolverCPCardLearning(
+    public PBSolverCPCardAllImpliedLearning(
             LearningStrategy<PBDataStructureFactory> learner,
             PBDataStructureFactory dsf, SearchParams params, IOrder order,
             boolean noRemove) {
@@ -64,13 +64,13 @@ public class PBSolverCPCardLearning extends PBSolverCPLong {
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
         return ConflictMapReduceToClause.createConflict(myconfl, level,
-                noRemove, ConflictMap.POSTPROCESSTOCARD);
+                noRemove, ConflictMap.POSTPROCESSTOCARDALLIMPLIED);
     }
 
     @Override
     public String toString(String prefix) {
         return super.toString(prefix) + "\n" + prefix
-                + "Performs a post-processing after conflict analysis in order to learn only cardinality constraints (Dixon's procedure)";
+                + "Performs a post-processing after conflict analysis in order to learn only cardinality constraints with all original implied literals";
     }
 
 }
