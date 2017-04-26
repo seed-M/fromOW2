@@ -674,6 +674,10 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
         return newCompetPBCPMixedConstraintsObjective();
     }
 
+    public static IPBSolver newCuttingPlanesWatched() {
+        return newCompetPBCPMixedConstraintsMinObjective();
+    }
+
     public static IPBSolver newCuttingPlanesStar() {
         return newPBCPStar(new PBMaxClauseCardConstrDataStructure(),
                 new VarOrderHeapObjective(), true);
