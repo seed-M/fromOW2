@@ -68,6 +68,7 @@ import org.sat4j.pb.core.PBSolverCP;
 import org.sat4j.pb.core.PBSolverCPCardLearning;
 import org.sat4j.pb.core.PBSolverCPClauseLearning;
 import org.sat4j.pb.core.PBSolverCPLong;
+import org.sat4j.pb.core.PBSolverCPLongDivideBy2;
 import org.sat4j.pb.core.PBSolverCPLongReduceToCard;
 import org.sat4j.pb.core.PBSolverCPLongRounding;
 //import org.sat4j.pb.core.PBSolverCard;
@@ -632,6 +633,18 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
         return solver;
     }
 
+    private static PBSolverCP newPBCPStarDivideBy2(PBDataStructureFactory dsf,
+            IOrder order, boolean noRemove) {
+        MiniSATLearning<PBDataStructureFactory> learning = new MiniSATLearning<PBDataStructureFactory>();
+        PBSolverCP solver = new PBSolverCPLongDivideBy2(learning, dsf, order,
+                noRemove);
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        solver.setRestartStrategy(new ArminRestarts());
+        solver.setLearnedConstraintsDeletionStrategy(solver.lbd_based);
+        return solver;
+    }
+
     private static PBSolverCP newPBCPStarRounding(PBDataStructureFactory dsf,
             IOrder order, boolean noRemove) {
         MiniSATLearning<PBDataStructureFactory> learning = new MiniSATLearning<PBDataStructureFactory>();
@@ -701,6 +714,11 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
 
     public static IPBSolver newCuttingPlanesStarCardLearning() {
         return newPBCPStarCardLearning(new PBMaxClauseCardConstrDataStructure(),
+                new VarOrderHeapObjective(), true);
+    }
+
+    public static IPBSolver newCuttingPlanesStarDivideBy2() {
+        return newPBCPStarDivideBy2(new PBMaxClauseCardConstrDataStructure(),
                 new VarOrderHeapObjective(), true);
     }
 

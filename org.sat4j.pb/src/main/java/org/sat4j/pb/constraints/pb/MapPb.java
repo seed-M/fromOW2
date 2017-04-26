@@ -75,10 +75,14 @@ public class MapPb implements IDataStructurePB {
     }
 
     public int reduceCoeffsByPower2() {
-        int nbBits = 1;
-        for (int i = 0; i < this.weightedLits.size() && nbBits > 0; i++)
+        assert this.weightedLits.size() > 0;
+        int nbBits = this.weightedLits.getCoef(0).bitLength();
+        for (int i = 0; i < this.weightedLits.size() && nbBits > 0; i++) {
             nbBits = Math.min(nbBits,
                     this.weightedLits.getCoef(i).getLowestSetBit());
+            if (nbBits == 0)
+                break;
+        }
         if (nbBits > 0) {
             for (int i = 0; i < this.weightedLits.size(); i++) {
                 this.weightedLits.changeCoef(i,

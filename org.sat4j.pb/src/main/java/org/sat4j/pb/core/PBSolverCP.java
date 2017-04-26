@@ -164,12 +164,6 @@ public class PBSolverCP extends PBSolver {
         }
 
         // assertive PB-constraint is build and referenced
-        int nbBits = confl.reduceCoeffsByPower2();
-        if (nbBits > 0) {
-            stats.numberOfReductionsByPower2++;
-            stats.numberOfRightShiftsForCoeffs = stats.numberOfRightShiftsForCoeffs
-                    + nbBits;
-        }
         confl.postProcess(currentLevel);
         PBConstr resConstr = (PBConstr) this.dsfactory
                 .createUnregisteredPseudoBooleanConstraint(confl);
