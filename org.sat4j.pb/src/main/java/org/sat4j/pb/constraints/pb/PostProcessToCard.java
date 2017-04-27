@@ -1,11 +1,3 @@
-package org.sat4j.pb.constraints.pb;
-
-import java.math.BigInteger;
-
-import org.sat4j.core.VecInt;
-import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.IteratorInt;
-
 /*******************************************************************************
  * SAT4J: a SATisfiability library for Java Copyright (C) 2004, 2012 Artois
  * University and CNRS
@@ -35,6 +27,14 @@ import org.sat4j.specs.IteratorInt;
  *
  * Contributors: CRIL - initial API and implementation
  *******************************************************************************/
+package org.sat4j.pb.constraints.pb;
+
+import java.math.BigInteger;
+
+import org.sat4j.core.VecInt;
+import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.IteratorInt;
+
 public class PostProcessToCard implements IPostProcess {
 
     private static final PostProcessToCard INSTANCE = new PostProcessToCard();
