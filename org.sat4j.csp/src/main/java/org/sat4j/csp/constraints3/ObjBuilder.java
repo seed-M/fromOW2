@@ -1,25 +1,29 @@
 /*******************************************************************************
-* SAT4J: a SATisfiability library for Java Copyright (C) 2004-2016 Daniel Le Berre
-*
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* which accompanies this distribution, and is available at
-* http://www.eclipse.org/legal/epl-v10.html
-*
-* Alternatively, the contents of this file may be used under the terms of
-* either the GNU Lesser General Public License Version 2.1 or later (the
-* "LGPL"), in which case the provisions of the LGPL are applicable instead
-* of those above. If you wish to allow use of your version of this file only
-* under the terms of the LGPL, and not to allow others to use your version of
-* this file under the terms of the EPL, indicate your decision by deleting
-* the provisions above and replace them with the notice and other provisions
-* required by the LGPL. If you do not delete the provisions above, a recipient
-* may use your version of this file under the terms of the EPL or the LGPL.
-*******************************************************************************/
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2016 Daniel Le Berre
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU Lesser General Public License Version 2.1 or later (the
+ * "LGPL"), in which case the provisions of the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of the LGPL, and not to allow others to use your version of
+ * this file under the terms of the EPL, indicate your decision by deleting
+ * the provisions above and replace them with the notice and other provisions
+ * required by the LGPL. If you do not delete the provisions above, a recipient
+ * may use your version of this file under the terms of the EPL or the LGPL.
+ *******************************************************************************/
 package org.sat4j.csp.constraints3;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -27,6 +31,7 @@ import org.sat4j.csp.intension.ICspToSatEncoder;
 import org.sat4j.csp.intension.IIntensionCtrEncoder;
 import org.sat4j.pb.IPBSolver;
 import org.sat4j.pb.ObjectiveFunction;
+import org.sat4j.pb.tools.LexicoDecoratorPB;
 import org.sat4j.reader.XMLCSP3Reader;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -51,10 +56,13 @@ public class ObjBuilder {
 	private IIntensionCtrEncoder intensionEnc;
 
 	private TypeCombination objCombination;
-	
-	private int nObjectives;
-	
+
+	private final List<ObjectiveFunction> objectives = new ArrayList<>();
+
+	private final IPBSolver solver;
+
 	public ObjBuilder(final IPBSolver solver, final IIntensionCtrEncoder intensionEnc) {
+		this.solver = solver;
 		this.intensionEnc = intensionEnc;
 		this.cspToSatEncoder = intensionEnc.getSolver();
 	}
@@ -64,19 +72,12 @@ public class ObjBuilder {
 	}
 	
 	private void addObjectiveFunction(final ObjectiveFunction obj) {
-		if(nObjectives == 1) {
-			composeObjectives();
-		}
-		this.cspToSatEncoder.setObjectiveFunction(obj);
-		++this.nObjectives;
+		this.objectives.add(obj);
 	}
-	
-	private void composeObjectives() {
-		switch(this.objCombination) {
-		case LEXICO:
-		case PARETO:
-			throw new UnsupportedOperationException("Multicriteria optimization is not handled yet.");
-		}
+
+	public IPBSolver composeObjectives() {
+		ObjectiveComposer oc = ObjectiveComposer.retrieveByTypeCombination(this.objCombination);
+		return oc.compose(this.solver, this.objectives);
 	}
 
 	public void buildObjToMinimize(final String id, final XVarInteger x) {
@@ -258,5 +259,61 @@ public class ObjBuilder {
 		final ObjectiveFunction obj = buildExprObjToMinimize(CtrBuilderUtils.syntaxTreeRootToString(syntaxTreeRoot), true);
 		addObjectiveFunction(obj);
 	}
+
+	protected enum ObjectiveComposer {
+		LEXICO(TypeCombination.LEXICO, "composeForLexico"),
+		PARETO(TypeCombination.PARETO, "composeForPareto");
+
+		private TypeCombination typeCombination;
+
+		private Method compositionMethod;
+
+		private ObjectiveComposer(final TypeCombination typeCombination, final String compositionMethodName) {
+			this.typeCombination = typeCombination;
+			try {
+				this.compositionMethod = getClass().getMethod(compositionMethodName, IPBSolver.class, List.class);
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new IllegalArgumentException(e);
+			}
+		}
+
+		protected static ObjectiveComposer retrieveByTypeCombination(final TypeCombination tc) {
+			if(tc == null) return ObjectiveComposer.LEXICO;
+			for(ObjectiveComposer oc : ObjectiveComposer.values()) {
+				if(oc.typeCombination == tc) return oc;
+			}
+			throw new IllegalArgumentException();
+		}
+
+		protected IPBSolver compose(final IPBSolver solver, final List<ObjectiveFunction> objectives) {
+			switch(objectives.size()) {
+			case 0:
+				return solver;
+			case 1:
+				solver.setObjectiveFunction(objectives.get(0));
+				return solver;
+			default:
+				try {
+					return (IPBSolver) this.compositionMethod.invoke(solver, objectives);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
+
+		public IPBSolver composeForLexico(final IPBSolver solver, final List<ObjectiveFunction> objectives) {
+			LexicoDecoratorPB lexicoDecorator = new LexicoDecoratorPB(solver);
+			for(ObjectiveFunction obj : objectives) {
+				lexicoDecorator.addCriterion(obj);
+			}
+			return lexicoDecorator;
+		}
+
+		public IPBSolver composeForPareto(final IPBSolver solver, final List<ObjectiveFunction> objectives) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 
 }
