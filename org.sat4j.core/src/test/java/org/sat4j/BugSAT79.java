@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sat4j.core.VecInt;
@@ -14,6 +15,7 @@ import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.GateTranslator;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Ignore
 public class BugSAT79 {
 
     private ISolver solver;

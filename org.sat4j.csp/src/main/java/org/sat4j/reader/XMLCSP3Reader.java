@@ -357,6 +357,12 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		this.objBuilder.setCombination(objCombination);
 	}
 
+	public void endObjectives() {
+		XCallbacks2.super.endObjectives();
+		this.solver = new PseudoOptDecorator(this.objBuilder.composeObjectives());
+	}
+
+
 	private void manageEntry(VEntry entry) {
 		if(entry instanceof XArray) {
 			XArray array = (XArray) entry;

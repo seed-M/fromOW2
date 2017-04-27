@@ -95,7 +95,7 @@ public class Parser {
 		}
 		++this.currentCharIndex;
 		if(operandsList.size() < operator.minArity() || operandsList.size() > operator.maxArity()) {
-			throw new IllegalArgumentException("wrong arity for operator \""+operator.nameAsString()+"\" at index "+this.currentCharIndex);
+			throw new WrongArityForOperatorException("wrong arity for operator \""+operator.nameAsString()+"\" at index "+this.currentCharIndex);
 		}
 		IExpression[] operandsArray = new IExpression[operandsList.size()];
 		operandsArray = operandsList.toArray(operandsArray);
