@@ -47,11 +47,6 @@ public class ConflictMap extends MapPb implements IConflict {
 
     final ILits voc;
 
-    public static final int NOPOSTPROCESS = 0;
-    public static final int POSTPROCESSTOCLAUSE = 1;
-    public static final int POSTPROCESSTOCARD = 2;
-    public static final int POSTPROCESSDIVIDEBY2 = 3;
-
     private static final int NOTCOMPUTED = -2;
 
     protected boolean hasBeenReduced = false;
@@ -63,9 +58,9 @@ public class ConflictMap extends MapPb implements IConflict {
     protected BigInteger currentSlack;
 
     protected int currentLevel;
-    private int backtrackLevel = NOTCOMPUTED;
+    int backtrackLevel = NOTCOMPUTED;
 
-    private final PBSolverStats stats;
+    final PBSolverStats stats;
 
     /**
      * allows to access directly to all variables belonging to a particular
@@ -89,53 +84,52 @@ public class ConflictMap extends MapPb implements IConflict {
 
     public static IConflict createConflict(PBConstr cpb, int level,
             boolean noRemove) {
-        return new ConflictMap(cpb, level, noRemove, NOPOSTPROCESS, null);
+        return new ConflictMap(cpb, level, noRemove, NoPostProcess.class, null);
     }
 
     public static IConflict createConflict(PBConstr cpb, int level,
-            boolean noRemove, int postProcessing) {
+            boolean noRemove, Class<? extends IPostProcess> postProcessing) {
         return new ConflictMap(cpb, level, noRemove, postProcessing, null);
     }
 
     public static IConflict createConflict(PBConstr cpb, int level,
-            boolean noRemove, int postProcessing, PBSolverStats stats) {
+            boolean noRemove, Class<? extends IPostProcess> postProcessing,
+            PBSolverStats stats) {
         return new ConflictMap(cpb, level, noRemove, postProcessing, stats);
     }
 
     ConflictMap(PBConstr cpb, int level) {
-        this(cpb, level, false, NOPOSTPROCESS, null);
+        this(cpb, level, false, NoPostProcess.class, null);
     }
 
     ConflictMap(PBConstr cpb, int level, boolean noRemove) {
-        this(cpb, level, noRemove, NOPOSTPROCESS, null);
+        this(cpb, level, noRemove, NoPostProcess.class, null);
     }
 
-    ConflictMap(PBConstr cpb, int level, boolean noRemove, int postProcessing,
-            PBSolverStats stats) {
+    ConflictMap(PBConstr cpb, int level, boolean noRemove,
+            Class<? extends IPostProcess> postProcessing, PBSolverStats stats) {
         super(cpb, level, noRemove);
         this.stats = stats;
         this.voc = cpb.getVocabulary();
         this.currentLevel = level;
         initStructures();
-        switch (postProcessing) {
-        case POSTPROCESSTOCLAUSE:
-            this.postProcess = new PostProcessToClause();
-            break;
-        case POSTPROCESSTOCARD:
-            this.postProcess = new PostProcessToCard();
-            break;
-        case POSTPROCESSDIVIDEBY2:
-            this.postProcess = new PostProcessDivideBy2();
-            break;
-        default:
-            this.postProcess = new NoPostProcess();
-            break;
-        }
+
+        this.postProcess = getPostProcessor(postProcessing);
 
         if (noRemove)
             this.rmSatLit = new NoRemoveSatisfied();
         else
             this.rmSatLit = new RemoveSatisfied();
+    }
+
+    private IPostProcess getPostProcessor(
+            Class<? extends IPostProcess> postProcessing) {
+        try {
+            return postProcessing.getConstructor(ConflictMap.class)
+                    .newInstance(this);
+        } catch (Exception e) {
+            return new NoPostProcess(this);
+        }
     }
 
     private void initStructures() {
@@ -167,7 +161,7 @@ public class ConflictMap extends MapPb implements IConflict {
      * @param level
      * @return
      */
-    private static int levelToIndex(int level) {
+    static int levelToIndex(int level) {
         return level + 1;
     }
 
@@ -177,7 +171,7 @@ public class ConflictMap extends MapPb implements IConflict {
      * @param indLevel
      * @return
      */
-    private static int indexToLevel(int indLevel) {
+    static int indexToLevel(int indLevel) {
         return indLevel - 1;
     }
 
@@ -235,274 +229,7 @@ public class ConflictMap extends MapPb implements IConflict {
 
     };
 
-    /**
-     * private interface to post-process the assertive conflict to a clause, to
-     * a cardinality or to let it as a PB-constraint.
-     * 
-     */
-    private interface IPostProcess {
-        void postProcess(int dl);
-    }
-
     private final IPostProcess postProcess;
-
-    private class NoPostProcess implements IPostProcess {
-        public void postProcess(int dl) {
-
-        }
-
-    }
-
-    private class PostProcessToClause implements IPostProcess {
-        public void postProcess(int dl) {
-            if (ConflictMap.this.isAssertive(dl)
-                    && (!ConflictMap.this.degree.equals(BigInteger.ONE))) {
-                int litLevel, ilit;
-                if (ConflictMap.this.assertiveLiteral != -1) {
-                    ConflictMap.this.assertiveLiteral = this
-                            .chooseAssertiveLiteral(dl);
-                    int lit = ConflictMap.this.weightedLits
-                            .getLit(ConflictMap.this.assertiveLiteral);
-
-                    IVecInt toSuppress = new VecInt();
-
-                    for (int i = 0; i < ConflictMap.this.size(); i++) {
-                        ilit = ConflictMap.this.weightedLits.getLit(i);
-                        litLevel = ConflictMap.this.voc.getLevel(ilit);
-                        if ((litLevel < this.assertiveLevel)
-                                && ConflictMap.this.voc.isFalsified(ilit))
-                            ConflictMap.this.weightedLits.changeCoef(i,
-                                    BigInteger.ONE);
-                        else if (ilit != lit) {
-                            toSuppress.push(ilit);
-                        }
-                    }
-
-                    ConflictMap.this.weightedLits.changeCoef(
-                            ConflictMap.this.assertiveLiteral, BigInteger.ONE);
-
-                    for (int i = 0; i < toSuppress.size(); i++)
-                        ConflictMap.this.removeCoef(toSuppress.get(i));
-
-                    ConflictMap.this.degree = BigInteger.ONE;
-                    ConflictMap.this.assertiveLiteral = ConflictMap.this.weightedLits
-                            .getFromAllLits(lit);
-                    assert ConflictMap.this.backtrackLevel == oldGetBacktrackLevel(
-                            dl);
-                }
-            }
-        }
-
-        private int assertiveLevel;
-
-        public int chooseAssertiveLiteral(int maxLevel) {
-            // we are looking for a level higher than maxLevel
-            // where the constraint is still assertive
-            // update ConflictMap.this.assertiveLiteral
-            VecInt lits;
-            int level;
-
-            int indStop = levelToIndex(maxLevel); // ou maxLevel - 1 ???
-            int indStart = levelToIndex(0);
-            BigInteger slack = ConflictMap.this.computeSlack(0)
-                    .subtract(ConflictMap.this.degree);
-            int previous = 0;
-            for (int indLevel = indStart; indLevel <= indStop; indLevel++) {
-                if (ConflictMap.this.byLevel[indLevel] != null) {
-                    level = indexToLevel(indLevel);
-                    assert ConflictMap.this.computeSlack(level)
-                            .subtract(ConflictMap.this.degree).equals(slack);
-                    if (ConflictMap.this.isImplyingLiteralOrdered(level,
-                            slack)) {
-                        ConflictMap.this.backtrackLevel = previous;
-                        assertiveLevel = level;
-                        break;
-                    }
-                    // updating the new slack
-                    lits = ConflictMap.this.byLevel[indLevel];
-                    int lit;
-                    for (IteratorInt iterator = lits.iterator(); iterator
-                            .hasNext();) {
-                        lit = iterator.next();
-                        if (ConflictMap.this.voc.isFalsified(lit)
-                                && ConflictMap.this.voc.getLevel(
-                                        lit) == indexToLevel(indLevel)) {
-                            slack = slack.subtract(
-                                    ConflictMap.this.weightedLits.get(lit));
-                        }
-                    }
-                    if (!lits.isEmpty()) {
-                        previous = level;
-                    }
-                }
-            }
-
-            assert ConflictMap.this.backtrackLevel == oldGetBacktrackLevel(
-                    maxLevel);
-            return assertiveLiteral;
-        }
-
-    }
-
-    private class PostProcessToCard implements IPostProcess {
-        public void postProcess(int dl) {
-            // procedure Reduce-to-cardinality 4.3.9 proposed by H. Dixon
-            // (Dixon's dissertation, page 67)
-            if (ConflictMap.this.isAssertive(dl)
-                    && (!ConflictMap.this.degree.equals(BigInteger.ONE))) {
-                int lit, litLevel, ilit;
-                BigInteger coefLit;
-                if (ConflictMap.this.assertiveLiteral != -1) {
-                    ConflictMap.this.assertiveLiteral = this
-                            .chooseAssertiveLiteral(dl);
-                    coefLit = ConflictMap.this.weightedLits
-                            .getCoef(ConflictMap.this.assertiveLiteral);
-
-                    // compute sum of coefficients of confl
-                    BigInteger sumCoefsTmp = BigInteger.ZERO;
-                    for (int i = 0; i < ConflictMap.this.size(); i++) {
-                        sumCoefsTmp = sumCoefsTmp
-                                .add(ConflictMap.this.weightedLits.getCoef(i));
-                    }
-
-                    // if it is already a cardinality constraint, return
-                    if (sumCoefsTmp.compareTo(
-                            BigInteger.valueOf(ConflictMap.this.size())) == 0) {
-                        return;
-                    }
-                    IVecInt compLSet = new VecInt();
-                    BigInteger coefMax = coefLit;
-                    BigInteger coefTmp;
-
-                    // construct lSet with all falsified literals s.t. sum of
-                    // the coefs of compl(lSet) < degree
-                    // first we add the assertive literal
-                    sumCoefsTmp = sumCoefsTmp.subtract(coefLit);
-                    ConflictMap.this.changeCoef(
-                            ConflictMap.this.assertiveLiteral, BigInteger.ONE);
-                    // then the needed falsified literals
-                    for (int i = 0; i < ConflictMap.this.size(); i++) {
-                        ilit = ConflictMap.this.weightedLits.getLit(i);
-                        lit = ConflictMap.this.weightedLits
-                                .getLit(ConflictMap.this.assertiveLiteral);
-                        litLevel = ConflictMap.this.voc.getLevel(ilit);
-                        coefTmp = ConflictMap.this.weightedLits.getCoef(i);
-                        if (ilit != lit) {
-                            if (litLevel < this.assertiveLevel
-                                    && ConflictMap.this.voc.isFalsified(ilit)) {
-                                ConflictMap.this.changeCoef(i, BigInteger.ONE);
-                                sumCoefsTmp = sumCoefsTmp.subtract(coefTmp);
-                                if (coefMax.compareTo(coefTmp) < 0)
-                                    coefMax = coefTmp;
-                            } else
-                                compLSet.push(ilit);
-                        }
-                    }
-                    assert sumCoefsTmp.compareTo(ConflictMap.this.degree) < 0;
-
-                    // add into lSet the sSet literals which are not already in
-                    // L and with coef > coefMax
-
-                    lit = ConflictMap.this.weightedLits
-                            .getLit(ConflictMap.this.assertiveLiteral);
-                    int degreeCard = 1;
-                    for (int i = 0; i < compLSet.size(); i++) {
-                        ilit = ConflictMap.this.weightedLits
-                                .getFromAllLits(compLSet.get(i));
-                        if (coefMax.compareTo(ConflictMap.this.weightedLits
-                                .getCoef(ilit)) <= 0) {
-                            ConflictMap.this.changeCoef(ilit, BigInteger.ONE);
-                            degreeCard++;
-                        } else {
-                            ConflictMap.this.removeCoef(compLSet.get(i));
-                        }
-                    }
-
-                    ConflictMap.this.degree = BigInteger.valueOf(degreeCard);
-                    ConflictMap.this.assertiveLiteral = ConflictMap.this.weightedLits
-                            .getFromAllLits(lit);
-
-                    assert ConflictMap.this.backtrackLevel == oldGetBacktrackLevel(
-                            dl);
-                }
-            }
-        }
-
-        private int assertiveLevel;
-
-        public int chooseAssertiveLiteral(int maxLevel) {
-            // we are looking for a level higher than maxLevel
-            // where the constraint is still assertive
-            VecInt lits;
-            int level;
-            int indStop = levelToIndex(maxLevel); // ou maxLevel - 1 ???
-            int indStart = levelToIndex(0);
-            BigInteger slack = ConflictMap.this.computeSlack(0)
-                    .subtract(ConflictMap.this.degree);
-            int previous = 0;
-            IVecInt literals = new VecInt();
-            for (int indLevel = indStart; indLevel <= indStop; indLevel++) {
-                if (ConflictMap.this.byLevel[indLevel] != null) {
-                    level = indexToLevel(indLevel);
-                    assert ConflictMap.this.computeSlack(level)
-                            .subtract(ConflictMap.this.degree).equals(slack);
-                    if (ConflictMap.this.isImplyingLiteralOrdered(level, slack,
-                            literals)) {
-                        this.assertiveLevel = level;
-                        ConflictMap.this.backtrackLevel = previous;
-                        break;
-                    }
-                    // updating the new slack
-                    lits = ConflictMap.this.byLevel[indLevel];
-                    int lit;
-                    for (IteratorInt iterator = lits.iterator(); iterator
-                            .hasNext();) {
-                        lit = iterator.next();
-                        if (ConflictMap.this.voc.isFalsified(lit)
-                                && ConflictMap.this.voc.getLevel(
-                                        lit) == indexToLevel(indLevel)) {
-                            slack = slack.subtract(
-                                    ConflictMap.this.weightedLits.get(lit));
-                        }
-                    }
-                    if (!lits.isEmpty()) {
-                        previous = level;
-                    }
-                }
-            }
-
-            assert literals.size() > 0;
-            BigInteger coef;
-            int maxLit = literals.get(0);
-            BigInteger maxCoef = ConflictMap.this.weightedLits.getCoef(maxLit);
-            for (int i = 1; i < literals.size(); i++) {
-                coef = ConflictMap.this.weightedLits.getCoef(literals.get(i));
-                if (coef.compareTo(maxCoef) > 0) {
-                    maxLit = literals.get(i);
-                    maxCoef = coef;
-                }
-            }
-
-            assert ConflictMap.this.backtrackLevel == oldGetBacktrackLevel(
-                    maxLevel);
-            assert literals.size() > 0;
-            return maxLit;
-        }
-
-    }
-
-    private class PostProcessDivideBy2 implements IPostProcess {
-        public void postProcess(int dl) {
-            int nbBits = ConflictMap.this.reduceCoeffsByPower2();
-            if (nbBits > 0) {
-                stats.numberOfReductionsByPower2++;
-                stats.numberOfRightShiftsForCoeffs = stats.numberOfRightShiftsForCoeffs
-                        + nbBits;
-            }
-
-        }
-
-    }
 
     public void postProcess(int dl) {
         this.postProcess.postProcess(dl);
@@ -759,7 +486,7 @@ public class ConflictMap extends MapPb implements IConflict {
     }
 
     // computes a slack with respect to a particular decision level
-    private BigInteger computeSlack(int dl) {
+    BigInteger computeSlack(int dl) {
         BigInteger slack = BigInteger.ZERO;
         int lit;
         BigInteger tmp;
@@ -849,7 +576,7 @@ public class ConflictMap extends MapPb implements IConflict {
     // a particular level
     // uses the coefs data structure (where coefficients are decreasing ordered)
     // to parse each literal
-    private boolean isImplyingLiteralOrdered(int dl, BigInteger slack) {
+    boolean isImplyingLiteralOrdered(int dl, BigInteger slack) {
         int ilit, litLevel;
         for (int i = 0; i < size(); i++) {
             ilit = this.weightedLits.getLit(i);
@@ -868,7 +595,7 @@ public class ConflictMap extends MapPb implements IConflict {
     // a particular level
     // uses the coefs data structure (where coefficients are decreasing ordered)
     // to parse each literal
-    private boolean isImplyingLiteralOrdered(int dl, BigInteger slack,
+    boolean isImplyingLiteralOrdered(int dl, BigInteger slack,
             IVecInt literals) {
         assert literals.size() == 0;
         int ilit, litLevel;
