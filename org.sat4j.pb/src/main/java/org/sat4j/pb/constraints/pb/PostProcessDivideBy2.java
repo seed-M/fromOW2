@@ -30,23 +30,22 @@
 package org.sat4j.pb.constraints.pb;
 
 public class PostProcessDivideBy2 implements IPostProcess {
-    /**
-     * 
-     */
-    private final ConflictMap conflictMap;
 
-    /**
-     * @param conflictMap
-     */
-    PostProcessDivideBy2(ConflictMap conflictMap) {
-        this.conflictMap = conflictMap;
+    private static final PostProcessDivideBy2 INSTANCE = new PostProcessDivideBy2();
+
+    private PostProcessDivideBy2() {
+        // no instantiation
     }
 
-    public void postProcess(int dl) {
-        int nbBits = this.conflictMap.reduceCoeffsByPower2();
+    public static final PostProcessDivideBy2 instance() {
+        return INSTANCE;
+    }
+
+    public void postProcess(int dl, ConflictMap conflictMap) {
+        int nbBits = conflictMap.reduceCoeffsByPower2();
         if (nbBits > 0) {
-            this.conflictMap.stats.numberOfReductionsByPower2++;
-            this.conflictMap.stats.numberOfRightShiftsForCoeffs = this.conflictMap.stats.numberOfRightShiftsForCoeffs
+            conflictMap.stats.numberOfReductionsByPower2++;
+            conflictMap.stats.numberOfRightShiftsForCoeffs = conflictMap.stats.numberOfRightShiftsForCoeffs
                     + nbBits;
         }
 

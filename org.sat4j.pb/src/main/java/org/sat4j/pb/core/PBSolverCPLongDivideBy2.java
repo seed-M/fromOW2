@@ -87,7 +87,7 @@ public class PBSolverCPLongDivideBy2 extends PBSolverCPLong {
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
         return ConflictMapReduceToClause.createConflict(myconfl, level,
-                noRemove, PostProcessDivideBy2.class, stats);
+                noRemove, PostProcessDivideBy2.instance(), stats);
     }
 
     @Override

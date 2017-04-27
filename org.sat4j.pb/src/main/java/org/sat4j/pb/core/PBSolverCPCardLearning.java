@@ -87,7 +87,7 @@ public class PBSolverCPCardLearning extends PBSolverCPLong {
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
         return ConflictMapReduceToClause.createConflict(myconfl, level,
-                noRemove, PostProcessToCard.class);
+                noRemove, PostProcessToCard.instance());
     }
 
     @Override

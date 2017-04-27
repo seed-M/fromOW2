@@ -36,41 +36,40 @@ import org.sat4j.specs.IteratorInt;
  * Contributors: CRIL - initial API and implementation
  *******************************************************************************/
 public class PostProcessToCard implements IPostProcess {
-    /**
-     * 
-     */
-    private final ConflictMap conflictMap;
 
-    /**
-     * @param conflictMap
-     */
-    PostProcessToCard(ConflictMap conflictMap) {
-        this.conflictMap = conflictMap;
+    private static final PostProcessToCard INSTANCE = new PostProcessToCard();
+
+    private PostProcessToCard() {
+        // no instantiation
     }
 
-    public void postProcess(int dl) {
+    public static final PostProcessToCard instance() {
+        return INSTANCE;
+    }
+
+    public void postProcess(int dl, ConflictMap conflictMap) {
         // procedure Reduce-to-cardinality 4.3.9 proposed by H. Dixon
         // (Dixon's dissertation, page 67)
-        if (this.conflictMap.isAssertive(dl)
-                && (!this.conflictMap.degree.equals(BigInteger.ONE))) {
+        if (conflictMap.isAssertive(dl)
+                && (!conflictMap.degree.equals(BigInteger.ONE))) {
             int lit, litLevel, ilit;
             BigInteger coefLit;
-            if (this.conflictMap.assertiveLiteral != -1) {
-                this.conflictMap.assertiveLiteral = this
-                        .chooseAssertiveLiteral(dl);
-                coefLit = this.conflictMap.weightedLits
-                        .getCoef(this.conflictMap.assertiveLiteral);
+            if (conflictMap.assertiveLiteral != -1) {
+                conflictMap.assertiveLiteral = this.chooseAssertiveLiteral(dl,
+                        conflictMap);
+                coefLit = conflictMap.weightedLits
+                        .getCoef(conflictMap.assertiveLiteral);
 
                 // compute sum of coefficients of confl
                 BigInteger sumCoefsTmp = BigInteger.ZERO;
-                for (int i = 0; i < this.conflictMap.size(); i++) {
+                for (int i = 0; i < conflictMap.size(); i++) {
                     sumCoefsTmp = sumCoefsTmp
-                            .add(this.conflictMap.weightedLits.getCoef(i));
+                            .add(conflictMap.weightedLits.getCoef(i));
                 }
 
                 // if it is already a cardinality constraint, return
                 if (sumCoefsTmp.compareTo(
-                        BigInteger.valueOf(this.conflictMap.size())) == 0) {
+                        BigInteger.valueOf(conflictMap.size())) == 0) {
                     return;
                 }
                 IVecInt compLSet = new VecInt();
@@ -81,19 +80,19 @@ public class PostProcessToCard implements IPostProcess {
                 // the coefs of compl(lSet) < degree
                 // first we add the assertive literal
                 sumCoefsTmp = sumCoefsTmp.subtract(coefLit);
-                this.conflictMap.changeCoef(this.conflictMap.assertiveLiteral,
+                conflictMap.changeCoef(conflictMap.assertiveLiteral,
                         BigInteger.ONE);
                 // then the needed falsified literals
-                for (int i = 0; i < this.conflictMap.size(); i++) {
-                    ilit = this.conflictMap.weightedLits.getLit(i);
-                    lit = this.conflictMap.weightedLits
-                            .getLit(this.conflictMap.assertiveLiteral);
-                    litLevel = this.conflictMap.voc.getLevel(ilit);
-                    coefTmp = this.conflictMap.weightedLits.getCoef(i);
+                for (int i = 0; i < conflictMap.size(); i++) {
+                    ilit = conflictMap.weightedLits.getLit(i);
+                    lit = conflictMap.weightedLits
+                            .getLit(conflictMap.assertiveLiteral);
+                    litLevel = conflictMap.voc.getLevel(ilit);
+                    coefTmp = conflictMap.weightedLits.getCoef(i);
                     if (ilit != lit) {
                         if (litLevel < this.assertiveLevel
-                                && this.conflictMap.voc.isFalsified(ilit)) {
-                            this.conflictMap.changeCoef(i, BigInteger.ONE);
+                                && conflictMap.voc.isFalsified(ilit)) {
+                            conflictMap.changeCoef(i, BigInteger.ONE);
                             sumCoefsTmp = sumCoefsTmp.subtract(coefTmp);
                             if (coefMax.compareTo(coefTmp) < 0)
                                 coefMax = coefTmp;
@@ -101,31 +100,31 @@ public class PostProcessToCard implements IPostProcess {
                             compLSet.push(ilit);
                     }
                 }
-                assert sumCoefsTmp.compareTo(this.conflictMap.degree) < 0;
+                assert sumCoefsTmp.compareTo(conflictMap.degree) < 0;
 
                 // add into lSet the sSet literals which are not already in
                 // L and with coef > coefMax
 
-                lit = this.conflictMap.weightedLits
-                        .getLit(this.conflictMap.assertiveLiteral);
+                lit = conflictMap.weightedLits
+                        .getLit(conflictMap.assertiveLiteral);
                 int degreeCard = 1;
                 for (int i = 0; i < compLSet.size(); i++) {
-                    ilit = this.conflictMap.weightedLits
+                    ilit = conflictMap.weightedLits
                             .getFromAllLits(compLSet.get(i));
                     if (coefMax.compareTo(
-                            this.conflictMap.weightedLits.getCoef(ilit)) <= 0) {
-                        this.conflictMap.changeCoef(ilit, BigInteger.ONE);
+                            conflictMap.weightedLits.getCoef(ilit)) <= 0) {
+                        conflictMap.changeCoef(ilit, BigInteger.ONE);
                         degreeCard++;
                     } else {
-                        this.conflictMap.removeCoef(compLSet.get(i));
+                        conflictMap.removeCoef(compLSet.get(i));
                     }
                 }
 
-                this.conflictMap.degree = BigInteger.valueOf(degreeCard);
-                this.conflictMap.assertiveLiteral = this.conflictMap.weightedLits
+                conflictMap.degree = BigInteger.valueOf(degreeCard);
+                conflictMap.assertiveLiteral = conflictMap.weightedLits
                         .getFromAllLits(lit);
 
-                assert this.conflictMap.backtrackLevel == this.conflictMap
+                assert conflictMap.backtrackLevel == conflictMap
                         .oldGetBacktrackLevel(dl);
             }
         }
@@ -133,39 +132,39 @@ public class PostProcessToCard implements IPostProcess {
 
     private int assertiveLevel;
 
-    public int chooseAssertiveLiteral(int maxLevel) {
+    private int chooseAssertiveLiteral(int maxLevel, ConflictMap conflictMap) {
         // we are looking for a level higher than maxLevel
         // where the constraint is still assertive
         VecInt lits;
         int level;
         int indStop = ConflictMap.levelToIndex(maxLevel); // ou maxLevel - 1 ???
         int indStart = ConflictMap.levelToIndex(0);
-        BigInteger slack = this.conflictMap.computeSlack(0)
-                .subtract(this.conflictMap.degree);
+        BigInteger slack = conflictMap.computeSlack(0)
+                .subtract(conflictMap.degree);
         int previous = 0;
         IVecInt literals = new VecInt();
         for (int indLevel = indStart; indLevel <= indStop; indLevel++) {
-            if (this.conflictMap.byLevel[indLevel] != null) {
+            if (conflictMap.byLevel[indLevel] != null) {
                 level = ConflictMap.indexToLevel(indLevel);
-                assert this.conflictMap.computeSlack(level)
-                        .subtract(this.conflictMap.degree).equals(slack);
-                if (this.conflictMap.isImplyingLiteralOrdered(level, slack,
+                assert conflictMap.computeSlack(level)
+                        .subtract(conflictMap.degree).equals(slack);
+                if (conflictMap.isImplyingLiteralOrdered(level, slack,
                         literals)) {
                     this.assertiveLevel = level;
-                    this.conflictMap.backtrackLevel = previous;
+                    conflictMap.backtrackLevel = previous;
                     break;
                 }
                 // updating the new slack
-                lits = this.conflictMap.byLevel[indLevel];
+                lits = conflictMap.byLevel[indLevel];
                 int lit;
                 for (IteratorInt iterator = lits.iterator(); iterator
                         .hasNext();) {
                     lit = iterator.next();
-                    if (this.conflictMap.voc.isFalsified(lit)
-                            && this.conflictMap.voc.getLevel(lit) == ConflictMap
+                    if (conflictMap.voc.isFalsified(lit)
+                            && conflictMap.voc.getLevel(lit) == ConflictMap
                                     .indexToLevel(indLevel)) {
-                        slack = slack.subtract(
-                                this.conflictMap.weightedLits.get(lit));
+                        slack = slack
+                                .subtract(conflictMap.weightedLits.get(lit));
                     }
                 }
                 if (!lits.isEmpty()) {
@@ -177,16 +176,16 @@ public class PostProcessToCard implements IPostProcess {
         assert literals.size() > 0;
         BigInteger coef;
         int maxLit = literals.get(0);
-        BigInteger maxCoef = this.conflictMap.weightedLits.getCoef(maxLit);
+        BigInteger maxCoef = conflictMap.weightedLits.getCoef(maxLit);
         for (int i = 1; i < literals.size(); i++) {
-            coef = this.conflictMap.weightedLits.getCoef(literals.get(i));
+            coef = conflictMap.weightedLits.getCoef(literals.get(i));
             if (coef.compareTo(maxCoef) > 0) {
                 maxLit = literals.get(i);
                 maxCoef = coef;
             }
         }
 
-        assert this.conflictMap.backtrackLevel == this.conflictMap
+        assert conflictMap.backtrackLevel == conflictMap
                 .oldGetBacktrackLevel(maxLevel);
         assert literals.size() > 0;
         return maxLit;

@@ -84,52 +84,43 @@ public class ConflictMap extends MapPb implements IConflict {
 
     public static IConflict createConflict(PBConstr cpb, int level,
             boolean noRemove) {
-        return new ConflictMap(cpb, level, noRemove, NoPostProcess.class, null);
+        return new ConflictMap(cpb, level, noRemove, NoPostProcess.instance(),
+                null);
     }
 
     public static IConflict createConflict(PBConstr cpb, int level,
-            boolean noRemove, Class<? extends IPostProcess> postProcessing) {
+            boolean noRemove, IPostProcess postProcessing) {
         return new ConflictMap(cpb, level, noRemove, postProcessing, null);
     }
 
     public static IConflict createConflict(PBConstr cpb, int level,
-            boolean noRemove, Class<? extends IPostProcess> postProcessing,
+            boolean noRemove, IPostProcess postProcessing,
             PBSolverStats stats) {
         return new ConflictMap(cpb, level, noRemove, postProcessing, stats);
     }
 
     ConflictMap(PBConstr cpb, int level) {
-        this(cpb, level, false, NoPostProcess.class, null);
+        this(cpb, level, false, NoPostProcess.instance(), null);
     }
 
     ConflictMap(PBConstr cpb, int level, boolean noRemove) {
-        this(cpb, level, noRemove, NoPostProcess.class, null);
+        this(cpb, level, noRemove, NoPostProcess.instance(), null);
     }
 
     ConflictMap(PBConstr cpb, int level, boolean noRemove,
-            Class<? extends IPostProcess> postProcessing, PBSolverStats stats) {
+            IPostProcess postProcessing, PBSolverStats stats) {
         super(cpb, level, noRemove);
         this.stats = stats;
         this.voc = cpb.getVocabulary();
         this.currentLevel = level;
         initStructures();
 
-        this.postProcess = getPostProcessor(postProcessing);
+        this.postProcess = postProcessing;
 
         if (noRemove)
             this.rmSatLit = new NoRemoveSatisfied();
         else
             this.rmSatLit = new RemoveSatisfied();
-    }
-
-    private IPostProcess getPostProcessor(
-            Class<? extends IPostProcess> postProcessing) {
-        try {
-            return postProcessing.getConstructor(ConflictMap.class)
-                    .newInstance(this);
-        } catch (Exception e) {
-            return new NoPostProcess(this);
-        }
     }
 
     private void initStructures() {
@@ -232,7 +223,7 @@ public class ConflictMap extends MapPb implements IConflict {
     private final IPostProcess postProcess;
 
     public void postProcess(int dl) {
-        this.postProcess.postProcess(dl);
+        this.postProcess.postProcess(dl, this);
     }
 
     /*

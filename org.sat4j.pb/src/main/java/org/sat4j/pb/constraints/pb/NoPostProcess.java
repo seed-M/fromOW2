@@ -30,11 +30,19 @@
 package org.sat4j.pb.constraints.pb;
 
 public class NoPostProcess implements IPostProcess {
-    public NoPostProcess(ConflictMap cm) {
-        // no need to keep it
+
+    private static final NoPostProcess INSTANCE = new NoPostProcess();
+
+    private NoPostProcess() {
+        // no instantiation
     }
 
-    public void postProcess(int dl) {
+    public static final NoPostProcess instance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public void postProcess(int dl, ConflictMap conflictMap) {
         // nothing to do
     }
 }

@@ -37,52 +37,49 @@ import org.sat4j.specs.IteratorInt;
 
 public class PostProcessToClause implements IPostProcess {
 
-    /**
-     * 
-     */
-    private final ConflictMap conflictMap;
+    private static final PostProcessToClause INSTANCE = new PostProcessToClause();
 
-    /**
-     * @param conflictMap
-     */
-    PostProcessToClause(ConflictMap conflictMap) {
-        this.conflictMap = conflictMap;
+    private PostProcessToClause() {
+        // no instantiation
     }
 
-    public void postProcess(int dl) {
-        if (this.conflictMap.isAssertive(dl)
-                && (!this.conflictMap.degree.equals(BigInteger.ONE))) {
+    public static final PostProcessToClause instance() {
+        return INSTANCE;
+    }
+
+    public void postProcess(int dl, ConflictMap conflictMap) {
+        if (conflictMap.isAssertive(dl)
+                && (!conflictMap.degree.equals(BigInteger.ONE))) {
             int litLevel, ilit;
-            if (this.conflictMap.assertiveLiteral != -1) {
-                this.conflictMap.assertiveLiteral = this
-                        .chooseAssertiveLiteral(dl);
-                int lit = this.conflictMap.weightedLits
-                        .getLit(this.conflictMap.assertiveLiteral);
+            if (conflictMap.assertiveLiteral != -1) {
+                conflictMap.assertiveLiteral = this.chooseAssertiveLiteral(dl,
+                        conflictMap);
+                int lit = conflictMap.weightedLits
+                        .getLit(conflictMap.assertiveLiteral);
 
                 IVecInt toSuppress = new VecInt();
 
-                for (int i = 0; i < this.conflictMap.size(); i++) {
-                    ilit = this.conflictMap.weightedLits.getLit(i);
-                    litLevel = this.conflictMap.voc.getLevel(ilit);
+                for (int i = 0; i < conflictMap.size(); i++) {
+                    ilit = conflictMap.weightedLits.getLit(i);
+                    litLevel = conflictMap.voc.getLevel(ilit);
                     if ((litLevel < this.assertiveLevel)
-                            && this.conflictMap.voc.isFalsified(ilit))
-                        this.conflictMap.weightedLits.changeCoef(i,
-                                BigInteger.ONE);
+                            && conflictMap.voc.isFalsified(ilit))
+                        conflictMap.weightedLits.changeCoef(i, BigInteger.ONE);
                     else if (ilit != lit) {
                         toSuppress.push(ilit);
                     }
                 }
 
-                this.conflictMap.weightedLits.changeCoef(
-                        this.conflictMap.assertiveLiteral, BigInteger.ONE);
+                conflictMap.weightedLits.changeCoef(
+                        conflictMap.assertiveLiteral, BigInteger.ONE);
 
                 for (int i = 0; i < toSuppress.size(); i++)
-                    this.conflictMap.removeCoef(toSuppress.get(i));
+                    conflictMap.removeCoef(toSuppress.get(i));
 
-                this.conflictMap.degree = BigInteger.ONE;
-                this.conflictMap.assertiveLiteral = this.conflictMap.weightedLits
+                conflictMap.degree = BigInteger.ONE;
+                conflictMap.assertiveLiteral = conflictMap.weightedLits
                         .getFromAllLits(lit);
-                assert this.conflictMap.backtrackLevel == this.conflictMap
+                assert conflictMap.backtrackLevel == conflictMap
                         .oldGetBacktrackLevel(dl);
             }
         }
@@ -90,7 +87,7 @@ public class PostProcessToClause implements IPostProcess {
 
     private int assertiveLevel;
 
-    public int chooseAssertiveLiteral(int maxLevel) {
+    public int chooseAssertiveLiteral(int maxLevel, ConflictMap conflictMap) {
         // we are looking for a level higher than maxLevel
         // where the constraint is still assertive
         // update ConflictMap.this.assertiveLiteral
@@ -99,30 +96,30 @@ public class PostProcessToClause implements IPostProcess {
 
         int indStop = ConflictMap.levelToIndex(maxLevel); // ou maxLevel - 1 ???
         int indStart = ConflictMap.levelToIndex(0);
-        BigInteger slack = this.conflictMap.computeSlack(0)
-                .subtract(this.conflictMap.degree);
+        BigInteger slack = conflictMap.computeSlack(0)
+                .subtract(conflictMap.degree);
         int previous = 0;
         for (int indLevel = indStart; indLevel <= indStop; indLevel++) {
-            if (this.conflictMap.byLevel[indLevel] != null) {
+            if (conflictMap.byLevel[indLevel] != null) {
                 level = ConflictMap.indexToLevel(indLevel);
-                assert this.conflictMap.computeSlack(level)
-                        .subtract(this.conflictMap.degree).equals(slack);
-                if (this.conflictMap.isImplyingLiteralOrdered(level, slack)) {
-                    this.conflictMap.backtrackLevel = previous;
+                assert conflictMap.computeSlack(level)
+                        .subtract(conflictMap.degree).equals(slack);
+                if (conflictMap.isImplyingLiteralOrdered(level, slack)) {
+                    conflictMap.backtrackLevel = previous;
                     assertiveLevel = level;
                     break;
                 }
                 // updating the new slack
-                lits = this.conflictMap.byLevel[indLevel];
+                lits = conflictMap.byLevel[indLevel];
                 int lit;
                 for (IteratorInt iterator = lits.iterator(); iterator
                         .hasNext();) {
                     lit = iterator.next();
-                    if (this.conflictMap.voc.isFalsified(lit)
-                            && this.conflictMap.voc.getLevel(lit) == ConflictMap
+                    if (conflictMap.voc.isFalsified(lit)
+                            && conflictMap.voc.getLevel(lit) == ConflictMap
                                     .indexToLevel(indLevel)) {
-                        slack = slack.subtract(
-                                this.conflictMap.weightedLits.get(lit));
+                        slack = slack
+                                .subtract(conflictMap.weightedLits.get(lit));
                     }
                 }
                 if (!lits.isEmpty()) {
@@ -131,9 +128,9 @@ public class PostProcessToClause implements IPostProcess {
             }
         }
 
-        assert this.conflictMap.backtrackLevel == this.conflictMap
+        assert conflictMap.backtrackLevel == conflictMap
                 .oldGetBacktrackLevel(maxLevel);
-        return this.conflictMap.assertiveLiteral;
+        return conflictMap.assertiveLiteral;
     }
 
 }

@@ -35,5 +35,5 @@ package org.sat4j.pb.constraints.pb;
  * 
  */
 public interface IPostProcess {
-    void postProcess(int dl);
+    void postProcess(int dl, ConflictMap conflictMap);
 }

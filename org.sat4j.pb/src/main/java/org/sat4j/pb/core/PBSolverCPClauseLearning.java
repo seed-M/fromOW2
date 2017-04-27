@@ -92,7 +92,7 @@ public class PBSolverCPClauseLearning extends PBSolverCPLong {
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
         return ConflictMapReduceToClause.createConflict(myconfl, level,
-                noRemove, PostProcessToClause.class);
+                noRemove, PostProcessToClause.instance());
     }
 
     @Override
