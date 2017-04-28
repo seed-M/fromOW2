@@ -69,8 +69,10 @@ import org.sat4j.pb.core.PBSolverCPCardLearning;
 import org.sat4j.pb.core.PBSolverCPClauseLearning;
 import org.sat4j.pb.core.PBSolverCPLong;
 import org.sat4j.pb.core.PBSolverCPLongDivideBy2;
+import org.sat4j.pb.core.PBSolverCPLongDivideByGCD;
 import org.sat4j.pb.core.PBSolverCPLongReduceToCard;
 import org.sat4j.pb.core.PBSolverCPLongRounding;
+import org.sat4j.pb.core.PBSolverCPReduceByGCD;
 import org.sat4j.pb.core.PBSolverCPReduceByPowersOf2;
 //import org.sat4j.pb.core.PBSolverCard;
 import org.sat4j.pb.core.PBSolverCautious;
@@ -609,18 +611,17 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
         return solver;
     }
 
-    // private static PBSolverCP newPBCPReduceByGCD(PBDataStructureFactory dsf,
-    // IOrder order, boolean noRemove) {
-    // MiniSATLearning<PBDataStructureFactory> learning = new
-    // MiniSATLearning<PBDataStructureFactory>();
-    // PBSolverCP solver = new PBSolverCPReduceByGCD(learning, dsf, order,
-    // noRemove);
-    // learning.setDataStructureFactory(solver.getDSFactory());
-    // learning.setVarActivityListener(solver);
-    // solver.setRestartStrategy(new ArminRestarts());
-    // solver.setLearnedConstraintsDeletionStrategy(solver.lbd_based);
-    // return solver;
-    // }
+    private static PBSolverCP newPBCPReduceByGCD(PBDataStructureFactory dsf,
+            IOrder order, boolean noRemove) {
+        MiniSATLearning<PBDataStructureFactory> learning = new MiniSATLearning<PBDataStructureFactory>();
+        PBSolverCP solver = new PBSolverCPReduceByGCD(learning, dsf, order,
+                noRemove);
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        solver.setRestartStrategy(new ArminRestarts());
+        solver.setLearnedConstraintsDeletionStrategy(solver.lbd_based);
+        return solver;
+    }
 
     private static PBSolverCP newPBCPStar(PBDataStructureFactory dsf,
             IOrder order, boolean noRemove) {
@@ -663,6 +664,18 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
             IOrder order, boolean noRemove) {
         MiniSATLearning<PBDataStructureFactory> learning = new MiniSATLearning<PBDataStructureFactory>();
         PBSolverCP solver = new PBSolverCPLongDivideBy2(learning, dsf, order,
+                noRemove);
+        learning.setDataStructureFactory(solver.getDSFactory());
+        learning.setVarActivityListener(solver);
+        solver.setRestartStrategy(new ArminRestarts());
+        solver.setLearnedConstraintsDeletionStrategy(solver.lbd_based);
+        return solver;
+    }
+
+    private static PBSolverCP newPBCPStarDivideByGCD(PBDataStructureFactory dsf,
+            IOrder order, boolean noRemove) {
+        MiniSATLearning<PBDataStructureFactory> learning = new MiniSATLearning<PBDataStructureFactory>();
+        PBSolverCP solver = new PBSolverCPLongDivideByGCD(learning, dsf, order,
                 noRemove);
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
@@ -723,10 +736,10 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
                 new VarOrderHeapObjective(), true);
     }
 
-    // public static IPBSolver newCuttingPlanesReduceByGCD() {
-    // return newPBCPReduceByGCD(new PBMaxClauseCardConstrDataStructure(),
-    // new VarOrderHeapObjective(), true);
-    // }
+    public static IPBSolver newCuttingPlanesReduceByGCD() {
+        return newPBCPReduceByGCD(new PBMaxClauseCardConstrDataStructure(),
+                new VarOrderHeapObjective(), true);
+    }
 
     public static IPBSolver newCuttingPlanesStar() {
         return newPBCPStar(new PBMaxClauseCardConstrDataStructure(),
@@ -756,6 +769,11 @@ public final class SolverFactory extends ASolverFactory<IPBSolver> {
 
     public static IPBSolver newCuttingPlanesStarDivideBy2() {
         return newPBCPStarDivideBy2(new PBMaxClauseCardConstrDataStructure(),
+                new VarOrderHeapObjective(), true);
+    }
+
+    public static IPBSolver newCuttingPlanesStarDivideByGCD() {
+        return newPBCPStarDivideByGCD(new PBMaxClauseCardConstrDataStructure(),
                 new VarOrderHeapObjective(), true);
     }
 

@@ -356,11 +356,11 @@ public class ConflictMap extends MapPb implements IConflict {
         // saturation
         this.degree = saturation();
         assert slackConflict().signum() < 0;
-        decreaseCoefs();
+        divideCoefs();
         return this.degree;
     }
 
-    void decreaseCoefs() {
+    void divideCoefs() {
     }
 
     /**

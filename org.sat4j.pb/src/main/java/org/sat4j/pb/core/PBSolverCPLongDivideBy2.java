@@ -33,7 +33,7 @@ import org.sat4j.minisat.core.IOrder;
 import org.sat4j.minisat.core.LearningStrategy;
 import org.sat4j.minisat.core.RestartStrategy;
 import org.sat4j.minisat.core.SearchParams;
-import org.sat4j.pb.constraints.pb.ConflictMapReduceToClause;
+import org.sat4j.pb.constraints.pb.ConflictMap;
 import org.sat4j.pb.constraints.pb.IConflict;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.pb.constraints.pb.PostProcessDivideBy2;
@@ -86,8 +86,8 @@ public class PBSolverCPLongDivideBy2 extends PBSolverCPLong {
 
     @Override
     protected IConflict chooseConflict(PBConstr myconfl, int level) {
-        return ConflictMapReduceToClause.createConflict(myconfl, level,
-                noRemove, PostProcessDivideBy2.instance(), stats);
+        return ConflictMap.createConflict(myconfl, level, noRemove,
+                PostProcessDivideBy2.instance(), stats);
     }
 
     @Override

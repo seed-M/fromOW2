@@ -46,6 +46,8 @@ public class PBSolverStats extends SolverStats {
 
     public long numberOfRightShiftsForCoeffs;
 
+    public long numberOfReductionsByGCD;
+
     public long numberOfLearnedConstraintsReduced;
 
     public long numberOfResolution;
@@ -66,6 +68,7 @@ public class PBSolverStats extends SolverStats {
         this.numberOfRoundingOperations = 0;
         this.numberOfReductionsByPower2 = 0;
         this.numberOfRightShiftsForCoeffs = 0;
+        this.numberOfReductionsByGCD = 0;
     }
 
     @Override
@@ -92,6 +95,9 @@ public class PBSolverStats extends SolverStats {
         out.println(
                 prefix + "number of right shift for reduction by power 2 \t: "
                         + this.numberOfRightShiftsForCoeffs);
+        out.println(
+                prefix + "number of reductions of the coefficients by GCD over coefficients \t: "
+                        + this.numberOfReductionsByGCD);
     }
 
 }

@@ -98,27 +98,27 @@ public class MapPb implements IDataStructurePB {
             return 0;
     }
 
-    public boolean reduceCoeffsByGCD() {
+    public int reduceCoeffsByGCD() {
         if (this.weightedLits.size() > 0) {
             BigInteger gcd = this.weightedLits.getCoef(0);
             for (int i = 0; i < this.weightedLits.size()
-                    && gcd.compareTo(BigInteger.ZERO) > 0; i++) {
+                    && gcd.compareTo(BigInteger.ONE) > 0; i++) {
                 gcd = gcd.gcd(this.weightedLits.getCoef(i));
             }
-            if (gcd.compareTo(BigInteger.ZERO) > 0) {
+            if (gcd.compareTo(BigInteger.ONE) > 0) {
                 for (int i = 0; i < this.weightedLits.size(); i++) {
                     changeCoef(i, this.weightedLits.getCoef(i).divide(gcd));
                 }
                 // diviser le degre
                 BigInteger[] result = this.degree.divideAndRemainder(gcd);
+                this.degree = result[0];
                 if (result[1].compareTo(BigInteger.ZERO) > 0) {
                     this.degree = this.degree.add(BigInteger.ONE);
                 }
-                return true;
             }
-            return false;
+            return gcd.intValue();
         } else
-            return false;
+            return 1;
     }
 
     public boolean isCardinality() {
