@@ -356,8 +356,11 @@ public class ConflictMap extends MapPb implements IConflict {
         // saturation
         this.degree = saturation();
         assert slackConflict().signum() < 0;
-
+        decreaseCoefs();
         return this.degree;
+    }
+
+    void decreaseCoefs() {
     }
 
     /**
@@ -534,31 +537,16 @@ public class ConflictMap extends MapPb implements IConflict {
         BigInteger tmp;
         int level = levelToIndex(this.currentLevel);
         if (this.byLevel[level] != null) {
-            // first falsified ones
             for (IteratorInt iterator = this.byLevel[level].iterator(); iterator
                     .hasNext();) {
                 lit = iterator.next();
                 tmp = this.weightedLits.get(lit);
-                if (tmp != null // && !this.voc.isUnassigned(lit)
-                        && slack.compareTo(tmp) < 0) {
+                if (tmp != null && slack.compareTo(tmp) < 0) {
                     this.assertiveLiteral = this.weightedLits
                             .getFromAllLits(lit);
                     return true;
                 }
             }
-            // second, satisfied ones
-            // for (IteratorInt iterator = this.byLevel[level].iterator();
-            // iterator
-            // .hasNext();) {
-            // lit = iterator.next();
-            // tmp = this.weightedLits.get(lit);
-            // if (tmp != null && this.voc.isSatisfied(lit)
-            // && slack.compareTo(tmp) < 0) {
-            // this.assertiveLiteral = this.weightedLits
-            // .getFromAllLits(lit);
-            // return true;
-            // }
-            // }
         }
         return false;
     }

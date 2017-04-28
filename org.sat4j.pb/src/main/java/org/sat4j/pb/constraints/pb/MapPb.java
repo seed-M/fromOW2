@@ -75,27 +75,50 @@ public class MapPb implements IDataStructurePB {
     }
 
     public int reduceCoeffsByPower2() {
-        assert this.weightedLits.size() > 0;
-        int nbBits = this.weightedLits.getCoef(0).bitLength();
-        for (int i = 0; i < this.weightedLits.size() && nbBits > 0; i++) {
-            nbBits = Math.min(nbBits,
-                    this.weightedLits.getCoef(i).getLowestSetBit());
-            if (nbBits == 0)
-                break;
-        }
-        if (nbBits > 0) {
-            for (int i = 0; i < this.weightedLits.size(); i++) {
-                this.weightedLits.changeCoef(i,
-                        this.weightedLits.getCoef(i).shiftRight(nbBits));
+        if (this.weightedLits.size() > 0) {
+            int nbBits = this.weightedLits.getCoef(0).bitLength();
+            for (int i = 0; i < this.weightedLits.size() && nbBits > 0; i++) {
+                nbBits = Math.min(nbBits,
+                        this.weightedLits.getCoef(i).getLowestSetBit());
             }
-            // diviser le degre
-            int nbBitsDegree = this.degree.getLowestSetBit();
-            this.degree = this.degree.shiftRight(nbBits);
-            if (nbBitsDegree < nbBits) {
-                this.degree = this.degree.add(BigInteger.ONE);
+            if (nbBits > 0) {
+                for (int i = 0; i < this.weightedLits.size(); i++) {
+                    changeCoef(i,
+                            this.weightedLits.getCoef(i).shiftRight(nbBits));
+                }
+                // diviser le degre
+                int nbBitsDegree = this.degree.getLowestSetBit();
+                this.degree = this.degree.shiftRight(nbBits);
+                if (nbBitsDegree < nbBits) {
+                    this.degree = this.degree.add(BigInteger.ONE);
+                }
             }
-        }
-        return nbBits;
+            return nbBits;
+        } else
+            return 0;
+    }
+
+    public boolean reduceCoeffsByGCD() {
+        if (this.weightedLits.size() > 0) {
+            BigInteger gcd = this.weightedLits.getCoef(0);
+            for (int i = 0; i < this.weightedLits.size()
+                    && gcd.compareTo(BigInteger.ZERO) > 0; i++) {
+                gcd = gcd.gcd(this.weightedLits.getCoef(i));
+            }
+            if (gcd.compareTo(BigInteger.ZERO) > 0) {
+                for (int i = 0; i < this.weightedLits.size(); i++) {
+                    changeCoef(i, this.weightedLits.getCoef(i).divide(gcd));
+                }
+                // diviser le degre
+                BigInteger[] result = this.degree.divideAndRemainder(gcd);
+                if (result[1].compareTo(BigInteger.ZERO) > 0) {
+                    this.degree = this.degree.add(BigInteger.ONE);
+                }
+                return true;
+            }
+            return false;
+        } else
+            return false;
     }
 
     public boolean isCardinality() {
