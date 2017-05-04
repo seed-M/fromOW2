@@ -24,8 +24,8 @@ import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.TimeoutException;
 
-public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
-        ManyCorePB<IPBSolver> {
+public class PreprocCardConstrLearningSolver<S extends IPBSolver>
+        extends ManyCorePB<IPBSolver> {
 
     private static final long serialVersionUID = 1L;
 
@@ -103,8 +103,8 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
 
     private void sat4jPreprocessing() {
         if (verbose)
-            System.out
-                    .println("c launching cardinality constraint revelation process");
+            System.out.println(
+                    "c launching cardinality constraint revelation process");
         long start = System.currentTimeMillis();
         this.cardFinder.searchCards();
         doPreprocessing();
@@ -113,7 +113,7 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
         PrintWriter out = new PrintWriter(System.out, true);
         if (verbose)
             printPreprocessingStats(out);
-        this.solvers.set(1, null);
+        this.solvers.get(1).reset();
     }
 
     private void updateObjMinBound(AtLeastCard card) {
@@ -138,8 +138,8 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
 
     private void rissPreprocessing() {
         if (verbose)
-            System.out
-                    .println("c launching cardinality constraint revelation process");
+            System.out.println(
+                    "c launching cardinality constraint revelation process");
         long start = System.currentTimeMillis();
         this.cardFinder.rissPreprocessing(this.rissLocation, this.instance);
         doPreprocessing();
@@ -148,7 +148,7 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
         PrintWriter out = new PrintWriter(System.out, true);
         if (verbose)
             printPreprocessingStats(out);
-        this.solvers.set(1, null);
+        this.solvers.get(1).reset();
     }
 
     private void doPreprocessing() {
@@ -157,15 +157,15 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
             updateObjMinBound(card);
             ++this.preprocessingCardsFound;
             try {
-                this.solvers.get(0)
-                        .addAtLeast(card.getLits(), card.getDegree());
+                this.solvers.get(0).addAtLeast(card.getLits(),
+                        card.getDegree());
             } catch (ContradictionException e) {
             }
         }
         for (AtLeastCard card : this.cardFinder.remainingAtLeastCards()) {
             try {
-                this.solvers.get(0)
-                        .addAtLeast(card.getLits(), card.getDegree());
+                this.solvers.get(0).addAtLeast(card.getLits(),
+                        card.getDegree());
             } catch (ContradictionException e) {
             }
         }
@@ -183,7 +183,8 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
 
     @Override
     public IConstr addClause(IVecInt literals) throws ContradictionException {
-        if (literals.size() > 1 && literals.size() <= this.maxAtMostDegree + 1) {
+        if (literals.size() > 1
+                && literals.size() <= this.maxAtMostDegree + 1) {
             this.cardFinder.addClause(literals);
             return this.solvers.get(1).addClause(literals);
         } else {
@@ -194,8 +195,8 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
     @Override
     public IConstr addPseudoBoolean(IVecInt lits, IVec<BigInteger> coeffs,
             boolean moreThan, BigInteger d) throws ContradictionException {
-        return moreThan ? addAtLeast(lits, coeffs, d) : addAtMost(lits, coeffs,
-                d);
+        return moreThan ? addAtLeast(lits, coeffs, d)
+                : addAtMost(lits, coeffs, d);
     }
 
     @Override
@@ -271,7 +272,8 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
     }
 
     @Override
-    public boolean isSatisfiable(boolean globalTimeout) throws TimeoutException {
+    public boolean isSatisfiable(boolean globalTimeout)
+            throws TimeoutException {
         if (!initDone) {
             init();
         }
@@ -381,10 +383,9 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
                         + cardinality.getKey() + " and size " + size.getKey());
             }
         }
-        System.out
-                .println("c solver contains "
-                        + this.solvers.get(solverIndex).nConstraints()
-                        + " constraints");
+        System.out.println("c solver contains "
+                + this.solvers.get(solverIndex).nConstraints()
+                + " constraints");
     }
 
     @Override
@@ -439,11 +440,6 @@ public class PreprocCardConstrLearningSolver<S extends IPBSolver> extends
 
     @Override
     public boolean removeConstr(IConstr c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeSubsumedConstr(IConstr c) {
         throw new UnsupportedOperationException();
     }
 
