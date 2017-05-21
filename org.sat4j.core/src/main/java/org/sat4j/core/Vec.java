@@ -263,6 +263,26 @@ public final class Vec<T> implements IVec<T> {
     }
 
     /**
+     * Remove an element that belongs to the Vector. The method will break if
+     * the element does not belong to the vector. While {@link #remove(T)} look
+     * from the beginning of the vector, this method starts from the end of the
+     * vector.
+     * 
+     * @param elem
+     *            an element from the vector.
+     */
+    public void removeFromLast(T elem) {
+        int j = this.nbelem - 1;
+        for (; this.myarray[j] != elem; j--) {
+            if (j == -1)
+                throw new NoSuchElementException();
+        }
+        // arraycopy is always faster than manual copy
+        System.arraycopy(this.myarray, j + 1, this.myarray, j, size() - j - 1);
+        this.myarray[--this.nbelem] = null;
+    }
+
+    /**
      * Delete the ith element of the vector. The latest element of the vector
      * replaces the removed element at the ith indexer.
      * 

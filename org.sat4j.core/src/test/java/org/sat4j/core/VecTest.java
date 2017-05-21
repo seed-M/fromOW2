@@ -33,9 +33,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import junit.framework.TestCase;
-
 import org.sat4j.specs.IVec;
+
+import junit.framework.TestCase;
 
 /*
  * Created on 16 oct. 2003
@@ -321,6 +321,23 @@ public class VecTest extends TestCase {
         nvec.push(toRemove);
         assertEquals(1, nvec.size());
         nvec.remove(toRemove);
+        assertEquals(0, nvec.size());
+    }
+
+    public void testRemoveFromLast() {
+        IVec<Integer> nvec = new Vec<Integer>();
+        for (int i = 0; i < 100; i++) {
+            nvec.push(new Integer(i));
+        }
+        Integer toRemove = nvec.get(10);
+        nvec.removeFromLast(toRemove);
+        assertEquals(99, nvec.size());
+        assertEquals(new Integer(11), nvec.get(10));
+        nvec.clear();
+        toRemove = new Integer(1);
+        nvec.push(toRemove);
+        assertEquals(1, nvec.size());
+        nvec.removeFromLast(toRemove);
         assertEquals(0, nvec.size());
     }
 

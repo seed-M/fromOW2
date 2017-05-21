@@ -32,6 +32,7 @@ package org.sat4j.specs;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An abstraction on the type of vector used in the library.
@@ -110,12 +111,25 @@ public interface IVec<T> extends Serializable, Cloneable {
     void set(int i, T o);
 
     /**
-     * Enleve un element qui se trouve dans le vecteur!!!
+     * Remove an element from the vector.
      * 
      * @param elem
-     *            un element du vecteur
+     *            an element of the vector
+     * @throws NoSuchElementException
+     *             if elem is not found in the vector.
      */
     void remove(T elem);
+
+    /**
+     * Remove an element from the vector, starting with the last element.
+     * 
+     * @param elem
+     *            an element of the vector
+     * @throws NoSuchElementException
+     *             if elem is not found in the vector.
+     * @since 2.3.6
+     */
+    void removeFromLast(T elem);
 
     /**
      * Delete the ith element of the vector. The latest element of the vector

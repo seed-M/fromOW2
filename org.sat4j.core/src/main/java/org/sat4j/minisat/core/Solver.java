@@ -433,7 +433,7 @@ public class Solver<D extends DataStructureFactory>
         }
         Constr c = (Constr) co;
         c.remove(this);
-        this.constrs.remove(c);
+        this.constrs.removeFromLast(c);
         clearLearntClauses();
         String type = c.getClass().getName();
         this.constrTypes.get(type).dec();

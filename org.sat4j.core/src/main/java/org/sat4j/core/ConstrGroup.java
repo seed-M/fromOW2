@@ -29,8 +29,6 @@
  *******************************************************************************/
 package org.sat4j.core;
 
-import java.util.Iterator;
-
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVec;
@@ -80,8 +78,8 @@ public class ConstrGroup implements IConstr {
     }
 
     public void removeFrom(ISolver solver) {
-        for (Iterator<IConstr> it = this.constrs.iterator(); it.hasNext();) {
-            solver.removeConstr(it.next());
+        for (int i = constrs.size() - 1; i >= 0; i--) {
+            solver.removeConstr(constrs.get(i));
         }
     }
 

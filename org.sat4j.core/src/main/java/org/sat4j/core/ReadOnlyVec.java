@@ -124,6 +124,10 @@ public final class ReadOnlyVec<T> implements IVec<T> {
         throw new UnsupportedOperationException();
     }
 
+    public void removeFromLast(T elem) {
+        throw new UnsupportedOperationException();
+    }
+
     public void set(int i, T o) {
         throw new UnsupportedOperationException();
     }
