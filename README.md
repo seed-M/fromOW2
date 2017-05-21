@@ -1,16 +1,20 @@
-HOW TO BUILD SAT4J FROM SOURCE
+# HOW TO BUILD SAT4J FROM SOURCE
 
-+ Using Maven
+
+## Using Maven (library users)
 
 Just launch 
 
-$ mvn -Dmaven.test.skip=true install
+```shell
+$ mvn -DskipTests=true install
+```
 
 to build the SAT4J modules from the source tree.
 
 All the dependencies will be gathered by Maven.
 
-+ Using ant
+
+## Using ant (solvers users)
 
 Download the missing libraries and put them in the lib directory:
 + Apache commons CLI
@@ -19,7 +23,26 @@ Download the missing libraries and put them in the lib directory:
 
 Just type:
 
-$ ant 
+```shell
+$ ant [core,pseudo,maxsat,sat]
+```
 
-to build the modules from source.
+to build the solvers from source.
 
+The solvers will be available in the directory `dist/CUSTOM`.
+
+You may want to use a custom release name.
+
+```shell
+$ ant -Drelease=MINE maxsat
+```
+
+In that case, the solvers will be available in the directory `dist/MINE`.
+
+Type
+
+```shell
+$ ant -p
+```
+
+to see available options.
