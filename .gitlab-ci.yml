@@ -6,7 +6,7 @@ cache:
 mybuild:
     stage: build
     script: 
-      - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent deploy sonar:sonar -Dmaven.test.failure.ignore=true -Dmaven.repo.local=/cache/maven.repo
+      - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent --settings settings.xml deploy sonar:sonar -Dmaven.test.failure.ignore=true -Dmaven.repo.local=/cache/maven.repo
     artifacts:
        paths:
         - org.*/target/*.jar
