@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.sat4j.AbstractLauncher;
 import org.sat4j.ILauncherMode;
-import org.sat4j.pb.tools.PBAdapter;
 import org.sat4j.reader.ECSPFormat;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
@@ -55,7 +54,7 @@ public class CSPLauncher extends AbstractLauncher {
 		if (args.length == 2) {
 			asolver = SolverFactory.instance().createSolverByName(args[0]);
 		} else {
-			asolver = new CspSatSolverDecorator(new PBAdapter(SolverFactory.newDefault()));
+			asolver = new CspSatSolverDecorator(org.sat4j.pb.SolverFactory.newDefault());
 		}
 		log(asolver.toString(COMMENT_PREFIX));
 		this.shouldOnlyDisplayEncoding = asolver.shouldOnlyDisplayEncoding();
