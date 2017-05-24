@@ -21,6 +21,7 @@ package org.sat4j.csp.constraints3;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.sat4j.csp.intension.ICspToSatEncoder;
 import org.sat4j.csp.intension.IIntensionCtrEncoder;
 import org.sat4j.reader.XMLCSP3Reader;
 import org.xcsp.common.Types.TypeOperatorRel;
@@ -40,19 +41,20 @@ public class ComparisonCtrBuilder {
 	public ComparisonCtrBuilder(IIntensionCtrEncoder intensionEnc) {
 		this.intensionCtrEncoder = intensionEnc;
 	}
-
-	public boolean buildCtrAllDifferent(XVarInteger[] list) { // TODO:
-																			// remove
-																			// dependence
-																			// to
-																			// varmapping
+	
+	public boolean buildCtrAllDifferent(XVarInteger[] list) {
+		final ICspToSatEncoder solver = this.intensionCtrEncoder.getSolver();
 		for (int i = 0; i < list.length - 1; ++i) {
-			final String norm1 = CtrBuilderUtils.normalizeCspVarName(list[i].id);
+			final int[] d1 = solver.getCspVarDomain(list[i].id);
 			for (int j = i + 1; j < list.length; ++j) {
-				final String norm2 = CtrBuilderUtils.normalizeCspVarName(list[j].id);
-				final String expr = "ne(" + norm1 + "," + norm2 + ")";
-				if (this.intensionCtrEncoder.encode(expr))
-					return true;
+				final int[] d2 = solver.getCspVarDomain(list[j].id);
+				for(int v1 : d1) {
+					for(int v2 : d2) {
+						if(v1 == v2) {
+							solver.addClause(new int[]{-solver.getSolverVar(list[i].id, v1), -solver.getSolverVar(list[j].id, v2)});
+						}
+					}
+				}
 			}
 		}
 		return false;
