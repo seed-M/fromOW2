@@ -76,7 +76,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 	private boolean encodeExpression(IExpression expression) {
 		Map<Integer, Integer> map = encodeWithTseitin(expression);
 		for(Map.Entry<Integer, Integer> entry : map.entrySet()) {
-			this.solver.addClause(new int[]{entry.getKey() == 0 ? -entry.getValue() : entry.getValue()});
+			this.solver.addClause(new int[]{entry.getKey().equals(0) ? -entry.getValue() : entry.getValue()});
 		}
 		return false;
 	}
@@ -371,7 +371,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()!=entry2.getKey()?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), !entry1.getKey().equals(entry2.getKey())?1:0);
 			}
 		}
 		return ret;
@@ -404,7 +404,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 	public Map<Integer, Integer> encodeOperatorNot(List<Map<Integer,Integer>> mappings) {
 		Map<Integer, Integer> ret = new HashMap<>();
 		for(Map.Entry<Integer, Integer> entry : mappings.get(0).entrySet()) {
-			ret.put(entry.getKey()==0 ? 1 : 0, entry.getValue());
+			ret.put(entry.getKey().equals(0) ? 1 : 0, entry.getValue());
 		}
 		return ret;
 	}
@@ -419,7 +419,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()!=0 && entry2.getKey()!=0?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), !entry1.getKey().equals(0) && !entry2.getKey().equals(0)?1:0);
 			}
 		}
 		return ret;
@@ -435,7 +435,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()!=0 || entry2.getKey()!=0?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), !entry1.getKey().equals(0) || !entry2.getKey().equals(0)?1:0);
 			}
 		}
 		return ret;
@@ -451,7 +451,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()!=0 ^ entry2.getKey()!=0?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), !entry1.getKey().equals(0) ^ !entry2.getKey().equals(0)?1:0);
 			}
 		}
 		return ret;
@@ -467,7 +467,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), (entry1.getKey()!=0) == (entry2.getKey()!=0)?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), (!entry1.getKey().equals(0)) == (!entry2.getKey().equals(0))?1:0);
 			}
 		}
 		return ret;
@@ -483,7 +483,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()==0 || entry2.getKey()!=0?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey().equals(0) || !entry2.getKey().equals(0)?1:0);
 			}
 		}
 		return ret;
@@ -500,7 +500,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 				Iterator<Entry<Integer, Integer>> it3 = mappings.get(2).entrySet().iterator();
 				while(it3.hasNext()) {
 					Entry<Integer, Integer> entry3 = it3.next();
-					buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry3.getValue(), entry1.getKey()!=0?entry2.getKey():entry3.getKey());
+					buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry3.getValue(), !entry1.getKey().equals(0)?entry2.getKey():entry3.getKey());
 				}
 			}
 		}
