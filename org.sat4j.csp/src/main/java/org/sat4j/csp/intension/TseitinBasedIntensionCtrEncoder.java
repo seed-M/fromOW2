@@ -387,7 +387,7 @@ public class TseitinBasedIntensionCtrEncoder implements IIntensionCtrEncoder {
 			Iterator<Entry<Integer, Integer>> it2 = mappings.get(1).entrySet().iterator();
 			while(it2.hasNext()) {
 				Entry<Integer, Integer> entry2 = it2.next();
-				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey()==entry2.getKey()?1:0);
+				buildImplVar(ret, entry1.getValue(), entry2.getValue(), entry1.getKey().equals(entry2.getKey())?1:0);
 			}
 		}
 		return ret;

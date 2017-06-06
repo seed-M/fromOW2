@@ -68,7 +68,9 @@ public class CountingCtrBuilder {
 			exprBuf.append(',');
 		}
 		varId = list[list.length-1].id;
-		exprBuf.append(CtrBuilderUtils.normalizeCspVarName(varId));
+		final int lastCoeff = coeffs[list.length-1];
+		final String normName = CtrBuilderUtils.normalizeCspVarName(varId);
+		exprBuf.append(lastCoeff == 1 ? normName : "mul("+lastCoeff+","+normName+")");
 		for(int i=0; i<list.length-1; ++i) {
 			exprBuf.append(')');
 		}
