@@ -807,7 +807,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	 */
 	@Override
 	public void buildCtrElement(String id, XVarInteger[] list, int value) {
-		this.contradictionFound |= this.connectionCtrBuilder.buildCtrElement(id, list, 0, null, TypeRank.ANY, value);
+		this.contradictionFound |= this.connectionCtrBuilder.buildCtrElement(id, list, value);
 	}
 
 	/**
@@ -823,7 +823,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	 */
 	@Override
 	public void buildCtrElement(String id, XVarInteger[] list, XVarInteger value) {
-		this.contradictionFound |= this.connectionCtrBuilder.buildCtrElement(id, list, 0, null, TypeRank.ANY, value);
+		this.contradictionFound |= this.connectionCtrBuilder.buildCtrElement(id, list, value);
 	}
 
 	/**
