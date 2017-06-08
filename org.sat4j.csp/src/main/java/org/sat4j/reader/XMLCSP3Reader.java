@@ -570,6 +570,11 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		this.contradictionFound |= this.countingCtrBuilder.buildCtrSum(id, list, coeffs, condition);
 	}
 
+	@Override
+	public void buildCtrSum(String id, XVarInteger[] list, XVarInteger[] coeffs, Condition condition) {
+		this.contradictionFound |= this.countingCtrBuilder.buildCtrSum(id, list, coeffs, condition);
+	}
+
 	/**
 	 * @see XCallbacks2#buildCtrLex(String, XVarInteger[][], TypeOperator)
 	 */

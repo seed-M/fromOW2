@@ -88,6 +88,39 @@ public class CountingCtrBuilder {
 		return this.intensionCtrEnc.encode(expr);
 	}
 
+	public boolean buildCtrSum(String id, XVarInteger[] list, XVarInteger[] coeffs, Condition condition) {
+		String varId;
+		StringBuilder exprBuf = new StringBuilder();
+		exprBuf.append(((ConditionRel)condition).operator.toString().toLowerCase());
+		exprBuf.append('(');
+		for(int i=0; i<list.length-1; ++i) {
+			exprBuf.append("add(");
+			exprBuf.append("mul(").append(CtrBuilderUtils.normalizeCspVarName(coeffs[i].id)).append(',');
+			varId = list[i].id;
+			exprBuf.append(CtrBuilderUtils.normalizeCspVarName(varId));
+			exprBuf.append(')');
+			exprBuf.append(',');
+		}
+		varId = list[list.length-1].id;
+		final String normName = CtrBuilderUtils.normalizeCspVarName(varId);
+		exprBuf.append("mul("+CtrBuilderUtils.normalizeCspVarName(coeffs[list.length-1].id)+","+normName+")");
+		for(int i=0; i<list.length-1; ++i) {
+			exprBuf.append(')');
+		}
+		exprBuf.append(',');
+		if(condition instanceof ConditionVar) {
+			varId = ((ConditionVar) condition).x.id();
+			exprBuf.append(CtrBuilderUtils.normalizeCspVarName(varId));
+		} else if(condition instanceof ConditionVal) {
+			exprBuf.append(((ConditionVal) condition).k);
+		} else {
+			throw new UnsupportedOperationException("this kind of condition is not supported yet.");
+		}
+		exprBuf.append(')');
+		String expr = exprBuf.toString();
+		return this.intensionCtrEnc.encode(expr);
+	}
+
 	public boolean buildCtrCount(String id, XVarInteger[] list, int[] values, Condition condition) {
 		return buildCtrCount(id, list, values, StringCondition.buildStringCondition(condition));
 	}
