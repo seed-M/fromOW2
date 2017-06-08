@@ -248,7 +248,7 @@ public class CountingCtrBuilder {
 	}
 
 	public boolean buildCtrNotAllEqual(String id, XVarInteger[] list) {
-		return buildCtrNValues(id, list, new StringCondition("ne(", ","+Integer.toString(list.length)+")"));
+		return buildCtrNValues(id, list, new StringCondition("ne(", ",1)"));
 	}
 
 	public boolean buildCtrCardinality(String id, XVarInteger[] list, boolean closed, int[] values, XVarInteger[] occurs) {
