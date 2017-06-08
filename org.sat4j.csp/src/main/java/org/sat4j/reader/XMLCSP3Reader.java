@@ -21,6 +21,7 @@ package org.sat4j.reader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.sat4j.csp.intension.ICspToSatEncoder;
 import org.sat4j.csp.intension.IIntensionCtrEncoder;
 import org.sat4j.csp.intension.IntensionCtrEncoderFactory;
 import org.sat4j.pb.IPBSolver;
+import org.sat4j.pb.ObjectiveFunction;
 import org.sat4j.pb.PseudoOptDecorator;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
@@ -172,8 +174,14 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		StringBuilder strModelBuffer = new StringBuilder();
 		switch(this.launcher.getExitCode()) {
 		case OPTIMUM_FOUND:
+			final ObjectiveFunction obj = this.solver.getObjectiveFunction();
+			BigInteger degree = obj.calculateDegree(this.solver);
+			final BigInteger correction = obj.getCorrection();
+			if(!correction.equals(BigInteger.ZERO)) {
+				degree = degree.multiply(correction);
+			}
 			strModelBuffer.append("<instantiation type=\"optimum\" cost=\"")
-				.append(this.solver.getObjectiveFunction().calculateDegree(this.solver).toString())
+				.append(degree.toString())
 				.append("\">\n");
 			appendModel(strModelBuffer, model);
 			break;
