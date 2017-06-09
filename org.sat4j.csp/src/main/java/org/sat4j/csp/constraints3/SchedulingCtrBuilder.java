@@ -42,11 +42,8 @@ public class SchedulingCtrBuilder {
 
 	private final IIntensionCtrEncoder intensionEnc;
 
-	private final ComparisonCtrBuilder comparisonCtrBuilder;
-
-	public SchedulingCtrBuilder(IIntensionCtrEncoder intensionEnc, ComparisonCtrBuilder comparisonCtrBuilder) {
+	public SchedulingCtrBuilder(IIntensionCtrEncoder intensionEnc) {
 		this.intensionEnc = intensionEnc;
-		this.comparisonCtrBuilder = comparisonCtrBuilder;
 	}
 	
 	public boolean buildCtrStretch(String id, XVarInteger[] list, int[] values, int[] widthsMin, int[] widthsMax) {

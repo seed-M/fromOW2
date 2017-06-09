@@ -138,7 +138,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		this.elementaryCtrBuilder = new ElementaryCtrBuilder(this.intensionEnc);
 		this.comparisonCtrBuilder = new ComparisonCtrBuilder(this.intensionEnc);
 		this.connectionCtrBuilder = new ConnectionCtrBuilder(this.intensionEnc);
-		this.schedulingCtrBuilder = new SchedulingCtrBuilder(this.intensionEnc, this.comparisonCtrBuilder);
+		this.schedulingCtrBuilder = new SchedulingCtrBuilder(this.intensionEnc);
 		this.genericCtrBuilder = new GenericCtrBuilder(this.intensionEnc);
 		this.countingCtrBuilder = new CountingCtrBuilder(this.intensionEnc);
 		this.languageCtrBuilder = new LanguageCtrBuilder(this.cspToSatEncoder);
