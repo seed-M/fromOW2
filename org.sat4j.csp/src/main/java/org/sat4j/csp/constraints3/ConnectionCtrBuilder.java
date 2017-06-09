@@ -41,6 +41,22 @@ public class ConnectionCtrBuilder {
 		this.intensionCtrEncoder = intensionEnc;
 	}
 	
+	public boolean buildCtrChannel(String id, XVarInteger[] list, int startIndex, XVarInteger value) {
+		for(int i=0; i<list.length; ++i) {
+			final String[] andParts = new String[list.length];
+			for(int j=0; j<list.length; ++j) {
+				final String normJ = CtrBuilderUtils.normalizeCspVarName(list[j].id);
+				andParts[j] = "eq("+normJ+","+(i==j ? 1 : 0)+")";
+			}
+			final String andExpr = CtrBuilderUtils.chainExpressionsForAssociativeOp(andParts, "and");
+			final String expr = "imp(eq("+CtrBuilderUtils.normalizeCspVarName(value.id)+","+(i+startIndex)+"),"+andExpr+")";
+			if(this.intensionCtrEncoder.encode(expr)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean buildCtrChannel(String id, XVarInteger[] list1, int startIndex1, XVarInteger[] list2, int startIndex2) {
 		if(list1.length != list2.length) {
 			throw new IllegalArgumentException("lists of different sizes provided as arguments of channel constraint");

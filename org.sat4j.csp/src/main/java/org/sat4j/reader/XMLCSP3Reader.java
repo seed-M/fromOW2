@@ -138,7 +138,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 		this.elementaryCtrBuilder = new ElementaryCtrBuilder(this.intensionEnc);
 		this.comparisonCtrBuilder = new ComparisonCtrBuilder(this.intensionEnc);
 		this.connectionCtrBuilder = new ConnectionCtrBuilder(this.intensionEnc);
-		this.schedulingCtrBuilder = new SchedulingCtrBuilder(this.intensionEnc);
+		this.schedulingCtrBuilder = new SchedulingCtrBuilder(this.intensionEnc, this.comparisonCtrBuilder);
 		this.genericCtrBuilder = new GenericCtrBuilder(this.intensionEnc);
 		this.countingCtrBuilder = new CountingCtrBuilder(this.intensionEnc);
 		this.languageCtrBuilder = new LanguageCtrBuilder(this.cspToSatEncoder);
@@ -620,7 +620,7 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	 */
 	@Override
 	public void buildCtrChannel(String id, XVarInteger[] list, int startIndex, XVarInteger value) {
-		unimplementedCase(id); // TODO: check (again) set variables are not supported yet 
+		this.contradictionFound |= this.connectionCtrBuilder.buildCtrChannel(id, list, startIndex, value); 
 	}
 
 	/**
@@ -941,6 +941,23 @@ public class XMLCSP3Reader extends Reader implements XCallbacks2 {
 	@Override
 	public void buildCtrClause(String id, XVarInteger[] pos, XVarInteger[] neg) { // TODO: externalize
 		this.contradictionFound |= this.elementaryCtrBuilder.buildCtrClause(id, pos, neg);
+	}
+
+	@Override
+	public void buildCtrCircuit(String id, XVarInteger[] list, int startIndex, int size) {
+		unimplementedCase(id); // TODO
+//		this.contradictionFound |= this.packingCtrBuilder.buildCtrCircuit(id, list, startIndex, size);
+	}
+
+	@Override
+	public void buildCtrCircuit(String id, XVarInteger[] list, int startIndex, XVarInteger size) {
+		unimplementedCase(id); // TODO
+//		this.contradictionFound |= this.packingCtrBuilder.buildCtrCircuit(id, list, startIndex, size);
+	}
+
+	@Override
+	public void buildCtrCircuit(String id, XVarInteger[] list, int startIndex) {
+		this.contradictionFound |= this.schedulingCtrBuilder.buildCtrCircuit(id, list, startIndex);
 	}
 
 	public void buildVarSymbolic(XVarSymbolic x, String[] values) {

@@ -433,7 +433,9 @@ public abstract class AbstractLauncher implements Serializable, ILogAble {
     }
 
     protected void flushLog() {
-        this.out.print(logBuffer.toString());
+        if (logBuffer != null) {
+            this.out.print(logBuffer.toString());
+        }
         logBuffer = null;
     }
 

@@ -19,7 +19,10 @@
 package org.sat4j.csp.constraints3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sat4j.csp.intension.IIntensionCtrEncoder;
 import org.sat4j.reader.XMLCSP3Reader;
@@ -39,8 +42,11 @@ public class SchedulingCtrBuilder {
 
 	private final IIntensionCtrEncoder intensionEnc;
 
-	public SchedulingCtrBuilder(IIntensionCtrEncoder intensionEnc) {
+	private final ComparisonCtrBuilder comparisonCtrBuilder;
+
+	public SchedulingCtrBuilder(IIntensionCtrEncoder intensionEnc, ComparisonCtrBuilder comparisonCtrBuilder) {
 		this.intensionEnc = intensionEnc;
+		this.comparisonCtrBuilder = comparisonCtrBuilder;
 	}
 	
 	public boolean buildCtrStretch(String id, XVarInteger[] list, int[] values, int[] widthsMin, int[] widthsMax) {
@@ -469,6 +475,82 @@ public class SchedulingCtrBuilder {
 				if(this.intensionEnc.encode(expr)) return true;
 			}
 		}
+		return false;
+	}
+
+	public boolean buildCtrCircuit(String id, XVarInteger[] list, int startIndex) {
+		final List<List<Integer>> circuits = buildCircuits(new int[list.length], 0);
+		final String circuitsExprs[] = new String[circuits.size()];
+		for(int i=0; i<circuits.size(); ++i) {
+			final List<Integer> circuit = circuits.get(i);
+			final String eqExprs[] = new String[circuit.size()];
+			for(int j=0; j<circuit.size(); ++j) {
+				final String norm = CtrBuilderUtils.normalizeCspVarName(list[j].id);
+				eqExprs[j] = "eq("+norm+","+(circuit.get(j)+startIndex)+")";
+			}
+			circuitsExprs[i] = CtrBuilderUtils.chainExpressionsForAssociativeOp(eqExprs, "and");
+		}
+		final String expr = CtrBuilderUtils.chainExpressionsForAssociativeOp(circuitsExprs, "or");
+		return this.intensionEnc.encode(expr);
+	}
+
+	private List<List<Integer>> buildCircuits(int[] circuit, int length) {
+		if(length == circuit.length) {
+			return returnIfCircuit(circuit);
+		}
+		List<List<Integer>> circuits = new ArrayList<>();
+		for(int i=0; i<circuit.length; ++i) {
+			boolean mustContinue = false;
+			for(int j=0; j<length; ++j) {
+				if(circuit[j] == i) {
+					mustContinue = true;
+					break;
+				}
+			}
+			if(mustContinue) {
+				continue;
+			}
+			circuit[length] = i;
+			circuits.addAll(buildCircuits(circuit, length+1));
+		}
+		return circuits;
+	}
+
+	private List<List<Integer>> returnIfCircuit(int[] circuit) {
+		Set<Integer> visited = new HashSet<>();
+		int i=0;
+		for(; i < circuit.length && circuit[i] == i; ++i) {
+			visited.add(circuit[i]);
+		}
+		if(i < circuit.length) {
+			final int start = i;
+			visited.add(i);
+			for(i=circuit[i]; i!=start; i=circuit[i]) {
+				visited.add(i);
+			}
+			i = start;
+		}
+		for(; i<circuit.length; ++i) {
+			if(circuit[i] == i) {
+				visited.add(i);
+			}
+		}
+		List<List<Integer>> circuits = new ArrayList<>();
+		if(visited.size() == circuit.length) {
+			List<Integer> circuitAsList = new ArrayList<>();
+			Arrays.stream(circuit).forEach(x -> circuitAsList.add(x));
+			circuits.add(circuitAsList);
+		}
+		return circuits;
+	}
+
+	public boolean buildCtrCircuit(String id, XVarInteger[] list, int startIndex, XVarInteger size) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean buildCtrCircuit(String id, XVarInteger[] list, int startIndex, int size) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
