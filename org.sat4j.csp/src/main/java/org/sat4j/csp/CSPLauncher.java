@@ -40,7 +40,9 @@ public class CSPLauncher extends AbstractLauncher {
 	private boolean shouldOnlyDisplayEncoding = false;
 	
 	public CSPLauncher() {
-		bufferizeLog();
+		if(System.getProperty("CompetitionOutput") != null) {
+			bufferizeLog();
+		}
 	}
 
 	/*

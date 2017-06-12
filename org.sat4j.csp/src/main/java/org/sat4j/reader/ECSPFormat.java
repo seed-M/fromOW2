@@ -100,7 +100,10 @@ public enum ECSPFormat {
 			if(shouldOnlyDisplayEncoding) {
 				return pw;
 			}
-			XMLCommentPrintWriter commentPrintWriter = new XMLCommentPrintWriter(pw);
+			if(System.getProperty("CompetitionOutput") != null) {
+				return pw;
+			}
+			final XMLCommentPrintWriter commentPrintWriter = new XMLCommentPrintWriter(pw);
 			commentPrintWriter.addDncPrefix("v ");
 			return commentPrintWriter;
 		}
