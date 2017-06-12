@@ -139,4 +139,14 @@ public class CSPLauncher extends AbstractLauncher {
 			return args[0];
 		return args[1];
 	}
+	
+	@Override
+	protected void displayResult() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        super.displayResult();
+    }
 }
